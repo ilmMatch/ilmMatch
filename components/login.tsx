@@ -12,17 +12,14 @@ export default function Login() {
     const { signup, login, loading } = useAuth()
 
     async function handleSubmit() {
-        console.log("clicked button")
         if (!email || !password || password.length < 6) {
             return
         }
         setAuthenticating(true)
         try {
             if (isRegister) {
-                console.log('Signing up a new user')
                 await signup(email, password)
             } else {
-                console.log('Logging in existing user')
                 await login(email, password)
             }
 

@@ -58,15 +58,15 @@ export function AuthProvider(props: { children: React.ReactNode }) {
                 }
 
                 // if user exists, fetch data from firestore database
-                console.log('Fetching User Data')
-                const docRef = doc(db, 'users', user.uid)
-                const docSnap = await getDoc(docRef)
-                let firebaseData = {}
-                if (docSnap.exists()) {
-                    console.log('Found User Data')
-                    firebaseData = docSnap.data()
-                }
-                setUserDataObj(firebaseData)
+                // const docRef = doc(db, 'users', user.uid)
+                // const docSnap = await getDoc(docRef)
+                // let firebaseData = {}
+                // if (docSnap.exists()) {
+                //     console.log('Found User Data')
+                //     firebaseData = docSnap.data()
+                // }
+                // console.log("firebaseData", firebaseData)
+                // setUserDataObj(firebaseData)
             } catch (err: any) {
                 console.error('Error fetching user data:', err.message);
             } finally {
