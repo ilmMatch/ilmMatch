@@ -19,7 +19,7 @@ export function LogoutButton() {
   }
   return (
     <Button onClick={handleSubmit}>
-      <LogOut /> Loutout
+      <LogOut /> Logout
     </Button>
   );
 }

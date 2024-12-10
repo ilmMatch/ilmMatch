@@ -9,7 +9,13 @@ import {
   User,
   UserCredential,
 } from 'firebase/auth';
-import { doc, DocumentData, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  DocumentData,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import { useContext, useState, useEffect, createContext } from 'react';
 
 interface AuthContextType {
@@ -67,6 +73,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         firstName,
         lastName,
         role: 'user',
+        email,
         timestamp: new Date().toISOString(),
       };
       await setDoc(userRef, userData);
@@ -122,15 +129,15 @@ export function AuthProvider(props: { children: React.ReactNode }) {
           return;
         }
         // if user exists, fetch data from firestore database
-        // const docRef = doc(db, 'users', user.uid)
-        // const docSnap = await getDoc(docRef)
-        // let firebaseData = {}
-        // if (docSnap.exists()) {
-        //     console.log('Found User Data')
-        //     firebaseData = docSnap.data()
-        // }
-        // console.log("firebaseData", firebaseData)
-        // setUserDataObj(firebaseData)
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        let firebaseData = {};
+        if (docSnap.exists()) {
+          console.log('Found User Data');
+          firebaseData = docSnap.data();
+        }
+        console.log('firebaseData', firebaseData);
+        setUserDataObj(firebaseData);
       } catch (err: any) {
         console.error('Error fetching user data:', err.message);
       } finally {

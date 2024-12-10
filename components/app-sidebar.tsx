@@ -28,6 +28,7 @@ import {
 } from './ui/collapsible';
 import { useAuth } from '@/context/AuthProvider';
 import { NavUser } from './sidebar/nav-user';
+import Link from 'next/link';
 
 // Menu items.
 const items = [
@@ -74,10 +75,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
