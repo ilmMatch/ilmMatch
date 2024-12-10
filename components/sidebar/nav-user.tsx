@@ -34,7 +34,10 @@ export function NavUser() {
     email: 'email@gmail.com',
     avatar: 'string',
   };
-
+  if (!userDataObj) {
+    return <>Loading...</>
+  }
+  console.log(userDataObj)
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -43,21 +46,21 @@ export function NavUser() {
             <AvatarImage
               src={user.avatar}
               alt={
-                userDataObj?.firstName.charAt(0) +
-                userDataObj?.lastName.charAt(0)
+                userDataObj.firstName.charAt(0) +
+                userDataObj.lastName.charAt(0)
               }
             />
             <AvatarFallback className="rounded-lg">
-              {userDataObj?.firstName.charAt(0) +
-                userDataObj?.lastName.charAt(0)}
+              {userDataObj.firstName.charAt(0) +
+                userDataObj.lastName.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">
-              {userDataObj?.firstName} {userDataObj?.lastName}
+              {userDataObj.firstName} {userDataObj.lastName}
             </span>
             <span className="truncate text-xs w-40 sm:w-36 ">
-              {userDataObj?.email}
+              {userDataObj.email}
             </span>
           </div>
           <TooltipProvider>
