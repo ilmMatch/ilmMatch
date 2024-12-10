@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -7,25 +7,22 @@ import {
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
-} from "@nextui-org/navbar";
+} from '@nextui-org/navbar';
 // import { Button } from "@nextui-org/button";
-import { Kbd } from "@nextui-org/kbd";
-import { Link } from "@nextui-org/link";
-import { Input } from "@nextui-org/input";
-import { link as linkStyles } from "@nextui-org/theme";
-import NextLink from "next/link";
-import clsx from "clsx";
-import { CircleUserRound, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
+import { Kbd } from '@nextui-org/kbd';
+import { Link } from '@nextui-org/link';
+import { Input } from '@nextui-org/input';
+import { link as linkStyles } from '@nextui-org/theme';
+import NextLink from 'next/link';
+import clsx from 'clsx';
+import { CircleUserRound, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { siteConfig } from '@/config/site';
+import { ThemeSwitch } from '@/components/theme-switch';
 
-import {
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
-import { useAuth } from "@/context/AuthProvider";
-import { LogoutButton, LogoutMobile } from "./Loutout";
+import { Logo } from '@/components/icons';
+import { useAuth } from '@/context/AuthProvider';
+import { LogoutButton, LogoutMobile } from './Loutout';
 
 export const Navbar = () => {
   // const searchInput = (
@@ -49,7 +46,7 @@ export const Navbar = () => {
   //   />
   // );
 
-  const {currentUser, loading} = useAuth()
+  const { currentUser, loading } = useAuth();
   return (
     <NextUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -64,8 +61,8 @@ export const Navbar = () => {
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  linkStyles({ color: 'foreground' }),
+                  'data-[active=true]:text-primary data-[active=true]:font-medium'
                 )}
                 color="foreground"
                 href={item.href}
@@ -83,19 +80,29 @@ export const Navbar = () => {
       >
         {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
         <NavbarItem className="hidden md:flex">
-          {currentUser ? <LogoutButton/> : <Link href="/login">
-          <Button>
-            <Mail /> Login
-            </Button>
-          </Link>}
-          
+          {currentUser ? (
+            <LogoutButton />
+          ) : (
+            <Link href="/login">
+              <Button>
+                <Mail /> Login
+              </Button>
+            </Link>
+          )}
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
-        {currentUser ? <LogoutMobile/> :  <Link href="/login"> <CircleUserRound /></Link>}
-       
+        {currentUser ? (
+          <LogoutMobile />
+        ) : (
+          <Link href="/login">
+            {' '}
+            <CircleUserRound />
+          </Link>
+        )}
+
         <NavbarMenuToggle />
       </NavbarContent>
 

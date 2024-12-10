@@ -5,7 +5,14 @@
     {
       "label": "Next dev",
       "task": "Next.js: run"
+    },
+    {
+      "command": "workbench.action.tasks.runTask",
+      "args": "Prettier: Fix"
+    },
+    {
+      "command": "workbench.action.tasks.runTask",
+      "args": "ESLint: Fix"
     }
   ]
 }
-

@@ -1,46 +1,43 @@
-'use client'
-import { useAuth } from '@/context/AuthProvider'
-import { Button } from '@nextui-org/button'
-import Link from 'next/link'
+'use client';
+import { useAuth } from '@/context/AuthProvider';
+import { Button } from '@nextui-org/button';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 export default function SignupPage() {
-
   const router = useRouter();
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [fName, setfName] = useState('')
-  const [lName, setlName] = useState('')
-  const [confirmPassword, setconfirmPassword] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fName, setfName] = useState('');
+  const [lName, setlName] = useState('');
+  const [confirmPassword, setconfirmPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const { signup, loading, currentUser } = useAuth()
-
+  const { signup, loading, currentUser } = useAuth();
 
   useEffect(() => {
-    if(currentUser){
+    if (currentUser) {
       router.push('/');
     }
-  },[currentUser])
+  }, [currentUser]);
 
   async function handleSubmit() {
     if (!email || !password || password.length < 8 || !fName || !lName) {
-      return
+      return;
     }
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      await signup(email, password, fName, lName)
+      await signup(email, password, fName, lName);
     } catch (err: any) {
-      console.log(err.message)
+      console.log(err.message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-
   }
 
   if (loading) {
-    return (<>Loading</>)
+    return <>Loading</>;
   }
   return (
     <section className="bg-white dark:bg-black">
@@ -53,7 +50,7 @@ export default function SignupPage() {
           />
 
           <div className="hidden lg:relative lg:block lg:p-12">
-            <span className="block text-white" >
+            <span className="block text-white">
               <span className="sr-only">Home</span>
               <svg
                 className="h-8 sm:px-4 py-3"
@@ -73,20 +70,16 @@ export default function SignupPage() {
             </h2>
 
             <p className="mt-4 leading-relaxed text-white/90">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-              quibusdam aperiam voluptatum.
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi
+              nam dolorum aliquam, quibusdam aperiam voluptatum.
             </p>
           </div>
         </section>
 
-        <main
-          className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
-        >
+        <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
           <div className="max-w-xl lg:max-w-3xl">
             <div className="relative -mt-16 block lg:hidden">
-              <span
-                className="inline-flex size-16 items-center justify-center rounded-full bg-white text-blue-600 sm:size-20 dark:bg-gray-900"
-              >
+              <span className="inline-flex size-16 items-center justify-center rounded-full bg-white text-blue-600 sm:size-20 dark:bg-gray-900">
                 <svg
                   className="h-8 sm:px-4 py-3"
                   viewBox="0 0 28 24"
@@ -105,8 +98,8 @@ export default function SignupPage() {
               </h1>
 
               <p className="mt-4 leading-relaxed text-gray-500 dark:text-gray-400">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-                quibusdam aperiam voluptatum.
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                Eligendi nam dolorum aliquam, quibusdam aperiam voluptatum.
               </p>
             </div>
             <h2 className="text-center text-2xl font-bold">Sign up</h2>
@@ -125,7 +118,7 @@ export default function SignupPage() {
                   name="first_name"
                   value={fName}
                   onChange={(e) => {
-                    setfName(e.target.value)
+                    setfName(e.target.value);
                   }}
                   className="px-4 py-3  mt-1 w-full rounded-md border border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 />
@@ -145,14 +138,17 @@ export default function SignupPage() {
                   name="last_name"
                   value={lName}
                   onChange={(e) => {
-                    setlName(e.target.value)
+                    setlName(e.target.value);
                   }}
                   className="px-4 py-3 mt-1 w-full rounded-md border border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 />
               </div>
 
               <div className="col-span-6">
-                <label htmlFor="Email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                <label
+                  htmlFor="Email"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+                >
                   Email
                 </label>
 
@@ -162,7 +158,7 @@ export default function SignupPage() {
                   name="email"
                   value={email}
                   onChange={(e) => {
-                    setEmail(e.target.value)
+                    setEmail(e.target.value);
                   }}
                   className="px-4 py-3 mt-1 w-full rounded-md border border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 />
@@ -171,7 +167,6 @@ export default function SignupPage() {
               <div className="col-span-6 sm:col-span-3">
                 <label
                   htmlFor="Password"
-
                   className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Password
@@ -183,7 +178,7 @@ export default function SignupPage() {
                   name="password"
                   value={[password]}
                   onChange={(e) => {
-                    setPassword(e.target.value)
+                    setPassword(e.target.value);
                   }}
                   className="px-4 py-3 mt-1 w-full rounded-md border border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 />
@@ -203,7 +198,7 @@ export default function SignupPage() {
                   name="password_confirmation"
                   value={confirmPassword}
                   onChange={(e) => {
-                    setconfirmPassword(e.target.value)
+                    setconfirmPassword(e.target.value);
                   }}
                   className="px-4 py-3 mt-1 w-full rounded-md border border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 />
@@ -226,12 +221,12 @@ export default function SignupPage() {
                   disabled={submitting}
                   className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500 dark:hover:bg-blue-700 dark:hover:text-white"
                 >
-                  {!submitting ? "Create an account" : "Creating account"}
+                  {!submitting ? 'Create an account' : 'Creating account'}
                 </Button>
 
-                <Link href='/login' className="text-sm">
+                <Link href="/login" className="text-sm">
                   Already have an account?{' '}
-                  <span  className=" text-primary">Log in</span>.
+                  <span className=" text-primary">Log in</span>.
                 </Link>
               </div>
             </div>
@@ -239,5 +234,5 @@ export default function SignupPage() {
         </main>
       </div>
     </section>
-  )
+  );
 }
