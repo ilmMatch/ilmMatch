@@ -36,8 +36,12 @@ export function LogoutMobile() {
     }
   }
   return (
-    <Button variant={'ghost'} onClick={handleSubmit}>
-      <LogOut />
+    <Button
+      variant={'ghost'}
+      onClick={handleSubmit}
+      className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
+    >
+      <LogOut className="size-5" />
     </Button>
   );
 }

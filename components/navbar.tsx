@@ -15,8 +15,13 @@ import clsx from 'clsx';
 import { siteConfig } from '@/config/site';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { Logo } from '@/components/icons';
+import { LogoutButton } from './Logout';
+import { Button } from './ui/button';
+import { Mail } from 'lucide-react';
+import { useAuth } from '@/context/AuthProvider';
 
 export const Navbar = () => {
+  const { currentUser } = useAuth();
   // const searchInput = (
   //   <Input
   //     aria-label="Search"
@@ -72,11 +77,21 @@ export const Navbar = () => {
         <NavbarItem className="hidden lg:flex">
           <ThemeSwitch />
         </NavbarItem>
+        <NavbarItem className="hidden lg:flex">
+          {!currentUser && (
+            <Link href="/login">
+              <Button>
+                <Mail /> Login
+              </Button>
+            </Link>
+          )}
+        </NavbarItem>
         <NavbarItem className="hidden md:flex"></NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
+
         <NavbarMenuToggle />
       </NavbarContent>
 
@@ -101,6 +116,15 @@ export const Navbar = () => {
             </NavbarMenuItem>
           ))}
         </div>
+        <NavbarMenuItem>
+          {!currentUser && (
+            <Link href="/login">
+              <Button>
+                <Mail /> Login
+              </Button>
+            </Link>
+          )}
+        </NavbarMenuItem>
       </NavbarMenu>
     </NextUINavbar>
   );
