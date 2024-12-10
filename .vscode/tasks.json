@@ -12,24 +12,12 @@
     {
       "label": "Prettier: Fix",
       "type": "shell",
-      "command": "npx prettier --write .",
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "problemMatcher": [],
-      "detail": "Run Prettier to format the code"
+      "command": "npx prettier --write ."
     },
     {
       "label": "ESLint: Fix",
       "type": "shell",
-      "command": "npx eslint --fix .",
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
-      "problemMatcher": [],
-      "detail": "Run ESLint to fix linting issues"
+      "command": "npx eslint --fix ."
     }
   ]
 }

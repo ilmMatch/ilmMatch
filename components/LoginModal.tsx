@@ -8,7 +8,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure,
 } from '@nextui-org/react';
 import Link from 'next/link';
 import ForgotPassword from '@/app/(auth)/login/forgotPassword';

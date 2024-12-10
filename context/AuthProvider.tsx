@@ -9,13 +9,7 @@ import {
   User,
   UserCredential,
 } from 'firebase/auth';
-import {
-  doc,
-  DocumentData,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore';
+import { doc, DocumentData, setDoc, updateDoc } from 'firebase/firestore';
 import { useContext, useState, useEffect, createContext } from 'react';
 
 interface AuthContextType {
@@ -117,10 +111,9 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         assignedAt: new Date().toISOString(),
       });
       alert(`Role '${role}' assigned to user '${userId}'`);
-    } catch (error: any) {
-      console.error('Error assigning role:', error.message);
+    } catch (err: any) {
+      console.error('Error assigning role:', err.message);
       alert('Failed to assign role.');
-    } finally {
     }
   };
 

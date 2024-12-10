@@ -22,7 +22,7 @@ import { ThemeSwitch } from '@/components/theme-switch';
 
 import { Logo } from '@/components/icons';
 import { useAuth } from '@/context/AuthProvider';
-import { LogoutButton, LogoutMobile } from './Loutout';
+import { LogoutButton, LogoutMobile } from './Logout';
 
 export const Navbar = () => {
   // const searchInput = (

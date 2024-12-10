@@ -7,12 +7,12 @@
       "task": "Next.js: run"
     },
     {
-      "command": "workbench.action.tasks.runTask",
-      "args": "Prettier: Fix"
+      "label": "Prettier",
+      "task": "Prettier: Fix"
     },
     {
-      "command": "workbench.action.tasks.runTask",
-      "args": "ESLint: Fix"
+      "label": "ESLint",
+      "task": "ESLint: Fix"
     }
   ]
 }
