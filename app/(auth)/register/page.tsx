@@ -43,7 +43,7 @@ export default function SignupPage() {
     return <>Loading</>;
   }
   return (
-    <section className="flex flex-col items-center justify-center">
+    <section className="flex flex-col items-center justify-center h-[calc(100vh-var(--navbar-height))]">
       <div className="max-w-lg w-full">
 
         <main className="p-4 md:p-8 rounded-2xl border border-gray-200 dark:border-gray-800">

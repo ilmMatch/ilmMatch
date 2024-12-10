@@ -41,7 +41,7 @@ export default function LoginPage() {
     return <>Loading</>;
   }
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-var(--navbar-height))]">
       <div className="max-w-md w-full">
         <div className="p-8 rounded-2xl border border-gray-200 dark:border-gray-800">
           <h2 className="text-center text-2xl font-bold">Sign in</h2>

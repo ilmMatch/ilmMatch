@@ -42,7 +42,7 @@ export default function LoginModal() {
   }
   return (
     <>
-      <Modal backdrop={'blur'} isOpen={true} onClose={handleClose}>
+      <Modal backdrop={'blur'} isOpen={true} onClose={handleClose} placement={"center"}>
         <ModalContent>
           {(onClose: any) => (
             <>

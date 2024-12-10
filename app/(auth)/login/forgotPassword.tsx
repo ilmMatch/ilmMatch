@@ -57,7 +57,7 @@ export default function ForgotPassword({
           Forgot your password?
         </Link>
       </div>
-      <Modal backdrop={'blur'} isOpen={isOpen} onClose={onClose}>
+      <Modal backdrop={'blur'} isOpen={isOpen} onClose={onClose} placement={"center"}>
         <ModalContent>
           {(onClose: any) => (
             <>
