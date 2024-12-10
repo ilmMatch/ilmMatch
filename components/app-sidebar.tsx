@@ -95,11 +95,13 @@ export function AppSidebar() {
 export function SidebarComponent() {
     const { currentUser } = useAuth()
     return (
-        <>
-            <span className="block sm:hidden absolute top-20 left-4">
-                <SidebarTrigger />
-            </span>
-            {currentUser ? <AppSidebar /> : ""}
-        </>
+        currentUser ?
+            <>
+                <AppSidebar />
+                <span className="block sm:hidden fixed top-20 left-4 z-10">
+                    <SidebarTrigger />
+                </span>
+            </>
+            : ""
     )
 }
