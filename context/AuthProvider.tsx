@@ -136,7 +136,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
           console.log('Found User Data');
           firebaseData = docSnap.data();
         }
-        console.log('firebaseData', firebaseData);
         setUserDataObj(firebaseData);
       } catch (err: any) {
         console.error('Error fetching user data:', err.message);

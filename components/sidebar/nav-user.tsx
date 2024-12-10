@@ -10,15 +10,11 @@ import {
 } from '@/components/ui/tooltip';
 import {
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
-import Link from 'next/link';
-import { useEffect } from 'react';
 
 export function NavUser() {
   const { logout, userDataObj } = useAuth();
@@ -38,9 +34,7 @@ export function NavUser() {
     email: 'email@gmail.com',
     avatar: 'string',
   };
-  useEffect(() => {
-    console.log('userDataObj......', userDataObj);
-  }, [userDataObj]);
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
