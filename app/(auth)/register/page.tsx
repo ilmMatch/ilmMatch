@@ -45,18 +45,13 @@ export default function SignupPage() {
   return (
     <section className="flex flex-col items-center justify-center h-[calc(100vh-var(--navbar-height))]">
       <div className="max-w-lg w-full">
-
         <main className="p-4 md:p-8 rounded-2xl border border-gray-200 dark:border-gray-800">
           <div className="">
             <h2 className="text-center text-2xl font-bold">Sign up</h2>
             <div className="mt-8 space-y-2 md:space-y-4">
-              <div className='flex flex-col md:flex-row gap-2'>
+              <div className="flex flex-col md:flex-row gap-2">
                 <div className="">
-                  <Label
-                    htmlFor="FirstName"
-                  >
-                    First Name
-                  </Label>
+                  <Label htmlFor="FirstName">First Name</Label>
 
                   <Input
                     type="text"
@@ -71,11 +66,7 @@ export default function SignupPage() {
                 </div>
 
                 <div className="">
-                  <Label
-                    htmlFor="LastName"
-                  >
-                    Last Name
-                  </Label>
+                  <Label htmlFor="LastName">Last Name</Label>
 
                   <Input
                     type="text"
@@ -90,11 +81,7 @@ export default function SignupPage() {
                 </div>
               </div>
               <div className="">
-                <Label
-                  htmlFor="Email"
-                >
-                  Email
-                </Label>
+                <Label htmlFor="Email">Email</Label>
                 <div className="relative flex items-center">
                   <Input
                     name="email"
@@ -108,17 +95,11 @@ export default function SignupPage() {
                     }}
                   />
                   <Mail className="w-4 h-4 absolute right-4"></Mail>
-
                 </div>
               </div>
-              <div className='flex flex-col md:flex-row gap-2'>
-
+              <div className="flex flex-col md:flex-row gap-2">
                 <div className="">
-                  <Label
-                    htmlFor="Password"
-                  >
-                    Password
-                  </Label>
+                  <Label htmlFor="Password">Password</Label>
                   <div className="relative flex items-center">
                     <Input
                       type="password"
@@ -131,18 +112,12 @@ export default function SignupPage() {
                       }}
                     />
                     <Eye className="w-4 h-4 absolute right-4 cursor-pointer" />
-
                   </div>
                 </div>
 
                 <div className="">
-                  <Label
-                    htmlFor="PasswordConfirmation"
-                  >
-                    Confirm Password
-                  </Label>
+                  <Label htmlFor="PasswordConfirmation">Confirm Password</Label>
                   <div className="relative flex items-center">
-
                     <Input
                       type="password"
                       id="PasswordConfirmation"
@@ -154,7 +129,6 @@ export default function SignupPage() {
                       }}
                     />
                     <Eye className="w-4 h-4 absolute right-4 cursor-pointer" />
-
                   </div>
                 </div>
               </div>

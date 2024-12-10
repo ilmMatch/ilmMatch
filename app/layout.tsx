@@ -2,7 +2,7 @@ import '@/styles/globals.css';
 import { Metadata, Viewport } from 'next';
 import { Link } from '@nextui-org/link';
 import clsx from 'clsx';
-import { SidebarProvider, } from "@/components/ui/sidebar"
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { Providers } from './providers';
 
 import { siteConfig } from '@/config/site';
@@ -67,7 +67,6 @@ export default function RootLayout({
               </div>
             </SidebarProvider>
           </Providers>
-
         </AuthProvider>
       </body>
     </html>

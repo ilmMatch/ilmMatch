@@ -78,9 +78,10 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden lg:flex"><ThemeSwitch /></NavbarItem>
+        <NavbarItem className="hidden lg:flex">
+          <ThemeSwitch />
+        </NavbarItem>
         <NavbarItem className="hidden md:flex">
-
           {currentUser ? (
             <LogoutButton />
           ) : (
@@ -115,10 +116,10 @@ export const Navbar = () => {
               <Link
                 color={
                   index === 2
-                    ? "primary"
+                    ? 'primary'
                     : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                      ? 'danger'
+                      : 'foreground'
                 }
                 href="#"
                 size="lg"

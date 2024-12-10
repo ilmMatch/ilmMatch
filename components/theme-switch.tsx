@@ -72,7 +72,6 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
           ),
         })}
       >
-
         {!isSelected || isSSR ? (
           <Sun className="h-[1.2rem] w-[1.2rem]" />
         ) : (

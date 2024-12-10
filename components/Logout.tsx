@@ -36,7 +36,7 @@ export function LogoutMobile() {
     }
   }
   return (
-    <Button variant={"ghost"} onClick={handleSubmit}>
+    <Button variant={'ghost'} onClick={handleSubmit}>
       <LogOut />
     </Button>
   );

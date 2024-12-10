@@ -96,13 +96,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       alert('Please provide both User ID and Role.');
       return;
     }
-    console.log(
-      'currentuser',
-      currentUser.uid,
-      '\n role:',
-      role,
-      '\n userId:' + userId
-    );
+    console.log('currentuser', currentUser);
     try {
       const userDoc = doc(db, 'users', userId);
       await updateDoc(userDoc, {
