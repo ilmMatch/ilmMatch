@@ -2,9 +2,12 @@
 import {
   Calendar,
   ChevronDown,
+  Command,
   Home,
   Inbox,
+  LifeBuoy,
   Search,
+  Send,
   Settings,
 } from 'lucide-react';
 
@@ -15,11 +18,13 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   Collapsible,
@@ -29,6 +34,7 @@ import {
 import { useAuth } from '@/context/AuthProvider';
 import { NavUser } from './sidebar/nav-user';
 import Link from 'next/link';
+import { Logo } from './icons';
 
 // Menu items.
 const items = [
@@ -59,16 +65,58 @@ const items = [
   },
 ];
 
+const navSecondary = [
+  {
+    title: 'Support',
+    url: '#',
+    icon: LifeBuoy,
+  },
+  {
+    title: 'Feedback',
+    url: '#',
+    icon: Send,
+  },
+];
+
 export function AppSidebar() {
+  const { state, isMobile } = useSidebar();
   return (
-    <Sidebar collapsible="icon" variant="floating">
+    <Sidebar collapsible="icon" variant="floating" hidden={isMobile}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem
+            className={`flex items-center justify-center ${state === 'collapsed' ? 'flex-col gap-3' : ''}`}
+          >
+            <SidebarMenuButton size="lg" asChild>
+              <a href="#">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <Logo className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Ilm Match</span>
+                  {/* <span className="truncate text-xs">description</span> */}
+                </div>
+              </a>
+            </SidebarMenuButton>
+            <span
+              className={`flex items-center justify-center ${state === 'collapsed' ? 'self-start' : ''}`}
+            >
+              {' '}
+              <SidebarTrigger />
+            </span>
+          </SidebarMenuItem>
+          {/* <SidebarMenuItem>
+            <SidebarTrigger />
+          </SidebarMenuItem> */}
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <span className="max-sm:hidden">
             <SidebarTrigger />
           </span>
-        </SidebarGroup>
-        <SidebarGroup className="mt-20">
+        </SidebarGroup> */}
+        <SidebarGroup>
           <SidebarGroupLabel>Ilm Match</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -99,6 +147,23 @@ export function AppSidebar() {
             </CollapsibleContent>
           </SidebarGroup>
         </Collapsible>
+
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navSecondary.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild size="sm">
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
