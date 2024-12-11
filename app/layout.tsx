@@ -9,7 +9,7 @@ import { siteConfig } from '@/config/site';
 import { fontSans } from '@/config/fonts';
 import { Navbar } from '@/components/navbar';
 import { AuthProvider } from '@/context/AuthProvider';
-import { SidebarComponent } from '@/components/app-sidebar';
+import { SidebarComponent } from '@/components/sidebar/app-sidebar';
 
 export const metadata: Metadata = {
   title: {

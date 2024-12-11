@@ -1,12 +1,20 @@
-import { ProfileForm } from '@/components/forms/userProfile';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import React from 'react';
+import { ProfileForm } from '@/components/forms/userProfile';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ProfilePage() {
   return (
-    <>
-      <ProfileForm />
-    </>
+    <Tabs defaultValue="account" className="md:w-[80%] mx-auto">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Profile</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <ProfileForm />
+      </TabsContent>
+      <TabsContent value="password">
+        <ProfileForm />
+      </TabsContent>
+    </Tabs>
   );
 }

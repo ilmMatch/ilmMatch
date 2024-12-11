@@ -12,7 +12,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { LogoutMobile } from '../Logout';
 
 export function NavUser() {
-  const { logout, userDataObj } = useAuth();
+  const { logout, userDataPrivate } = useAuth();
   const router = useRouter();
   async function handleSubmit() {
     try {
@@ -23,7 +23,7 @@ export function NavUser() {
     }
   }
 
-  if (!userDataObj) {
+  if (!userDataPrivate) {
     return <>Loading...</>;
   }
   return (
@@ -31,22 +31,16 @@ export function NavUser() {
       <SidebarMenuItem className="flex items-center justify-center">
         <SidebarMenuButton size="lg" className="hover:bg-transparent">
           <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage
-              src={userDataObj.avatar}
-              alt={
-                userDataObj.firstName.charAt(0) + userDataObj.lastName.charAt(0)
-              }
-            />
             <AvatarFallback className="rounded-lg">
-              {userDataObj.firstName.charAt(0) + userDataObj.lastName.charAt(0)}
+              {userDataPrivate.userName.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">
-              {userDataObj.firstName} {userDataObj.lastName}
+            <span className="truncate w-40 sm:w-32 font-semibold">
+              {userDataPrivate.userName}
             </span>
             <span className="truncate text-xs w-40 sm:w-32 ">
-              {userDataObj.email}
+              {userDataPrivate.email}
             </span>
           </div>
         </SidebarMenuButton>

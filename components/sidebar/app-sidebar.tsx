@@ -30,11 +30,11 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from './ui/collapsible';
+} from '@/components/ui/collapsible';
 import { useAuth } from '@/context/AuthProvider';
-import { NavUser } from './sidebar/nav-user';
+import { NavUser } from '@/components/sidebar/nav-user';
 import Link from 'next/link';
-import { Logo } from './icons';
+import { Logo } from '@/components/icons';
 
 // Menu items.
 const items = [
@@ -153,7 +153,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {navSecondary.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild size="sm">
+                  <SidebarMenuButton asChild size="sm" tooltip={item.title}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>

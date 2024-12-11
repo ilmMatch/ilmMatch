@@ -2,8 +2,16 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuth } from '@/context/AuthProvider';
-import { Eye, Mail } from 'lucide-react';
+import { set } from 'date-fns';
+import { Eye, Loader, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -12,8 +20,8 @@ export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fName, setfName] = useState('');
-  const [lName, setlName] = useState('');
+  const [userName, setuserName] = useState('');
+  const [gender, setGender] = useState('');
   const [confirmPassword, setconfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,12 +34,13 @@ export default function SignupPage() {
   }, [currentUser]);
 
   async function handleSubmit() {
-    if (!email || !password || password.length < 8 || !fName || !lName) {
+    if (!email || !password || password.length < 8 || !userName || !gender) {
+      console.log('missing input value/s');
       return;
     }
     setSubmitting(true);
     try {
-      await signup(email, password, fName, lName);
+      await signup(email, password, userName, gender);
     } catch (err: any) {
       console.log(err.message);
     } finally {
@@ -51,33 +60,32 @@ export default function SignupPage() {
             <div className="mt-8 space-y-2 md:space-y-4">
               <div className="flex flex-col md:flex-row gap-2">
                 <div className="">
-                  <Label htmlFor="FirstName">First Name</Label>
+                  <Label htmlFor="userName">Name</Label>
 
                   <Input
                     type="text"
-                    id="FirstName"
-                    name="first_name"
-                    placeholder="First Name"
-                    value={fName}
+                    id="userName"
+                    name="userName"
+                    placeholder="Name"
+                    value={userName}
                     onChange={(e) => {
-                      setfName(e.target.value);
+                      setuserName(e.target.value);
                     }}
                   />
                 </div>
-
-                <div className="">
-                  <Label htmlFor="LastName">Last Name</Label>
-
-                  <Input
-                    type="text"
-                    id="LastName"
-                    name="last_name"
-                    placeholder="Last Name"
-                    value={lName}
-                    onChange={(e) => {
-                      setlName(e.target.value);
-                    }}
-                  />
+                <div className="flex-1">
+                  <Label htmlFor="PasswordConfirmation">Gender</Label>
+                  <div className="relative flex items-center">
+                    <Select onValueChange={setGender} value={gender}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="brother">Brother</SelectItem>
+                        <SelectItem value="sister">Sister</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               <div className="">
@@ -132,16 +140,6 @@ export default function SignupPage() {
                   </div>
                 </div>
               </div>
-              {/* <div className="col-span-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              By creating an account, you agree to our
-              <a href="#" className="text-gray-700 underline dark:text-gray-200">
-                terms and conditions
-              </a>
-              and
-              <a href="#" className="text-gray-700 underline dark:text-gray-200"> privacy policy </a>.
-            </p>
-          </div> */}
 
               <div className="flex flex-col space-y-2 md:space-y-4 mt-4">
                 <Button
