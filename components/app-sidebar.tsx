@@ -40,7 +40,7 @@ import { Logo } from './icons';
 const items = [
   {
     title: 'Home',
-    url: '#',
+    url: '/profile',
     icon: Home,
   },
   {
