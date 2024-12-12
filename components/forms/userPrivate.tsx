@@ -150,8 +150,7 @@ export function PrivateForm() {
   }, [userDataPrivate, reset]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // await userPrivateUpdate(values);
+    await userPrivateUpdate(values);
     setEditing(false);
   }
   if (loading) {

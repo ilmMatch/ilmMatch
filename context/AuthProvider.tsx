@@ -159,7 +159,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const userRefP = doc(db, 'usersprofile', userId);
 
       const UserProfileInfo = userDataPrivate as UserDataPrivateType;
-      UserProfileInfo.dob = new Date(userDataPrivate.dob.seconds * 1000);
+      UserProfileInfo.dob = new Date(userDataPrivate.dob?.seconds * 1000);
       const updates = getObjectDiff(userDataPrivate, UserProfileNew);
 
       if (Object.keys(updates).length === 0) {

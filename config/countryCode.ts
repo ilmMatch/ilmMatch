@@ -1,4 +1,6 @@
-export const countryCode = [
+import { CountryCode } from "@/types";
+
+export const countryCode: CountryCode[] = [
     {
         country: 'Afghanistan',
         flag: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_the_Taliban.svg',
@@ -562,7 +564,7 @@ export const countryCode = [
     {
         country: 'Kazakhstan',
         flag: 'https://flagcdn.com/kz.svg',
-        code: [76, 77],
+        code: 7,
     },
     {
         country: 'Kenya',
