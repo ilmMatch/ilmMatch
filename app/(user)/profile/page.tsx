@@ -1,5 +1,6 @@
 import React from 'react';
-import { ProfileForm } from '@/components/forms/userProfile';
+import { PrivateForm } from '@/components/forms/userPrivate';
+import ProfileForm from '@/components/forms/userProfile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ProfilePage() {
@@ -10,7 +11,7 @@ export default function ProfilePage() {
         <TabsTrigger value="password">Profile</TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <ProfileForm />
+        <PrivateForm />
       </TabsContent>
       <TabsContent value="password">
         <ProfileForm />

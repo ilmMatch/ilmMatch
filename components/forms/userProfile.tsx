@@ -33,351 +33,86 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthProvider';
 import { useEffect, useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
-const formSchema = z
-  .object({
-    userName: z
-      .string()
-      .min(3, {
-        message: 'Name must be at least 3 characters.',
-      })
-      .max(100),
-    mobileNumber: z
-      .string()
-      .refine((val) => !isNaN(Number(val)), {
-        message: 'Mobile number must be a valid number',
-      })
-      .transform(Number)
-      .refine((val) => val >= 1000000000 && val <= 9999999999, {
-        message: 'Mobile number must be 10 digits.',
-      })
-      .nullable(),
-    waliName: z
-      .string()
-      .min(3, {
-        message: 'Name must be at least 3 characters.',
-      })
-      .max(100),
-    waliMobileNumber: z
-      .string()
-      .refine((val) => !isNaN(Number(val)), {
-        message: 'Mobile number must be a valid number',
-      })
-      .transform(Number)
-      .refine((val) => val >= 1000000000 && val <= 9999999999, {
-        message: 'Mobile number must be 10 digits.',
-      })
-      .nullable(),
-    dob: z.date({
-      required_error: 'A date of birth is required.',
-    }),
-    gender: z.enum(['brother', 'sister']),
-  })
-  .refine((data) => data.mobileNumber !== data.waliMobileNumber, {
-    message: 'Mobile number and Wali Mobile number must be different.',
-    path: ['waliMobileNumber'],
-  })
-  .refine(
-    (data) => {
-      if (data.gender === 'brother') {
-        // If gender is brother, mobileNumber is required and waliMobileNumber is optional
-        return data.mobileNumber !== null;
-      }
-      if (data.gender === 'sister') {
-        // If gender is sister, waliMobileNumber is required and mobileNumber is optional
-        return data.waliMobileNumber !== null;
-      }
-      return true;
-    },
-    {
-      message: 'Mobile number and Wali Mobile number validation failed.',
-    }
-  );
-// z.string().max(5);
-// z.string().min(5);
-// z.string().length(5);
-// z.string().email();
-// z.string().url();
-// z.string().date();
-// z.string({
-//   required_error: "Name is required",
-//   invalid_type_error: "Name must be a string",
-// });
-// z.date().min(new Date("1900-01-01"), { message: "Too old" });
-// z.date().max(new Date(), { message: "Too young!" });
-// z.enum(["Admin", "User", "Trout"]);
+const formSchema = z.object({
+  bornRevert: z.enum(['Born', 'Revert', 'Not Provided']),
+});
 
-export function ProfileForm() {
-  const { userProfileUpdate, userDataProfile, loading } = useAuth();
-  const [editing, setEditing] = useState(false);
+export default function ProfileForm() {
+  const { userDataProfile } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userName: userDataProfile?.userName || 'Not Available',
-      mobileNumber: userDataProfile?.mobileNumber?.toString() || "Not Available",
-      waliName: userDataProfile?.waliName || 'Not Available',
-      waliMobileNumber: userDataProfile?.waliMobileNumber?.toString() || "Not Available",
-      dob: userDataProfile?.dob
-        ? new Date(userDataProfile.dob.seconds * 1000)
-        : undefined,
-      gender: userDataProfile?.gender || 'brother',
+      bornRevert: userDataProfile?.bornRevert || 'Not Provided',
     },
   });
-  const { reset, setValue } = form;
-
-
-  useEffect(() => {
-    if (userDataProfile) {
-      reset({
-        userName: userDataProfile?.userName || 'Not Available',
-        mobileNumber: userDataProfile?.mobileNumber?.toString() || "Not Available",
-        waliName: userDataProfile?.waliName || 'Not Available',
-        waliMobileNumber: userDataProfile?.waliMobileNumber?.toString() || "Not Available",
-        dob: userDataProfile?.dob
-          ? new Date(userDataProfile.dob.seconds * 1000)
-          : undefined,
-        gender: userDataProfile?.gender || 'brother',
-      });
-    }
-  }, [userDataProfile, reset]);
+  const { reset } = form;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    await userProfileUpdate(values);
-    setEditing(false);
+    console.log(values);
   }
-  if (loading) { return <>loading</> }
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>Contact Info</CardTitle>
+              <CardTitle>Public Info</CardTitle>
               <CardDescription>
-                This information is private and not shown to anyone. Click save
-                when you're done.
+                This information is Public and visible to anyone using Ilm
+                Match. Click save when you're done.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="md:flex md:gap-2">
-                <FormField
-                  control={form.control}
-                  name="userName"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-4 flex-1">
-                      <div className="flex items-center flex-grow">
-                        <FormLabel className="min-w-32 ">Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Name"
-                            {...field}
-                            className={cn(
-                              'flex-grow w-full',
-                              !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                            )}
-                            disabled={!editing}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="mobileNumber"
-                  render={({ field }) => (
-                    <FormItem className="">
-                      <div className="flex items-center">
-                        <FormLabel className="min-w-32 ">Contact:</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Mobile Number"
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value)}
-                            value={field.value ?? ''}
-                            className={cn(
-                              'flex-grow',
-                              !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                            )}
-                            disabled={!editing}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="md:flex md:gap-2">
-                <FormField
-                  control={form.control}
-                  name="waliName"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-4 flex-1">
-                      <div className="flex items-center flex-grow">
-                        <FormLabel className="min-w-32 ">Wali</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Name"
-                            {...field}
-                            className={cn(
-                              'flex-grow w-full',
-                              !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                            )}
-                            disabled={!editing}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="waliMobileNumber"
-                  render={({ field }) => (
-                    <FormItem className="">
-                      <div className="flex items-center">
-                        <FormLabel className="min-w-32 ">Contact:</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Mobile Number"
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value)}
-                            value={field.value ?? ''}
-                            className={cn(
-                              'flex-grow',
-                              !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                            )}
-                            disabled={!editing}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="md:flex md:gap-2 ">
-                <FormField
-                  control={form.control}
-                  name="dob"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col ">
-                      <div className="flex items-center">
-                        <FormLabel className="min-w-32">
-                          Date of birth
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={'outline'}
-                                className={cn(
-                                  'w-[240px] pl-3 text-left font-normal flex-grow',
-                                  !field.value && 'text-muted-foreground',
-                                  !editing && 'border-none justify-start'
-                                )}
-                                disabled={!editing}
-                              >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>dob not selected</span>
-                                )}
-                                {editing && (
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                )}
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              defaultMonth={
-                                new Date(
-                                  new Date().getFullYear(),
-                                  getMonth(new Date())
-                                )
-                              }
-                              disabled={(date) =>
-                                date > new Date() ||
-                                date < new Date('1940-01-01')
-                              }
-                              initialFocus
-                              captionLayout="dropdown-buttons"
-                              fromYear={1920}
-                              toYear={new Date().getFullYear()}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormDescription className="mt-auto">
-                  Your date of birth is used to calculate your age.{' '}
-                  <span className="md:block">
-                    Age will be publicly displayed.
-                  </span>
-                </FormDescription>
-              </div>
+              Name: {userDataProfile?.initials}
+              <FormField
+                control={form.control}
+                name="bornRevert"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-4 flex-1">
+                    <div className="flex items-center flex-grow">
+                      <FormLabel className="min-w-32 ">
+                        Born or Revert
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          {...field}
+                          onValueChange={(value) => field.onChange(value)}
+                          value={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={field.value} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Born">Born</SelectItem>
+                            <SelectItem value="Revert">Revert</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {/* <Input
+                                                    placeholder="Name"
+                                                    {...field}
+                                                /> */}
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </CardContent>
 
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem className="">
-                  <div className="">
-                    <FormControl>
-                      <Input {...field} className="hidden" disabled />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <CardFooter>
-              {editing && (
-                <span className="flex gap-2 ">
-                  {' '}
-                  <Button type="submit">Save changes</Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => {
-                      reset();
-                      setEditing(false);
-                    }}
-                  >
-                    cancel
-                  </Button>
-                </span>
-              )}
-              {!editing && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setEditing(true)}
-                >
-                  Edit
-                </Button>
-              )}
+              <Button type="submit">Save changes</Button>
+              <Button type="button" variant="secondary">
+                Edit
+              </Button>
             </CardFooter>
           </Card>
         </form>

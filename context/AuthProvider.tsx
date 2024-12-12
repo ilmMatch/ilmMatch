@@ -16,6 +16,7 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
+import { get } from 'http';
 import { useContext, useState, useEffect, createContext } from 'react';
 
 interface UserDataProfileType {
@@ -25,14 +26,6 @@ interface UserDataProfileType {
   waliMobileNumber: number | null;
   dob: Date;
   gender: string;
-}
-
-interface UserDataPrivateType {
-  firstName: string;
-  lastName: string;
-  mobileNumber: number | null;
-  waliMobileNumber: number | null;
-  email: Date;
 }
 
 interface AuthContextType {
@@ -51,7 +44,7 @@ interface AuthContextType {
   forgetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   roleManager: (userId: string, role: string) => Promise<void>;
-  userProfileUpdate: (userProfileNew: UserDataProfileType) => Promise<void>;
+  userPrivateUpdate: (userProfileNew: UserDataProfileType) => Promise<void>;
   loading: boolean;
 }
 
@@ -103,7 +96,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         timestamp: new Date().toISOString(),
       };
       const userDataP = {
-        userName,
+        initials: getInitials(userName),
         gender,
         timestamp: new Date().toISOString(),
       };
@@ -150,35 +143,27 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   };
 
-  async function userProfileUpdate(UserProfileNew: UserDataProfileType) {
+  async function userPrivateUpdate(UserProfileNew: UserDataProfileType) {
     try {
-      if (!currentUser) throw 'You must be logged in';
+      if (!currentUser || !userDataPrivate) throw 'You must be logged in';
       const userId = currentUser.uid;
-      const userRef = doc(db, 'usersprofile', userId);
+      const userRef = doc(db, 'users', userId);
+      const userRefP = doc(db, 'usersprofile', userId);
 
-      const UserProfileInfo = userDataProfile as UserDataProfileType;
-      // Compare fields and construct the object with updated fields
-      const updates: Partial<UserDataProfileType> = {};
+      const UserProfileInfo = userDataPrivate as UserDataProfileType;
+      UserProfileInfo.dob = new Date(userDataPrivate.dob.seconds * 1000);
+      const updates = getObjectDiff(userDataPrivate, UserProfileNew);
 
-      for (const key in UserProfileNew) {
-        const newValue = UserProfileNew[key as keyof UserDataProfileType];
-        const currentValue = UserProfileInfo[key as keyof UserDataProfileType];
-
-        if (newValue !== currentValue) {
-          updates[key as keyof UserDataProfileType] = newValue as
-            | undefined
-            | any;
-        }
-      }
-
-      // If there are no updates, return early
       if (Object.keys(updates).length === 0) {
         console.log('No updates to apply');
         return;
       }
 
-      // Update only the changed fields in Firestore
       await updateDoc(userRef, updates);
+      if (updates.userName) {
+        const initials = getInitials(updates.userName);
+        await updateDoc(userRefP, { initials: initials });
+      }
 
       console.log('User profile updated successfully');
     } catch (error) {
@@ -233,9 +218,42 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     forgetPassword,
     login,
     roleManager,
-    userProfileUpdate,
+    userPrivateUpdate,
     loading,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
+}
+
+// *********************************************************************************
+// This function calculates the difference between two objects(oldData and newData)
+// and returns a new object containing only the keys that have been added or modified.
+function getObjectDiff<T extends Record<string, any>>(
+  oldData: T,
+  newData: T
+): Partial<T> {
+  const diff: Partial<T> = {};
+
+  // Iterate through all keys in the new data
+  for (const key in newData) {
+    // Check if the key doesn't exist in old data or the value has changed
+    if (
+      !(key in oldData) || // New key
+      JSON.stringify(oldData[key]) !== JSON.stringify(newData[key]) // Value changed
+    ) {
+      diff[key] = newData[key];
+    }
+  }
+
+  return diff;
+}
+
+function getInitials(fullName: string): string {
+  const nameParts = fullName.split(' ');
+
+  const initials = nameParts
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('.');
+
+  return initials;
 }
