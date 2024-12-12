@@ -37,6 +37,10 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --approved: 120 65% 45%;
+    --approved-foreground: 60 9.1% 97.8%;
+    --pending: 220 65% 45%;
+    --pending-foreground: 60 9.1% 97.8%;
   }
 
   .dark {
@@ -72,6 +76,10 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --approved: 120 45% 30%;
+    --approved-foreground: 60 9.1% 97.8%;
+    --pending: 220 45% 30%;
+    --pending-foreground: 60 9.1% 97.8%;
   }
 }
 

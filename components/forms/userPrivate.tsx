@@ -33,6 +33,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthProvider';
 import { useEffect, useState } from 'react';
+import { CustomPhoneInput } from './fields/mobileInput';
 
 const formSchema = z
   .object({
@@ -42,8 +43,9 @@ const formSchema = z
         message: 'Name must be at least 3 characters.',
       })
       .max(100),
+    countryCode: z.string(),
     mobileNumber: z
-      .string()
+      .number()
       .refine((val) => !isNaN(Number(val)), {
         message: 'Mobile number must be a valid number',
       })
@@ -115,6 +117,7 @@ export function PrivateForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       userName: userDataPrivate?.userName || 'Not Available',
+      countryCode: userDataPrivate?.countryCode || 'US',
       mobileNumber:
         userDataPrivate?.mobileNumber?.toString() || 'Not Available',
       waliName: userDataPrivate?.waliName || 'Not Available',
@@ -126,12 +129,13 @@ export function PrivateForm() {
       gender: userDataPrivate?.gender || 'brother',
     },
   });
-  const { reset } = form;
+  const { reset, setValue } = form;
 
   useEffect(() => {
     if (userDataPrivate) {
       reset({
         userName: userDataPrivate?.userName || 'Not Available',
+        countryCode: userDataPrivate?.countryCode || 'US',
         mobileNumber:
           userDataPrivate?.mobileNumber?.toString() || 'Not Available',
         waliName: userDataPrivate?.waliName || 'Not Available',
@@ -146,12 +150,18 @@ export function PrivateForm() {
   }, [userDataPrivate, reset]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await userPrivateUpdate(values);
+    console.log(values);
+    // await userPrivateUpdate(values);
     setEditing(false);
   }
   if (loading) {
     return <>loading</>;
   }
+
+  const handleUserPhoneChange = (countryCode: string, phoneNumber: string) => {
+    setValue('countryCode', countryCode);
+    setValue('mobileNumber', phoneNumber ? Number(phoneNumber) : null);
+  };
   return (
     <>
       <Form {...form}>
@@ -180,7 +190,7 @@ export function PrivateForm() {
                             className={cn(
                               'flex-grow w-full',
                               !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           />
@@ -198,7 +208,7 @@ export function PrivateForm() {
                       <div className="flex items-center">
                         <FormLabel className="min-w-32 ">Contact:</FormLabel>
                         <FormControl>
-                          <Input
+                          {/* <Input
                             placeholder="Mobile Number"
                             type="number"
                             {...field}
@@ -210,6 +220,13 @@ export function PrivateForm() {
                                 'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
+                          /> */}
+                          <CustomPhoneInput
+                            onChange={handleUserPhoneChange}
+                            className={cn(
+                              !editing &&
+                              'pointer-events-none opacity-50 cursor-default'
+                            )}
                           />
                         </FormControl>
                       </div>
@@ -234,7 +251,7 @@ export function PrivateForm() {
                             className={cn(
                               'flex-grow w-full',
                               !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           />
@@ -261,7 +278,7 @@ export function PrivateForm() {
                             className={cn(
                               'flex-grow',
                               !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           />

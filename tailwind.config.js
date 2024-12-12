@@ -49,6 +49,14 @@ module.exports = {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
+        approved: {
+          DEFAULT: 'hsl(var(--approved))',
+          foreground: 'hsl(var(--approved-foreground))',
+        },
+        pending: {
+          DEFAULT: 'hsl(var(--pending))',
+          foreground: 'hsl(var(--pending-foreground))',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

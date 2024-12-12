@@ -45,7 +45,7 @@ const items = [
   },
   {
     title: 'Inbox',
-    url: '#',
+    url: '/find',
     icon: Inbox,
   },
   {

@@ -1,5 +1,6 @@
 'use client';
 import { auth, db } from '@/firebase';
+import { FetchUserProfilesResult, UserProfile } from '@/types/firebase';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -10,16 +11,20 @@ import {
   UserCredential,
 } from 'firebase/auth';
 import {
+  addDoc,
+  collection,
   doc,
   DocumentData,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from 'firebase/firestore';
-import { get } from 'http';
 import { useContext, useState, useEffect, createContext } from 'react';
 
-interface UserDataProfileType {
+interface UserDataPrivateType {
   userName: string;
   mobileNumber: number | null;
   waliName: string;
@@ -44,7 +49,9 @@ interface AuthContextType {
   forgetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   roleManager: (userId: string, role: string) => Promise<void>;
-  userPrivateUpdate: (userProfileNew: UserDataProfileType) => Promise<void>;
+  userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<void>;
+  approvalUpdate: (data: string, uid: string) => Promise<void>;
+  getProfiles: () => Promise<FetchUserProfilesResult>;
   loading: boolean;
 }
 
@@ -99,6 +106,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         initials: getInitials(userName),
         gender,
         timestamp: new Date().toISOString(),
+        approved: 'not approved',
       };
       await setDoc(userRef, userData);
       await setDoc(userRefP, userDataP);
@@ -143,14 +151,14 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   };
 
-  async function userPrivateUpdate(UserProfileNew: UserDataProfileType) {
+  async function userPrivateUpdate(UserProfileNew: UserDataPrivateType) {
     try {
       if (!currentUser || !userDataPrivate) throw 'You must be logged in';
       const userId = currentUser.uid;
       const userRef = doc(db, 'users', userId);
       const userRefP = doc(db, 'usersprofile', userId);
 
-      const UserProfileInfo = userDataPrivate as UserDataProfileType;
+      const UserProfileInfo = userDataPrivate as UserDataPrivateType;
       UserProfileInfo.dob = new Date(userDataPrivate.dob.seconds * 1000);
       const updates = getObjectDiff(userDataPrivate, UserProfileNew);
 
@@ -169,6 +177,54 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error during profile update:', error);
       throw error;
+    }
+  }
+
+  async function approvalUpdate(data: string, uid: string) {
+    try {
+      const userRef = doc(db, 'usersprofile', uid);
+      await updateDoc(userRef, { approved: data });
+
+      console.log('User profile updated successfully');
+      return;
+    } catch (error) {
+      console.error('Error during updation:', error);
+      throw error;
+    }
+  }
+
+  async function getProfiles() {
+    try {
+      // Create a reference to the usersprofile collection
+      const usersProfileRef = collection(db, 'usersprofile');
+
+      // Create a query to fetch only approved profiles
+      const q = query(
+        usersProfileRef,
+        where('approved', 'not-in', ['requested', 'not approved'])
+      );
+
+      // Execute the query
+      const querySnapshot = await getDocs(q);
+
+      // Map the documents to an array of data
+      const userProfiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<UserProfile, 'id'>),
+      }));
+      console.log('userProfiles', userProfiles);
+
+      return {
+        success: true,
+        profiles: userProfiles,
+      };
+    } catch (error: any) {
+      console.error('Error fetching user profiles:', error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
@@ -207,6 +263,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     return unsubscribe;
   }, []);
 
+
+
   const values: AuthContextType = {
     currentUser,
     userDataPrivate,
@@ -219,6 +277,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     login,
     roleManager,
     userPrivateUpdate,
+    approvalUpdate,
+    getProfiles,
     loading,
   };
 
