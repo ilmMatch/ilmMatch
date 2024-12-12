@@ -1,5 +1,4 @@
 'use client';
-import { CustomPhoneInput } from '@/components/forms/fields/mobileInput';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import React, { useEffect, useState } from 'react';
@@ -27,7 +26,7 @@ export default function FindPage() {
     //   }, []);
     return (<div>
 
-        <CustomPhoneInput onChange={handleMobileNumberChange} className={'border-red-50 border'} />
+        {/* <CustomPhoneInput onChange={handleMobileNumberChange} className={'border-red-50 border'} /> */}
         page
     </div>
     );

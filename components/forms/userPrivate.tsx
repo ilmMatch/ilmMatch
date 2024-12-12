@@ -33,7 +33,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthProvider';
 import { useEffect, useState } from 'react';
-import { CustomPhoneInput } from './fields/mobileInput';
+import { CountryCodeSelector } from './fields/CountryCodeSelector';
 
 const formSchema = z
   .object({
@@ -43,9 +43,9 @@ const formSchema = z
         message: 'Name must be at least 3 characters.',
       })
       .max(100),
-    countryCode: z.string(),
+    countryCode: z.number().nullable(),
     mobileNumber: z
-      .number()
+      .string()
       .refine((val) => !isNaN(Number(val)), {
         message: 'Mobile number must be a valid number',
       })
@@ -60,6 +60,7 @@ const formSchema = z
         message: 'Name must be at least 3 characters.',
       })
       .max(100),
+    waliCountryCode: z.number().nullable(),
     waliMobileNumber: z
       .string()
       .refine((val) => !isNaN(Number(val)), {
@@ -117,10 +118,11 @@ export function PrivateForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       userName: userDataPrivate?.userName || 'Not Available',
-      countryCode: userDataPrivate?.countryCode || 'US',
+      countryCode: userDataPrivate?.countryCode || null,
       mobileNumber:
         userDataPrivate?.mobileNumber?.toString() || 'Not Available',
       waliName: userDataPrivate?.waliName || 'Not Available',
+      waliCountryCode: userDataPrivate?.waliCountryCode || null,
       waliMobileNumber:
         userDataPrivate?.waliMobileNumber?.toString() || 'Not Available',
       dob: userDataPrivate?.dob
@@ -135,10 +137,11 @@ export function PrivateForm() {
     if (userDataPrivate) {
       reset({
         userName: userDataPrivate?.userName || 'Not Available',
-        countryCode: userDataPrivate?.countryCode || 'US',
+        countryCode: userDataPrivate?.countryCode || null,
         mobileNumber:
           userDataPrivate?.mobileNumber?.toString() || 'Not Available',
         waliName: userDataPrivate?.waliName || 'Not Available',
+        waliCountryCode: userDataPrivate?.waliCountryCode || null,
         waliMobileNumber:
           userDataPrivate?.waliMobileNumber?.toString() || 'Not Available',
         dob: userDataPrivate?.dob
@@ -150,6 +153,7 @@ export function PrivateForm() {
   }, [userDataPrivate, reset]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     await userPrivateUpdate(values);
     setEditing(false);
   }
@@ -157,10 +161,6 @@ export function PrivateForm() {
     return <>loading</>;
   }
 
-  const handleUserPhoneChange = (countryCode: string, phoneNumber: string) => {
-    setValue('countryCode', countryCode);
-    setValue('mobileNumber', phoneNumber ? Number(phoneNumber) : null);
-  };
   return (
     <>
       <Form {...form}>
@@ -199,40 +199,58 @@ export function PrivateForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="mobileNumber"
-                  render={({ field }) => (
-                    <FormItem className="">
-                      <div className="flex items-center">
-                        <FormLabel className="min-w-32 ">Contact:</FormLabel>
-                        <FormControl>
-                          {/* <Input
-                            placeholder="Mobile Number"
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value)}
-                            value={field.value ?? ''}
-                            className={cn(
-                              'flex-grow',
-                              !editing &&
+                <div className="flex">
+                  <FormField
+                    control={form.control}
+                    name="countryCode"
+                    render={({ field }) => (
+                      <FormItem className="">
+                        <div className="flex items-center">
+                          <FormLabel className="min-w-32 ">Contact:</FormLabel>
+                          <FormControl>
+                            <CountryCodeSelector
+                              // onChange={handleUserPhoneChange}
+                              onChange={(e) => field.onChange(e)}
+                              defaultCode={field.value}
+                              editing={editing}
+                              className={cn(
+                                !editing &&
+                                'pointer-events-none opacity-50 cursor-default'
+                              )}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mobileNumber"
+                    render={({ field }) => (
+                      <FormItem className="">
+                        <div className="flex items-center">
+                          <FormControl>
+                            <Input
+                              placeholder="Mobile Number"
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              value={field.value ?? ''}
+                              className={cn(
+                                'flex-grow',
+                                !editing &&
                                 'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                            )}
-                            disabled={!editing}
-                          /> */}
-                          <CustomPhoneInput
-                            onChange={handleUserPhoneChange}
-                            className={cn(
-                              !editing &&
-                              'pointer-events-none opacity-50 cursor-default'
-                            )}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                              )}
+                              disabled={!editing}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <div className="md:flex md:gap-2">
@@ -260,33 +278,66 @@ export function PrivateForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="waliMobileNumber"
-                  render={({ field }) => (
-                    <FormItem className="">
-                      <div className="flex items-center">
-                        <FormLabel className="min-w-32 ">Contact:</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Mobile Number"
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value)}
-                            value={field.value ?? ''}
+
+                <div className="flex">
+                  <FormField
+                    control={form.control}
+                    name="waliCountryCode"
+                    render={({ field }) => (
+                      <FormItem className="">
+                        <div className="flex items-center">
+                          <FormLabel className="min-w-32 ">Contact:</FormLabel>
+                          <FormControl>
+                            <CountryCodeSelector
+                              // onChange={handleUserPhoneChange}
+                              onChange={(e) => field.onChange(e)}
+                              defaultCode={field.value}
+                              editing={editing}
+                              className={cn(
+                                !editing &&
+                                'pointer-events-none opacity-50 cursor-default'
+                              )}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="waliMobileNumber"
+                    render={({ field }) => (
+                      <FormItem className="">
+                        <div className="flex items-center">
+                          <FormControl>
+                            <Input
+                              placeholder="Mobile Number"
+                              type="number"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              value={field.value ?? ''}
+                              className={cn(
+                                'flex-grow',
+                                !editing &&
+                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              )}
+                              disabled={!editing}
+                            />
+                            {/* <CountryCodeSelector
+                            onChange={handleUserPhoneChange}
                             className={cn(
-                              'flex-grow',
                               !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              'pointer-events-none opacity-50 cursor-default'
                             )}
-                            disabled={!editing}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                          /> */}
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
               <div className="md:flex md:gap-2 ">
                 <FormField

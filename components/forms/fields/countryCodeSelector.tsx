@@ -21,39 +21,43 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { countryCode } from '@/config/countryCode';
 import { CountryCode } from '@/types';
+import { useState } from 'react';
 
 interface CustomPhoneInputProps {
-    onChange: (countryCode: string, phoneNumber: string) => void;
+    onChange: (countryCode: number) => void;
+    defaultCode: number | null,
+    editing: boolean,
     className?: string;
 }
 
-export function CustomPhoneInput({
+export function CountryCodeSelector({
     onChange,
+    defaultCode,
+    editing,
     className,
 }: CustomPhoneInputProps) {
-    const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState('');
-    const [phoneNumber, setPhoneNumber] = React.useState('');
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState<CountryCode>({} as CountryCode);
+    const [phoneNumber, setPhoneNumber] = useState('');
 
-    const handleCountrySelect = (currentValue: string) => {
+    const handleCountrySelect = (currentValue: CountryCode) => {
         setValue(currentValue);
         setOpen(false);
-        onChange(currentValue, phoneNumber);
+        onChange(currentValue.code);
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPhoneNumber = e.target.value.replace(/\D/g, '');
         setPhoneNumber(newPhoneNumber);
-        onChange(value, newPhoneNumber);
+        onChange(value.code);
     };
 
     const selectedCountry = countryCode.find(
-        (country) => country.country === value
+        (country) => country === value
     );
 
     return (
-        <div className={cn('space-y-2', className)}>
-            <Label htmlFor="phone">Phone Number</Label>
+        <div className={cn('', className)}>
             <div className="flex space-x-2">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
@@ -61,21 +65,14 @@ export function CustomPhoneInput({
                             variant="outline"
                             role="combobox"
                             aria-expanded={open}
-                            className="w-fit justify-between p-2"
+                            className={cn("w-fit justify-between p-2", !editing && "border-none p-0")}
                             disabled={false}
                         >
                             <>
-                                <img
-                                    src={
-                                        selectedCountry ? selectedCountry.flag : countryCode[0].flag
-                                    }
-                                    alt={`Flag of ${selectedCountry ? selectedCountry.country : countryCode[0].country}`}
-                                    className="w-5 h-3"
-                                />
-                                + {selectedCountry ? selectedCountry.code : countryCode[0].code}
+                                + {selectedCountry ? selectedCountry.code : defaultCode ? defaultCode : countryCode[0].code}
                             </>
 
-                            <ChevronsUpDown className="h-4 w-fit shrink-0 opacity-50" />
+                            <ChevronsUpDown className={cn("h-4 w-fit shrink-0 opacity-50", !editing && "hidden")} />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[200px] p-0">
@@ -87,7 +84,7 @@ export function CustomPhoneInput({
                                     {countryCode.map((country) => (
                                         <CommandItem
                                             key={country.country}
-                                            onSelect={() => handleCountrySelect(country.country)}
+                                            onSelect={() => handleCountrySelect(country)}
                                             className="flex"
                                         >
                                             <div className="bg-secondary p-1 max-w-fit rounded-sm">
@@ -105,14 +102,6 @@ export function CustomPhoneInput({
                         </Command>
                     </PopoverContent>
                 </Popover>
-                <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Enter phone number"
-                    value={phoneNumber}
-                    onChange={handlePhoneChange}
-                    className="flex-1"
-                />
             </div>
         </div>
     );
