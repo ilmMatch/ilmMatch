@@ -3,7 +3,7 @@ export interface UserProfile {
   approved: string;
   // Add other fields specific to your user profile
   // For example:
-  name?: string;
+  initials?: string;
   email?: string;
   // Add any other fields your profile might have
 }

@@ -168,9 +168,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       }
 
       await updateDoc(userRef, updates);
-      if (updates.userName) {
-        const initials = getInitials(updates.userName);
-        await updateDoc(userRefP, { initials: initials });
+
+      if (updates.userName || updates.dob) {
+        const updateData: Record<string, any> = {};
+
+        if (updates.userName) {
+          updateData.initials = getInitials(updates.userName);
+        }
+        if (updates.dob) {
+          updateData.dob = updates.dob;
+        }
+
+        await updateDoc(userRefP, updateData);
       }
 
       console.log('User profile updated successfully');
@@ -262,8 +271,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     });
     return unsubscribe;
   }, []);
-
-
 
   const values: AuthContextType = {
     currentUser,

@@ -1,33 +1,35 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import React, { useEffect, useState } from 'react';
+import UserModal from './userModal';
 
 export default function FindPage() {
-    const { getProfiles } = useAuth();
-    const [users, setUsers] = useState<UserProfile[] | undefined>([]);
+  const { getProfiles } = useAuth();
+  const [users, setUsers] = useState<UserProfile[] | undefined>([]);
 
-
-    const [mobileNumber, setMobileNumber] = useState({ countryCode: '', phoneNumber: '' })
-
-    const handleMobileNumberChange = (countryCode: string, phoneNumber: string) => {
-        setMobileNumber({ countryCode, phoneNumber })
+  async function getUsers() {
+    const data = await getProfiles();
+    if (!data.success) {
+      console.log(data.error);
     }
-    async function getUsers() {
-        const data = await getProfiles();
-        if (!data.success) {
-            console.log(data.error);
-        }
-        setUsers(data.profiles);
-    }
+    setUsers(data.profiles);
+  }
 
-    //   useEffect(() => {
-    //     getUsers();
-    //   }, []);
-    return (<div>
+  useEffect(() => {
+    getUsers();
+  }, []);
 
-        {/* <CustomPhoneInput onChange={handleMobileNumberChange} className={'border-red-50 border'} /> */}
-        page
+  return (
+    <div>
+      {users &&
+        users.map((user) => (
+          <div key={user.id}>
+            <strong>{user.initials}</strong> - {user.id}
+            <UserModal user={user} />
+          </div>
+        ))}
     </div>
-    );
+  );
 }
