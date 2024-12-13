@@ -1,4 +1,4 @@
-import { BadgeCheck, Bookmark, Home } from "lucide-react";
+import { BadgeCheck, Bookmark, Home, Send } from "lucide-react";
 
 export type SiteConfig = typeof siteConfig;
 
@@ -42,6 +42,11 @@ export const siteConfig = {
       label: 'My Bookmark',
       href: '/bookmark',
       icon: Bookmark,
+    },
+    {
+      label: 'Requests',
+      href: '/requests',
+      icon: Send,
     },
   ],
   navMenuItems: [

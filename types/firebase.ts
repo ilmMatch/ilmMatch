@@ -14,3 +14,11 @@ export interface FetchUserProfilesResult {
   profiles?: UserProfile[];
   error?: string;
 }
+
+
+
+export type RequestAction = 'requested' | 'rejected' | 'pending';
+
+export interface RequestCollection {
+  [key: string]: RequestAction;
+}

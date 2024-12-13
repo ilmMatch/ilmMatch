@@ -5,15 +5,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ProfilePage() {
   return (
-    <Tabs defaultValue="account" className="md:w-[80%] mx-auto">
+    <Tabs defaultValue="private" className="md:w-[80%] mx-auto">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="account">Account</TabsTrigger>
-        <TabsTrigger value="password">Profile</TabsTrigger>
+        <TabsTrigger value="private">Account</TabsTrigger>
+        <TabsTrigger value="public">Profile</TabsTrigger>
       </TabsList>
-      <TabsContent value="account">
+      <TabsContent value="private">
         <PrivateForm />
       </TabsContent>
-      <TabsContent value="password">
+      <TabsContent value="public">
         <ProfileForm />
       </TabsContent>
     </Tabs>

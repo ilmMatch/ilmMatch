@@ -1,6 +1,6 @@
 'use client';
 import { auth, db } from '@/firebase';
-import { FetchUserProfilesResult, UserProfile } from '@/types/firebase';
+import { FetchUserProfilesResult, RequestCollection, UserProfile } from '@/types/firebase';
 import { set } from 'date-fns';
 import {
   createUserWithEmailAndPassword,
@@ -58,8 +58,10 @@ interface AuthContextType {
   getProfiles: () => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
   bookmarkUpdate: (bookmarkUID: string, action: "add" | "remove") => Promise<void>;
-  requestUpdate: (userUID: string, action: "add" | "remove") => Promise<void>;
+  profileRequestUpdate: (userUID: string, action: "add" | "remove") => Promise<void>;
   requestedByUpdate: (requestedof: string, requestedby: string, state: "accepted" | "rejected" | "requested", action: "add" | "remove") => Promise<void>;
+  getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
+  getRequestedMe: (uid: string) => Promise<RequestCollection>
   loading: boolean;
 }
 
@@ -264,7 +266,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
-  async function requestUpdate(userUID: string, action: "add" | "remove") {
+  async function profileRequestUpdate(userUID: string, action: "add" | "remove") {
     try {
       if (!currentUser) throw 'You must be logged in';
       const userRef = doc(db, 'users', currentUser.uid);
@@ -304,6 +306,54 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
+  async function getProfilebyUIDs(uids: string[]) {
+    try {
+      const usersProfileRef = collection(db, "usersprofile");
+      const q = query(usersProfileRef, where("__name__", "in", uids));
+      console.log(q, uids)
+      // Fetch the documents
+      const querySnapshot = await getDocs(q);
+
+      // Process the results
+      const profiles: UserProfile[] = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as Omit<UserProfile, 'id'>),
+      }));
+
+      console.log("Fetched Profiles.:", profiles);
+      return {
+        success: true,
+        profiles: profiles,
+      };
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
+    }
+  }
+
+  async function getRequestedMe(uid: string) {
+    try {
+      if (!currentUser) throw 'You must be logged in';
+      // requestedby: field that needs to be updated
+      // requestedof: document Id
+      const userRef = doc(db, 'requests', uid);
+
+      const docSnap = await getDoc(userRef);
+      let firebaseData = {};
+      if (docSnap.exists()) {
+        firebaseData = docSnap.data();
+      }
+      return firebaseData;
+
+    } catch (error) {
+      console.error('Error Requesting:', error);
+      throw error;
+    }
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -356,8 +406,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     getProfiles,
     allProfiles,
     bookmarkUpdate,
-    requestUpdate,
+    profileRequestUpdate,
     requestedByUpdate,
+    getProfilebyUIDs,
+    getRequestedMe,
     loading,
   };
 

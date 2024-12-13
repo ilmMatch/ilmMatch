@@ -15,13 +15,13 @@ import { useAuth } from '@/context/AuthProvider';
 
 export default function UserModal({ user }: { user: UserProfile }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const { currentUser, bookmarkUpdate, requestUpdate, userDataPrivate, requestedByUpdate } = useAuth();
+    const { currentUser, bookmarkUpdate, profileRequestUpdate, userDataPrivate, requestedByUpdate } = useAuth();
 
     async function handleProfileMatchRequest() {
         if (!currentUser) throw "you must be logged in"
         console.log('match', user);
         await requestedByUpdate(user.id, currentUser.uid, "requested", "add")
-        await requestUpdate(user.id, "add")
+        await profileRequestUpdate(user.id, "add")
     }
     async function handleBookMark(action: "add" | "remove") {
         await bookmarkUpdate(user.id, action)
