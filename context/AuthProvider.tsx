@@ -1,6 +1,7 @@
 'use client';
 import { auth, db } from '@/firebase';
 import { FetchUserProfilesResult, UserProfile } from '@/types/firebase';
+import { set } from 'date-fns';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -12,6 +13,8 @@ import {
 } from 'firebase/auth';
 import {
   addDoc,
+  arrayRemove,
+  arrayUnion,
   collection,
   doc,
   DocumentData,
@@ -52,6 +55,8 @@ interface AuthContextType {
   userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<void>;
   approvalUpdate: (data: string, uid: string) => Promise<void>;
   getProfiles: () => Promise<FetchUserProfilesResult>;
+  allProfiles: UserProfile[];
+  bookmarkUpdate: (bookmarkUID: string, action: "add" | "remove") => Promise<void>;
   loading: boolean;
 }
 
@@ -68,6 +73,7 @@ export function useAuth() {
 export function AuthProvider(props: { children: React.ReactNode }) {
   const { children } = props;
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
   const [userDataPrivate, setUserDataPrivate] = useState<DocumentData | null>(
     null
   );
@@ -222,7 +228,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
       console.log('userProfiles', userProfiles);
-
+      setAllProfiles(userProfiles);
       return {
         success: true,
         profiles: userProfiles,
@@ -236,6 +242,26 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       };
     }
   }
+
+
+  async function bookmarkUpdate(bookmarkUID: string, action: "add" | "remove") {
+    try {
+      if (!currentUser) throw 'You must be logged in';
+      const userRef = doc(db, 'users', currentUser.uid);
+      if (action === "add") {
+        await updateDoc(userRef, { bookmarks: arrayUnion(bookmarkUID) });
+      } else if (action === "remove") {
+        await updateDoc(userRef, { bookmarks: arrayRemove(bookmarkUID) });
+      }
+      return;
+    } catch (error) {
+      console.error('Error during bookmark:', error);
+      throw error;
+    }
+  }
+
+
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -286,6 +312,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     userPrivateUpdate,
     approvalUpdate,
     getProfiles,
+    allProfiles,
+    bookmarkUpdate,
     loading,
   };
 
