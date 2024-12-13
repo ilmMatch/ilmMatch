@@ -35,8 +35,10 @@ import { useAuth } from '@/context/AuthProvider';
 import { NavUser } from '@/components/sidebar/nav-user';
 import Link from 'next/link';
 import { Logo } from '@/components/icons';
+import { siteConfig } from '@/config/site';
 
 // Menu items.
+
 const items = [
   {
     title: 'Home',
@@ -120,12 +122,12 @@ export function AppSidebar() {
           <SidebarGroupLabel>Ilm Match</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <Link href={item.url}>
+              {siteConfig.sideMenuItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label}>
+                    <Link href={item.href}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

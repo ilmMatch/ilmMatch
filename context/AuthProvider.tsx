@@ -16,6 +16,7 @@ import {
   arrayRemove,
   arrayUnion,
   collection,
+  deleteField,
   doc,
   DocumentData,
   getDoc,
@@ -57,6 +58,8 @@ interface AuthContextType {
   getProfiles: () => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
   bookmarkUpdate: (bookmarkUID: string, action: "add" | "remove") => Promise<void>;
+  requestUpdate: (userUID: string, action: "add" | "remove") => Promise<void>;
+  requestedByUpdate: (requestedof: string, requestedby: string, state: "accepted" | "rejected" | "requested", action: "add" | "remove") => Promise<void>;
   loading: boolean;
 }
 
@@ -261,6 +264,45 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
+  async function requestUpdate(userUID: string, action: "add" | "remove") {
+    try {
+      if (!currentUser) throw 'You must be logged in';
+      const userRef = doc(db, 'users', currentUser.uid);
+      if (action === "add") {
+        await updateDoc(userRef, { requested: arrayUnion(userUID) });
+      } else if (action === "remove") {
+        await updateDoc(userRef, { requested: arrayRemove(userUID) });
+      }
+      return;
+    } catch (error) {
+      console.error('Error during bookmark:', error);
+      throw error;
+    }
+  }
+
+  async function requestedByUpdate(requestedof: string, requestedby: string, state: "accepted" | "rejected" | "requested", action: "add" | "remove") {
+    // adds the current user to the requestedby document of the requestuser
+    // requested user.ID { requestedby.UID: accepted | rejected | requested, requestedby.UID: accepted | rejected | requested, ... }
+    try {
+      if (!currentUser) throw 'You must be logged in';
+      // requestedby: field that needs to be updated
+      // requestedof: document Id
+      const userRef = doc(db, 'requests', requestedof);
+
+      if (action === "add") {
+        await setDoc(userRef, { [requestedby]: state }, { merge: true });
+      } else if (action === "remove") {
+        await updateDoc(userRef, {
+          [requestedby]: deleteField()
+        });
+      }
+
+    } catch (error) {
+      console.error('Error Requesting:', error);
+      throw error;
+    }
+  }
+
 
 
   useEffect(() => {
@@ -314,6 +356,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     getProfiles,
     allProfiles,
     bookmarkUpdate,
+    requestUpdate,
+    requestedByUpdate,
     loading,
   };
 

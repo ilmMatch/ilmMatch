@@ -10,17 +10,21 @@ import {
 } from '@nextui-org/react';
 import { Button } from '@/components/ui/button';
 import { UserProfile } from '@/types/firebase';
-import { BookMarked, BookmarkIcon } from 'lucide-react';
+import { BookmarkCheck, BookMarked, BookmarkIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 
 export default function UserModal({ user }: { user: UserProfile }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const { bookmarkUpdate } = useAuth();
+    const { currentUser, bookmarkUpdate, requestUpdate, userDataPrivate, requestedByUpdate } = useAuth();
 
-    console.log('modal', user);
-    async function handleBookMark() {
-        console.log('bookmark', user);
-        await bookmarkUpdate(user.id, "add")
+    async function handleProfileMatchRequest() {
+        if (!currentUser) throw "you must be logged in"
+        console.log('match', user);
+        await requestedByUpdate(user.id, currentUser.uid, "requested", "add")
+        await requestUpdate(user.id, "add")
+    }
+    async function handleBookMark(action: "add" | "remove") {
+        await bookmarkUpdate(user.id, action)
     }
     return (
         <>
@@ -35,18 +39,23 @@ export default function UserModal({ user }: { user: UserProfile }) {
                     {(onClose: any) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">
-                                {user.initials as string}
+                                <div className='flex items-center'>
+                                    <Button variant="ghost" size="icon" onClick={() => handleBookMark(userDataPrivate?.bookmarks.includes(user.id) ? "remove" : "add")}>
+                                        {userDataPrivate?.bookmarks.includes(user.id) ? <BookmarkCheck size={4} className='text-primary' /> : <BookmarkIcon size={4} className='text-primary' />}
+                                    </Button>
+                                    <span> {user.initials}</span>
+                                </div>
                             </ModalHeader>
                             <ModalBody>
-                                <>body </>
+                                <>{JSON.stringify(user, null, 2)}</>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="link" onClick={onClose}>
                                     Close
                                 </Button>
-                                <Button color="primary" onClick={handleBookMark}>
+                                <Button color="primary" onClick={handleProfileMatchRequest}>
                                     {/* <BookMarked /> */}
-                                    <BookmarkIcon />
+                                    Request
                                 </Button>
                             </ModalFooter>
                         </>

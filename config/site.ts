@@ -1,3 +1,5 @@
+import { BadgeCheck, Bookmark, Home } from "lucide-react";
+
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
@@ -23,6 +25,23 @@ export const siteConfig = {
     {
       label: 'About',
       href: '/about',
+    },
+  ],
+  sideMenuItems: [
+    {
+      label: 'Home',
+      href: '/profile',
+      icon: Home,
+    },
+    {
+      label: 'Approved Users',
+      href: '/find',
+      icon: BadgeCheck,
+    },
+    {
+      label: 'My Bookmark',
+      href: '/bookmark',
+      icon: Bookmark,
     },
   ],
   navMenuItems: [
