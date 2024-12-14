@@ -2,6 +2,7 @@
 import {
   Calendar,
   ChevronDown,
+  ChevronRight,
   Command,
   Home,
   Inbox,
@@ -37,36 +38,6 @@ import Link from 'next/link';
 import { Logo } from '@/components/icons';
 import { siteConfig } from '@/config/site';
 
-// Menu items.
-
-const items = [
-  {
-    title: 'Home',
-    url: '/profile',
-    icon: Home,
-  },
-  {
-    title: 'Inbox',
-    url: '/find',
-    icon: Inbox,
-  },
-  {
-    title: 'Calendar',
-    url: '#',
-    icon: Calendar,
-  },
-  {
-    title: 'Search',
-    url: '#',
-    icon: Search,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
-  },
-];
-
 const navSecondary = [
   {
     title: 'Support',
@@ -80,8 +51,9 @@ const navSecondary = [
   },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
   const { state, isMobile } = useSidebar();
+
   return (
     <Sidebar collapsible="icon" variant="floating" hidden={isMobile}>
       <SidebarHeader>
@@ -107,17 +79,11 @@ export function AppSidebar() {
               <SidebarTrigger />
             </span>
           </SidebarMenuItem>
-          {/* <SidebarMenuItem>
-            <SidebarTrigger />
-          </SidebarMenuItem> */}
+
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {/* <SidebarGroup>
-          <span className="max-sm:hidden">
-            <SidebarTrigger />
-          </span>
-        </SidebarGroup> */}
+
         <SidebarGroup>
           <SidebarGroupLabel>Ilm Match</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -136,19 +102,35 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarSeparator />
-        <Collapsible defaultOpen className="group/collapsible">
-          <SidebarGroup>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="text-popover-foreground">
-                Help
-                <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarGroupContent />
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
+
+        {isAdmin &&
+          <Collapsible defaultOpen className="group/collapsible">
+            <SidebarGroup>
+              <SidebarGroupLabel asChild>
+                <CollapsibleTrigger className="text-popover-foreground">
+                  Admin
+                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {siteConfig.sideMenuAdminItems.map((item) => (
+                      <SidebarMenuItem key={item.label}>
+                        <SidebarMenuButton asChild tooltip={item.label}>
+                          <Link href={item.href}>
+                            <item.icon />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
+        }
 
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
@@ -175,10 +157,10 @@ export function AppSidebar() {
 }
 
 export function SidebarComponent() {
-  const { currentUser } = useAuth();
-  return currentUser ? (
+  const { currentUser, userDataPrivate } = useAuth();
+  return currentUser && userDataPrivate ? (
     <>
-      <AppSidebar />
+      <AppSidebar isAdmin={userDataPrivate?.role === 'admin'} />
       <span className="block sm:hidden fixed top-20 left-4 z-10">
         <SidebarTrigger />
       </span>

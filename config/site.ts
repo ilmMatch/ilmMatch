@@ -1,4 +1,4 @@
-import { BadgeCheck, Bookmark, Home, Send } from "lucide-react";
+import { BadgeCheck, Bookmark, Heart, Home, Send, UserPlus } from "lucide-react";
 
 export type SiteConfig = typeof siteConfig;
 
@@ -47,6 +47,28 @@ export const siteConfig = {
       label: 'Requests',
       href: '/requests',
       icon: Send,
+    },
+    {
+      label: 'Accepted',
+      href: '/accepted',
+      icon: Heart,
+    },
+  ],
+  sideMenuAdminItems: [
+    {
+      label: 'Assign Admin',
+      href: '/admin/rolemanage',
+      icon: UserPlus,
+    },
+    {
+      label: 'Accepted Requests',
+      href: '/requests',
+      icon: Heart,
+    },
+    {
+      label: 'Accepted',
+      href: '/accepted',
+      icon: Heart,
     },
   ],
   navMenuItems: [
