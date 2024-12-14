@@ -1,4 +1,4 @@
-import { BadgeCheck, Bookmark, Heart, Home, Send, UserPlus } from "lucide-react";
+import { BadgeCheck, Bookmark, Heart, Home, Send, UserPlus, UserRoundCheck } from "lucide-react";
 
 export type SiteConfig = typeof siteConfig;
 
@@ -61,14 +61,14 @@ export const siteConfig = {
       icon: UserPlus,
     },
     {
-      label: 'Accepted Requests',
+      label: 'Request Approval',
       href: '/admin/requests',
       icon: Heart,
     },
     {
-      label: 'Accepted',
-      href: '/accepted',
-      icon: Heart,
+      label: 'User Approval',
+      href: '/admin/approve',
+      icon: UserRoundCheck,
     },
   ],
   navMenuItems: [
