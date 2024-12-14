@@ -1,138 +1,120 @@
-// 'use client'
-// import { useAuth } from '@/context/AuthProvider'
-// import React, { useState } from 'react'
-
-// export default function AdminRequestPage() {
-//     // const uids = [...new Set(acceptedRequests.map(([, uid]) => uid))]; //get unique ids
-//     const { getAllAccepted } = useAuth()
-//     const [matchedData, setMatchedData] = useState<[string, string][]>([]);
-//     const [matchedUID, setMatchedUID] = useState<string[]>([]);
-//     async function getAcceptedUID() {
-//         const matchedUsers = await getAllAccepted()
-//         setMatchedData(matchedUsers); // Store the array of pairs in the state
-
-//         // Extract unique UIDs from the array and update state
-//         const allUIDs = matchedUsers.flatMap(([uid1, uid2]) => [uid1, uid2]);
-//         const uniqueUIDs = Array.from(new Set(allUIDs)); // Get unique UIDs
-//         setMatchedUID(uniqueUIDs);
-//     }
-//     return (
-//         <div>
-//             fetch get myrequested collection<br />
-//             filter for status === "accepted"<br />
-//             display users and a button to send email<br />
-//             <br />
-//             send email button will call the users private details fron "users" collection and create a mail template<br />
-//             <br />
-//             and db will be updated with each user having user.matched=[other user]<br />
-
-//         </div>
-//     )
-// }
-'use client'
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthProvider';
+import { Button } from '@/components/ui/button';
 
 export default function AdminRequestPage() {
     // State variables
-    const [matchedData, setMatchedData] = useState<[string, string][]>([]);
-    const [matchedUID, setMatchedUID] = useState<string[]>([]);
-    const [visibleUIDs, setVisibleUIDs] = useState<string[]>([]);
+    const [matchedData, setMatchedData] = useState<[string, string][]>([]); // Array of matched pairs
+    const [visiblePairs, setVisiblePairs] = useState<[string, string][]>([]); // Pairs currently displayed
     const [profiles, setProfiles] = useState<Map<string, any>>(new Map()); // Stores profiles by UID
     const [loading, setLoading] = useState(false); // Flag for loading profiles
-    const [hasMore, setHasMore] = useState(true); // Flag to check if more profiles need to be loaded
+    const [hasMore, setHasMore] = useState(true); // Flag to check if more pairs need to be loaded
 
-    const { getAllAccepted, getProfilebyUID } = useAuth(); // Assuming getProfilebyUID fetches profile details
-    const loaderRef = useRef<HTMLDivElement>(null); // Reference for the scroll detection
+    const { getAllAccepted, getProfilebyUID } = useAuth(); // Auth functions
+    const loaderRef = useRef<HTMLDivElement>(null); // Reference for scroll detection
 
-    // Fetch all accepted requests and prepare data
-    async function getAcceptedUID() {
-        const matchedUsers = await getAllAccepted(); // Fetch data using the provided function
-        setMatchedData(matchedUsers); // Store the array of pairs in state
+    // Fetch all matched pairs
+    async function fetchMatchedData() {
+        const matchedUsers = await getAllAccepted(); // Fetch pairs of matched UIDs
+        setMatchedData(matchedUsers);
 
-        // Extract unique UIDs from both parts of each pair
-        const allUIDs = matchedUsers.flatMap(([uid1, uid2]) => [uid1, uid2]);
-        const uniqueUIDs = Array.from(new Set(allUIDs));
-        setMatchedUID(uniqueUIDs); // Update state with unique UIDs
-        console.log('matchedUID', matchedUID, matchedUsers);
+        // Initialize with the first 10 pairs
+        const initialPairs = matchedUsers.slice(0, 10);
+        setVisiblePairs(initialPairs);
+        setHasMore(matchedUsers.length > 10); // Check if more pairs are available
     }
 
-    // Fetch user profile details for a given UID
-    const fetchProfiles = async (uids: string[]) => {
+    // Fetch user profiles for UIDs in the pairs
+    async function fetchProfilesForPairs(pairs: [string, string][]) {
         setLoading(true);
 
-        // For each UID, fetch profile details (check if already loaded)
         const newProfiles = new Map(profiles);
-        for (let uid of uids) {
-            if (!newProfiles.has(uid)) {
-                const profileData = await getProfilebyUID(uid);
-                newProfiles.set(uid, profileData);
+        for (let [uid1, uid2] of pairs) {
+            // Fetch profiles only if not already loaded
+            if (!newProfiles.has(uid1)) {
+                const profile1 = await getProfilebyUID(uid1);
+                newProfiles.set(uid1, profile1);
+            }
+            if (!newProfiles.has(uid2)) {
+                const profile2 = await getProfilebyUID(uid2);
+                newProfiles.set(uid2, profile2);
             }
         }
 
-        setProfiles(newProfiles); // Update profiles state
+        setProfiles(newProfiles);
         setLoading(false);
-    };
+    }
 
-    // Load more profiles when scrolled to the bottom
-    const handleScroll = () => {
-        console.log('scroll');
-        const bottom = loaderRef.current && loaderRef.current.getBoundingClientRect().bottom <= window.innerHeight;
+    // Load more pairs when scrolled to the bottom
+    const loadMorePairs = () => {
+        if (loading || !hasMore) return; // Prevent multiple fetches
 
-        if (bottom && !loading && hasMore) {
-            const nextVisibleUIDs = matchedUID.slice(visibleUIDs.length, visibleUIDs.length + 10); // Load 10 more
-            setVisibleUIDs((prev) => [...prev, ...nextVisibleUIDs]);
+        const nextPairs = matchedData.slice(visiblePairs.length, visiblePairs.length + 10); // Get the next 10 pairs
+        if (nextPairs.length === 0) {
+            setHasMore(false); // No more pairs to load
+        } else {
+            setVisiblePairs((prev) => [...prev, ...nextPairs]);
         }
     };
 
-    // Call this function when the component mounts
+    // Detect scroll events to trigger loading more pairs
+    const handleScroll = () => {
+        const bottom =
+            loaderRef.current && loaderRef.current.getBoundingClientRect().bottom <= window.innerHeight;
+        if (bottom) {
+            loadMorePairs();
+        }
+    };
+
+    // Initialize matched pairs on component mount
     useEffect(() => {
-        getAcceptedUID();
+        fetchMatchedData();
     }, []);
 
-    // Fetch profiles whenever visible UIDs change
+    // Fetch profiles whenever visible pairs change
     useEffect(() => {
-        if (visibleUIDs.length > 0) {
-            fetchProfiles(visibleUIDs);
+        if (visiblePairs.length > 0) {
+            fetchProfilesForPairs(visiblePairs);
         }
-    }, [visibleUIDs]);
+    }, [visiblePairs]);
 
-    // Detect scroll events
+    // Attach scroll listener
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [visibleUIDs, loading]);
+    }, [visiblePairs, loading]);
 
     return (
         <div>
             <h1>Admin Request Page</h1>
+
             <h2>Matched Data:</h2>
             <div>
-                {matchedData.map(([uid1, uid2], index) => (
-                    <div key={index}>
-                        <div>{uid1} ---- {uid2}</div>
-                    </div>
-                ))}
-            </div>
+                {visiblePairs.map(([uid1, uid2], index) => {
+                    const profile1 = profiles.get(uid1);
+                    const profile2 = profiles.get(uid2);
+                    const brother = profile1.gender === "brother" ? profile1 : profile2;
+                    const sister = profile1.gender === "sister" ? profile1 : profile2;
 
-            <h2>Profiles:</h2>
-            <div>
-                {visibleUIDs.map((uid, index) => {
-                    const profile = profiles.get(uid);
+
                     return (
-                        <div key={index}>
-                            <div>{uid}</div>
-                            {profile ? (
+                        <div key={index} className="border p-2">
+                            {profile1 && profile2 ? (
                                 <div>
-                                    {/* Assuming the profile has name and other fields */}
-                                    <p>Name: {profile.name}</p>
-                                    <p>Email: {profile.email}</p>
+                                    <p>
+                                        {brother.userName} -- {brother.email} -- {brother.gender}
+                                    </p>
+                                    <p>
+                                        {sister.userName} -- {sister.email} -- {sister.gender}
+                                    </p>
                                     {/* Add other profile fields here */}
+                                    <Button>Send Email</Button>
                                 </div>
                             ) : (
-                                <p>Loading...</p>
+                                <p>Loading profiles...</p>
                             )}
                         </div>
                     );
@@ -140,6 +122,8 @@ export default function AdminRequestPage() {
             </div>
 
             {loading && <div>Loading more profiles...</div>}
+
+            {!hasMore && <div>You reached the end.</div>}
 
             <div ref={loaderRef}></div> {/* Sentinel element for scroll detection */}
         </div>
