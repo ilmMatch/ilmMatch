@@ -66,6 +66,7 @@ interface AuthContextType {
   getRequestedMe: (uid: string) => Promise<RequestCollection>
   getMyRequested: (uid: string) => Promise<RequestCollection>
   getAllAccepted: () => Promise<[string, string][]>
+  setMatchAdmin: (profile1: string, profile2: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -302,6 +303,11 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       } else if (action === "remove") {
         await updateDoc(requestedme, { [requestedby]: deleteField() });
         await updateDoc(myrequested, { [requestedof]: deleteField() });
+      } else if (state === "unmatched") {
+        const docRef1 = doc(db, 'users', requestedof);
+        const docRef2 = doc(db, 'users', requestedby);
+        await setDoc(docRef1, { "matched.false": arrayUnion(requestedby), "matched.true": arrayRemove(requestedby) }, { merge: true });
+        await setDoc(docRef2, { "matched.false": arrayUnion(requestedof), "matched.true": arrayRemove(requestedof) }, { merge: true });
       }
 
     } catch (error) {
@@ -416,9 +422,37 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
     console.log(result, "result");
     return result;
+  }
 
+  async function setMatchAdmin(profile1: string, profile2: string) {
+    const docRef1 = doc(db, 'users', profile1);
+    const docRef2 = doc(db, 'users', profile2);
+    await setDoc(docRef1, { "matched.true": arrayUnion(profile2) }, { merge: true });
+    await setDoc(docRef2, { "matched.true": arrayUnion(profile1) }, { merge: true });
+
+
+
+    const requestedme1 = doc(db, 'requestedme', profile1);
+    const myrequested1 = doc(db, 'myrequested', profile1);
+    const requestedme2 = doc(db, 'requestedme', profile2);
+    const myrequested2 = doc(db, 'myrequested', profile2);
+
+
+    if (requestedme1) {
+      await updateDoc(requestedme1, { [profile2]: deleteField() });
+    }
+    if (myrequested1) {
+      await updateDoc(myrequested1, { [profile2]: deleteField() });
+    }
+    if (requestedme2) {
+      await updateDoc(requestedme2, { [profile1]: deleteField() });
+    }
+    if (myrequested2) {
+      await updateDoc(myrequested2, { [profile1]: deleteField() });
+    }
 
   }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
@@ -477,6 +511,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     getRequestedMe,
     getMyRequested,
     getAllAccepted,
+    setMatchAdmin,
     loading,
   };
 

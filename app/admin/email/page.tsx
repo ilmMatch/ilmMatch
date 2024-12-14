@@ -1,12 +1,16 @@
+'use client'
+import { Button } from '@/components/ui/button';
 import React from 'react'
 
 
 
 
-export default function page() {
+export default function Email() {
+
 
 
     return (
-        <div>page</div>
+        <div><Button >Send Email</Button>
+        </div>
     )
 }

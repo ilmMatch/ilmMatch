@@ -220,5 +220,12 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({ status, statusFrom
         );
     }
 
+    if (statusFrom === 'matched') {
+        return (
+            <Button onClick={handleRequestedMeClick('add', 'unmatched')} variant='destructive'>
+                Not Moving Forward?
+            </Button>
+        );
+    }
     return null;
 };

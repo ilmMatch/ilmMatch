@@ -11,7 +11,7 @@ export default function AdminRequestPage() {
     const [loading, setLoading] = useState(false); // Flag for loading profiles
     const [hasMore, setHasMore] = useState(true); // Flag to check if more pairs need to be loaded
 
-    const { getAllAccepted, getProfilebyUID } = useAuth(); // Auth functions
+    const { getAllAccepted, getProfilebyUID, setMatchAdmin } = useAuth(); // Auth functions
     const loaderRef = useRef<HTMLDivElement>(null); // Reference for scroll detection
 
     // Fetch all matched pairs
@@ -50,7 +50,10 @@ export default function AdminRequestPage() {
     const loadMorePairs = () => {
         if (loading || !hasMore) return; // Prevent multiple fetches
 
-        const nextPairs = matchedData.slice(visiblePairs.length, visiblePairs.length + 10); // Get the next 10 pairs
+        const nextPairs = matchedData.slice(
+            visiblePairs.length,
+            visiblePairs.length + 10
+        ); // Get the next 10 pairs
         if (nextPairs.length === 0) {
             setHasMore(false); // No more pairs to load
         } else {
@@ -61,7 +64,8 @@ export default function AdminRequestPage() {
     // Detect scroll events to trigger loading more pairs
     const handleScroll = () => {
         const bottom =
-            loaderRef.current && loaderRef.current.getBoundingClientRect().bottom <= window.innerHeight;
+            loaderRef.current &&
+            loaderRef.current.getBoundingClientRect().bottom <= window.innerHeight;
         if (bottom) {
             loadMorePairs();
         }
@@ -87,31 +91,112 @@ export default function AdminRequestPage() {
         };
     }, [visiblePairs, loading]);
 
+    async function sendEmail(brother: any, brotherUID: string, sister: any, sisterUID: string) {
+        const apiKey = process.env.NEXT_PUBLIC_MAIL_API_KEY
+        const url = process.env.NEXT_PUBLIC_MAIL_API_URL
+        if (!apiKey || !url) return
+        const emailData = {
+            sender: { name: 'Admin', email: 'sayyedrahat721@gmail.com' },
+            to: [{ name: brother.userName, email: brother.email }, { name: sister.userName, email: sister.email }],
+            subject: 'Ilm Match: Requested User Information',
+            htmlContent: `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Details</title>
+    <style>
+        body {
+            background-color: gold;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .brother,
+        .sister,
+        div {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="brother">
+        <strong>Brother</strong>
+        <div><b>Name:</b> ${brother.userName}</div>
+        <div> <b>Contact:</b>${brother.mobileNumber}</div>
+        <div> <b>Wali:</b>${brother.waliName ? brother.waliName : 'N/A'}</div>
+        <div> <b>Contact:</b>${brother.waliMobileNumber ? brother.waliMobileNumber : 'N/A'}</div>
+    </div>
+
+    <div class="sister">
+        <strong>Sister</strong>
+        <div><b>Name:</b> ${sister.userName}</div>
+        <div> <b>Contact:</b> ${sister.mobileNumber ? sister.mobileNumber : 'N/A'}</div>
+        <div> <b>Wali:</b> ${sister.waliName}</div>
+        <div><b>Contact:</b> ${sister.waliMobileNumber}</div>
+    </div>
+</body>
+
+</html>`,
+        };
+        console.log("called", brother, sister)
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': apiKey,
+                },
+                body: JSON.stringify(emailData),
+            });
+            console.log(response);
+            if (response.status === 201) {
+                console.log('Email sent successfully!');
+                alert('Email sent!');
+                await setMatchAdmin(brotherUID, sisterUID);
+            } else {
+                const error = await response.json();
+                console.error('Error sending email:', error);
+                alert('Failed to send email.');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('An error occurred while sending the email.');
+        }
+    }
+
     return (
         <div>
             <h1>Admin Request Page</h1>
-
             <h2>Matched Data:</h2>
             <div>
                 {visiblePairs.map(([uid1, uid2], index) => {
                     const profile1 = profiles.get(uid1);
                     const profile2 = profiles.get(uid2);
-                    const brother = profile1.gender === "brother" ? profile1 : profile2;
-                    const sister = profile1.gender === "sister" ? profile1 : profile2;
-
+                    // const brother = profile1.gender === 'brother' ? profile1 : profile2;
+                    // const sister = profile1.gender === 'sister' ? profile1 : profile2;
 
                     return (
                         <div key={index} className="border p-2">
                             {profile1 && profile2 ? (
                                 <div>
                                     <p>
-                                        {brother.userName} -- {brother.email} -- {brother.gender}
+                                        {profile1.userName} -- {profile1.email} --
                                     </p>
                                     <p>
-                                        {sister.userName} -- {sister.email} -- {sister.gender}
+                                        {profile2.userName} -- {profile2.email} --
                                     </p>
                                     {/* Add other profile fields here */}
-                                    <Button>Send Email</Button>
+                                    <Button onClick={() => sendEmail(profile1, uid1, profile2, uid2)}>
+                                        Send Email
+                                    </Button>
                                 </div>
                             ) : (
                                 <p>Loading profiles...</p>
@@ -120,11 +205,8 @@ export default function AdminRequestPage() {
                     );
                 })}
             </div>
-
             {loading && <div>Loading more profiles...</div>}
-
             {!hasMore && <div>You reached the end.</div>}
-
             <div ref={loaderRef}></div> {/* Sentinel element for scroll detection */}
         </div>
     );
