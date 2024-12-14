@@ -9,3 +9,6 @@ export type CountryCode = {
   flag: string;
   code: number;
 };
+
+
+export type Action = "add" | "remove";

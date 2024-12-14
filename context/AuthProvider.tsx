@@ -1,6 +1,7 @@
 'use client';
 import { auth, db } from '@/firebase';
-import { FetchUserProfilesResult, RequestCollection, UserProfile } from '@/types/firebase';
+import { Action } from '@/types';
+import { FetchUserProfilesResult, RequestAction, RequestCollection, UserProfile } from '@/types/firebase';
 import { set } from 'date-fns';
 import {
   createUserWithEmailAndPassword,
@@ -59,9 +60,10 @@ interface AuthContextType {
   allProfiles: UserProfile[];
   bookmarkUpdate: (bookmarkUID: string, action: "add" | "remove") => Promise<void>;
   profileRequestUpdate: (userUID: string, action: "add" | "remove") => Promise<void>;
-  requestedByUpdate: (requestedof: string, requestedby: string, state: "accepted" | "rejected" | "requested", action: "add" | "remove") => Promise<void>;
+  requestsUpdate: (requestedof: string, requestedby: string, state: RequestAction, action: Action) => Promise<void>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>
+  getMyRequested: (uid: string) => Promise<RequestCollection>
   loading: boolean;
 }
 
@@ -282,21 +284,22 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function requestedByUpdate(requestedof: string, requestedby: string, state: "accepted" | "rejected" | "requested", action: "add" | "remove") {
+  async function requestsUpdate(requestedof: string, requestedby: string, state: RequestAction, action: Action) {
     // adds the current user to the requestedby document of the requestuser
     // requested user.ID { requestedby.UID: accepted | rejected | requested, requestedby.UID: accepted | rejected | requested, ... }
     try {
       if (!currentUser) throw 'You must be logged in';
       // requestedby: field that needs to be updated
       // requestedof: document Id
-      const userRef = doc(db, 'requests', requestedof);
+      const requestedme = doc(db, 'requestedme', requestedof);
+      const myrequested = doc(db, 'myrequested', requestedby);
 
       if (action === "add") {
-        await setDoc(userRef, { [requestedby]: state }, { merge: true });
+        await setDoc(requestedme, { [requestedby]: state }, { merge: true });
+        await setDoc(myrequested, { [requestedof]: state }, { merge: true });
       } else if (action === "remove") {
-        await updateDoc(userRef, {
-          [requestedby]: deleteField()
-        });
+        await updateDoc(requestedme, { [requestedby]: deleteField() });
+        await updateDoc(myrequested, { [requestedof]: deleteField() });
       }
 
     } catch (error) {
@@ -340,7 +343,27 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       if (!currentUser) throw 'You must be logged in';
       // requestedby: field that needs to be updated
       // requestedof: document Id
-      const userRef = doc(db, 'requests', uid);
+      const userRef = doc(db, 'requestedme', uid);
+
+      const docSnap = await getDoc(userRef);
+      let firebaseData = {};
+      if (docSnap.exists()) {
+        firebaseData = docSnap.data();
+      }
+      return firebaseData;
+
+    } catch (error) {
+      console.error('Error Requesting:', error);
+      throw error;
+    }
+  }
+
+  async function getMyRequested(uid: string) {
+    try {
+      if (!currentUser) throw 'You must be logged in';
+      // requestedby: field that needs to be updated
+      // requestedof: document Id
+      const userRef = doc(db, 'myrequested', uid);
 
       const docSnap = await getDoc(userRef);
       let firebaseData = {};
@@ -407,9 +430,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     allProfiles,
     bookmarkUpdate,
     profileRequestUpdate,
-    requestedByUpdate,
+    requestsUpdate,
     getProfilebyUIDs,
     getRequestedMe,
+    getMyRequested,
     loading,
   };
 

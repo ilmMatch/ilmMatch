@@ -5,27 +5,37 @@ import { UserProfile } from '@/types/firebase'
 import React, { useEffect, useState } from 'react'
 
 export default function MyRequests() {
-    const { getProfilebyUIDs, userDataPrivate } = useAuth()
+    const { getProfilebyUIDs, userDataPrivate, currentUser, getMyRequested } = useAuth()
     const [myrequests, setMyRequests] = useState<UserProfile[] | undefined>([])
     async function getUsers() {
-        const data = await getProfilebyUIDs(userDataPrivate?.requested);
+        if (!currentUser) return "you must be logged in"
+        const myrequests = await getMyRequested(currentUser?.uid)
+        if (!myrequests) return "no requests found"
+
+        const uids = Object.keys(myrequests);
+        const data = await getProfilebyUIDs(uids);
         if (!data.success) {
             console.log(data.error);
         }
-        setMyRequests(data.profiles);
+        const profilesWithStatus = data.profiles?.map(profile => ({
+            ...profile,
+            status: myrequests[profile.id],
+        }));
+
+        setMyRequests(profilesWithStatus);
     }
 
     useEffect(() => {
-        if (userDataPrivate) {
-            console.log("userDataPrivate", userDataPrivate)
+        if (userDataPrivate && currentUser) {
             getUsers();
         }
-    }, [userDataPrivate]);
+    }, [userDataPrivate, currentUser]);
 
     return (
         <>{myrequests &&
             myrequests.map((user) => (
                 <div key={user.id}>
+                    {user.status}
                     <strong>{user.initials}</strong> - {user.id}
                     <UserModal user={user} />
                 </div>

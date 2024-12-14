@@ -9,9 +9,12 @@ export default function RequestedMe() {
     const [requests, setRequests] = useState<UserProfile[] | undefined>([])
     async function getUsers() {
         if (!currentUser) return "you must be logged in"
-        const requestsCollection = await getRequestedMe(currentUser.uid)
-        const uids = Object.keys(requestsCollection);
-
+        const requestedMe = await getRequestedMe(currentUser.uid)
+        const uids = Object.keys(requestedMe);
+        if (uids.length === 0) {
+            console.log("No requests found for the current user.");
+            return;
+        }
         const data = await getProfilebyUIDs(uids);
 
         if (!data.success) {
@@ -21,7 +24,7 @@ export default function RequestedMe() {
 
         const requestsWithStatus = data.profiles?.map(profile => ({
             ...profile,
-            status: requestsCollection[profile.id]
+            status: requestedMe[profile.id] && "requestedMe",
         }));
 
         setRequests(requestsWithStatus);

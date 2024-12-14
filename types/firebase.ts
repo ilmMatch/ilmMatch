@@ -5,6 +5,7 @@ export interface UserProfile {
   // For example:
   initials?: string;
   email?: string;
+  status?: string;
   // Add any other fields your profile might have
 }
 

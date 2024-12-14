@@ -13,7 +13,7 @@ export default function ProfileRequestPage() {
             <Tabs defaultValue="sent" className="md:w-[80%] mx-auto">
                 <TabsList>
                     <TabsTrigger value="sent">my requests</TabsTrigger>
-                    <TabsTrigger value="received">people asked for your</TabsTrigger>
+                    <TabsTrigger value="received">requested my details</TabsTrigger>
                 </TabsList>
                 <TabsContent value="sent"><MyRequests /></TabsContent>
                 <TabsContent value="received"><RequestedMe /></TabsContent>

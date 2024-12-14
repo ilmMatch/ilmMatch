@@ -5,7 +5,7 @@ import { UserProfile } from '@/types/firebase';
 import React, { use, useEffect, useState } from 'react';
 
 export default function BookmarkPage() {
-    const { userDataPrivate, allProfiles, getProfiles, loading } = useAuth();
+    const { userDataPrivate, allProfiles, getProfiles, loading, currentUser, getRequestedMe, getMyRequested } = useAuth();
     const [bookmarkedProfiles, setBookmarkedProfiles] = useState<UserProfile[]>([]);
 
     useEffect(() => {
@@ -14,18 +14,26 @@ export default function BookmarkPage() {
         }
     }, [allProfiles, getProfiles]);
 
-    function filterBookmark() {
+    async function filterBookmark() {
+        if (!currentUser) return "you must be logged in"
         if (!userDataPrivate?.bookmarks || allProfiles.length === 0) return [];
 
-        return allProfiles.filter(profile =>
+        const filteredProfiles = allProfiles.filter(profile =>
             userDataPrivate.bookmarks.includes(profile.id)
         );
+        const myrequests = await getMyRequested(currentUser?.uid)
+        const requestedMe = await getRequestedMe(currentUser.uid);
+
+        const profilesWithStatus = filteredProfiles?.map(profile => ({
+            ...profile,
+            status: requestedMe[profile.id] ? "requestedMe" : myrequests[profile.id] ? myrequests[profile.id] : undefined,
+        }));
+        setBookmarkedProfiles(profilesWithStatus);
+        return profilesWithStatus;
     }
 
     useEffect(() => {
-        const filteredProfiles = filterBookmark();
-        setBookmarkedProfiles(filteredProfiles);
-        console.log("filteredProfiles", filteredProfiles);
+        filterBookmark();
     }, [userDataPrivate?.bookmarks, allProfiles]);
 
     if (loading) {
