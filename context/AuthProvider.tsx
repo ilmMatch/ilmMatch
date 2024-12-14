@@ -295,6 +295,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const myrequested = doc(db, 'myrequested', requestedby);
 
       if (action === "add") {
+        console.log("in add")
         await setDoc(requestedme, { [requestedby]: state }, { merge: true });
         await setDoc(myrequested, { [requestedof]: state }, { merge: true });
       } else if (action === "remove") {

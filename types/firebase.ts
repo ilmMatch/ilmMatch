@@ -18,7 +18,7 @@ export interface FetchUserProfilesResult {
 
 
 
-export type RequestAction = 'requested' | 'rejected' | 'pending';
+export type RequestAction = 'requested' | 'rejected' | 'accepted' | 'unmatched';
 
 export interface RequestCollection {
   [key: string]: RequestAction;
