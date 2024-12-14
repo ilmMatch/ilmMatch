@@ -24,7 +24,8 @@ export default function RequestedMe() {
 
         const requestsWithStatus = data.profiles?.map(profile => ({
             ...profile,
-            status: requestedMe[profile.id] === "requested" ? "requestedMe" : requestedMe[profile.id] === "accepted" ? "accepted" : "rejected",
+            status: requestedMe[profile.id] ? requestedMe[profile.id] : "rejected",
+            statusFrom: "requestedMe",
         }));
 
         setRequests(requestsWithStatus);

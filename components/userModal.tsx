@@ -10,7 +10,7 @@ import {
 } from '@nextui-org/react';
 import { Button } from '@/components/ui/button';
 import { RequestAction, UserProfile } from '@/types/firebase';
-import { BookmarkCheck, BookMarked, BookmarkIcon } from 'lucide-react';
+import { BookmarkCheck, BookmarkIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { Action } from '@/types';
 
@@ -19,17 +19,26 @@ export default function UserModal({ user }: { user: UserProfile }) {
     const { currentUser, bookmarkUpdate, userDataPrivate, requestsUpdate } =
         useAuth();
 
-    async function handleProfileMatchRequest(requestedmeCollectionID: string, myrequestedCollectionID: string, action: Action, state: RequestAction) {
+    async function handleProfileMatchRequest(
+        requestedmeCollectionID: string,
+        myrequestedCollectionID: string,
+        action: Action,
+        state: RequestAction
+    ) {
         if (!currentUser) throw 'you must be logged in';
-        await requestsUpdate(requestedmeCollectionID, myrequestedCollectionID, state, action);
+        await requestsUpdate(
+            requestedmeCollectionID,
+            myrequestedCollectionID,
+            state,
+            action
+        );
     }
-
 
     async function handleBookMark(action: Action) {
         await bookmarkUpdate(user.id, action);
     }
 
-    if (!currentUser) return <>loading</>
+    if (!currentUser) return <>loading</>;
     return (
         <>
             <Button onClick={onOpen}>Open Profile</Button>
@@ -72,73 +81,13 @@ export default function UserModal({ user }: { user: UserProfile }) {
                                     Close
                                 </Button>
 
-                                {user.status
-                                    ? user.status == 'requestedMe'
-                                        ? <>
-                                            <Button
-                                                color="Destructive"
-                                                onClick={() => handleProfileMatchRequest(currentUser.uid, user.id, 'add', 'rejected')}//2nd argument is not required but have to pass, so keeping it rejected for the time
-                                            >
-                                                reject
-                                            </Button>
-                                            <Button
-                                                color="Destructive"
-                                                onClick={() => handleProfileMatchRequest(currentUser.uid, user.id, 'add', 'accepted')}//4th argument is not required but have to pass, so keeping it rejected for the time
-                                            >
-                                                Accept
-                                            </Button>
-                                        </>
-                                        : (user.status == 'requested' && <Button
-                                            color="Destructive"
-                                            onClick={() => handleProfileMatchRequest(user.id, currentUser.uid, 'add', 'rejected')}//2nd argument is not required but have to pass, so keeping it rejected for the time
-                                        >
-                                            Cancel Request
-                                        </Button>)
-                                    : <Button
-                                        color="primary"
-                                        onClick={() => handleProfileMatchRequest(user.id, currentUser.uid, 'add', 'requested')}
-                                    >
-                                        Request
-                                    </Button>}
-                                {user.status == 'rejected' && <Button variant={"outline"} disabled className='text-destructive'>Rejected</Button>}
-                                {user.status == 'accepted' && <Button variant={"secondary"} className='text-destructive'>Not moving Forward?</Button>}
-                                {user.status == 'unmatched' && <Button variant={"secondary"} className='text-destructive'>Reconsider?</Button>}
-
-                                {/* {buttonType ? (
-                                    buttonType === 'myRequested' ? (
-                                        <Button
-                                            color="Destructive"
-                                            onClick={() => handleProfileMatchRequest('add', "matched")}
-                                        >
-                                            accept
-                                        </Button>
-                                    ) : (
-                                        buttonType === 'requestedMe' && (
-                                            <>
-                                                <Button
-                                                    color="primary"
-                                                    onClick={() => handleProfileMatchRequest('add')}
-                                                >
-                                                    Reject
-                                                </Button>
-                                                <Button
-                                                    color="primary"
-                                                    onClick={() => handleProfileMatchRequest('add')}
-                                                >
-                                                    Accept
-                                                </Button>
-
-                                            </>
-                                        )
-                                    )
-                                ) : (
-                                    <Button
-                                        color="primary"
-                                        onClick={() => handleProfileMatchRequest('add')}
-                                    >
-                                        Request
-                                    </Button>
-                                )} */}
+                                <UserActionButtons
+                                    status={user.status}
+                                    statusFrom={user.statusFrom}
+                                    currentUserUID={currentUser.uid}
+                                    userUID={user.id}
+                                    handleAction={handleProfileMatchRequest}
+                                />
                             </ModalFooter>
                         </>
                     )}
@@ -147,3 +96,129 @@ export default function UserModal({ user }: { user: UserProfile }) {
         </>
     );
 }
+
+interface UserButtonStatusProps {
+    status?: string;
+    statusFrom?: string;
+    currentUserUID: string;
+    userUID: string;
+    handleAction: (
+        requestedmeCollectionID: string,
+        myrequestedCollectionID: string,
+        action: Action,
+        state: RequestAction
+    ) => Promise<void>;
+}
+
+const UserActionButtons: React.FC<UserButtonStatusProps> = ({ status, statusFrom, handleAction, currentUserUID, userUID }) => {
+
+    const handleMyRequestsClick = (action: Action, state: RequestAction) => async () => {
+        const requestedmeCollectionID = userUID
+        const myrequestedCollectionID = currentUserUID
+
+        await handleAction(
+            requestedmeCollectionID,
+            myrequestedCollectionID,
+            action,
+            state
+        );
+    };
+
+    const handleRequestedMeClick = (action: Action, state: RequestAction) => async () => {
+        const requestedmeCollectionID = currentUserUID;
+        const myrequestedCollectionID = userUID;
+        await handleAction(
+            requestedmeCollectionID,
+            myrequestedCollectionID,
+            action,
+            state
+        );
+    };
+
+    if (!status && !statusFrom) {
+        return (
+            <Button onClick={handleMyRequestsClick('add', 'requested')} variant='default'>Request</Button>
+        );
+    }
+
+    if (statusFrom === 'myrequests') {
+        if (status === 'rejected') {
+            return <Button variant='outline' className='text-destructive'>Rejected</Button>;
+        }
+
+        if (status === 'accepted') {
+            return (
+                <Button onClick={handleMyRequestsClick('add', 'unmatched')} variant='destructive'>
+                    Not Moving Forward
+                </Button>
+            );
+        }
+
+        if (status === 'unmatched') {
+            return (
+                <Button onClick={handleMyRequestsClick('add', 'accepted')} variant='secondary'>
+                    if still considering
+                </Button>
+            );
+        }
+
+        return (
+            // requested and re-requested
+            <Button onClick={handleMyRequestsClick('remove', 'requested')} variant='destructive'>
+                Cancel Request
+            </Button>
+        );
+    }
+
+    {
+        // user.status  : "requested" | "accepted" | "rejected" | "unmatched" | "re-requested"
+        // user.statusFrom : "myrequests" | "requestedMe"
+        // --- if both undefined then show "request"
+        // --- if user.statusFrom == "myrequests" then show "cancel request"
+        // --- --- and if status is rejected then show "rejected" ONLY
+        // --- --- and if status is accepted then show "not moving forward"
+        // --- --- and if status is unmatched then show "re-request"
+        // --- if statusFrom == "requestedMe" then show "reject" and "accept"
+        // --- --- and if status is rejected then show "rejected" and (reconsider)
+        // --- --- and if status is accepted then show "not moving forward"
+        // --- --- and if status is unmatched then show "re-request"
+    }
+
+    if (statusFrom === 'requestedMe') {
+        if (status === 'rejected') {
+            return (
+                <>
+                    <Button onClick={handleRequestedMeClick('add', 'accepted')} variant='default'> {/* // Re-request */}
+                        Reconsider
+                    </Button>
+                </>
+            );
+        }
+
+        if (status === 'accepted') {
+            return (
+                <Button onClick={handleRequestedMeClick('add', 'unmatched')} variant='destructive'>
+                    Not Moving Forward?
+                </Button>
+            );
+        }
+
+        if (status === 'unmatched') {
+            return (
+                <Button onClick={handleRequestedMeClick('add', 'accepted')} variant='secondary'>
+                    if still considering
+                </Button>
+            );
+        }
+
+        return (
+            // requested and re-requested
+            <>
+                <Button onClick={handleRequestedMeClick('add', 'rejected')} variant='destructive' >Reject</Button>
+                <Button onClick={handleRequestedMeClick('add', 'accepted')} variant='default' >Accept</Button>
+            </>
+        );
+    }
+
+    return null;
+};

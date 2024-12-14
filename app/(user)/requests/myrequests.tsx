@@ -20,6 +20,7 @@ export default function MyRequests() {
         const profilesWithStatus = data.profiles?.map(profile => ({
             ...profile,
             status: myrequests[profile.id],
+            statusFrom: "myrequests",
         }));
 
         setMyRequests(profilesWithStatus);

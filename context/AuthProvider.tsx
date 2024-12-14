@@ -61,9 +61,11 @@ interface AuthContextType {
   bookmarkUpdate: (bookmarkUID: string, action: "add" | "remove") => Promise<void>;
   profileRequestUpdate: (userUID: string, action: "add" | "remove") => Promise<void>;
   requestsUpdate: (requestedof: string, requestedby: string, state: RequestAction, action: Action) => Promise<void>;
+  getProfilebyUID: (uid: string) => Promise<DocumentData>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>
   getMyRequested: (uid: string) => Promise<RequestCollection>
+  getAllAccepted: () => Promise<[string, string][]>
   loading: boolean;
 }
 
@@ -295,7 +297,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const myrequested = doc(db, 'myrequested', requestedby);
 
       if (action === "add") {
-        console.log("in add")
         await setDoc(requestedme, { [requestedby]: state }, { merge: true });
         await setDoc(myrequested, { [requestedof]: state }, { merge: true });
       } else if (action === "remove") {
@@ -314,7 +315,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     try {
       const usersProfileRef = collection(db, "usersprofile");
       const q = query(usersProfileRef, where("__name__", "in", uids));
-      console.log(q, uids)
       // Fetch the documents
       const querySnapshot = await getDocs(q);
 
@@ -324,11 +324,29 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
 
-      console.log("Fetched Profiles.:", profiles);
       return {
         success: true,
         profiles: profiles,
       };
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
+    }
+  }
+
+  async function getProfilebyUID(uid: string) {
+    try {
+      const docRef = doc(db, 'users', uid);
+      const docSnap = await getDoc(docRef);
+      let firebaseData = {};
+      if (docSnap.exists()) {
+        firebaseData = docSnap.data();
+      }
+      return firebaseData
     } catch (error) {
       console.error("Error fetching profiles:", error);
       return {
@@ -379,6 +397,28 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
+  async function getAllAccepted() {
+    const myRequestCollection = collection(db, "myrequested");
+    const querySnapshot = await getDocs(myRequestCollection);
+
+    const result: [string, string][] = [];
+
+    querySnapshot.forEach((doc) => {
+      const docId = doc.id;
+      const data = doc.data();
+
+      for (const [uid, status] of Object.entries(data)) {
+        if (status === "accepted") {
+          result.push([docId, uid]);
+        }
+      }
+    });
+
+    console.log(result, "result");
+    return result;
+
+
+  }
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
@@ -433,8 +473,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     profileRequestUpdate,
     requestsUpdate,
     getProfilebyUIDs,
+    getProfilebyUID,
     getRequestedMe,
     getMyRequested,
+    getAllAccepted,
     loading,
   };
 

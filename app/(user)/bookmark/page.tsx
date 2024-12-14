@@ -26,7 +26,8 @@ export default function BookmarkPage() {
 
         const profilesWithStatus = filteredProfiles?.map(profile => ({
             ...profile,
-            status: requestedMe[profile.id] ? "requestedMe" : myrequests[profile.id] ? myrequests[profile.id] : undefined,
+            status: requestedMe[profile.id] ? requestedMe[profile.id] : myrequests[profile.id] ? myrequests[profile.id] : undefined,
+            statusFrom: requestedMe[profile.id] ? "requestedMe" : myrequests[profile.id] ? "myrequests" : undefined,
         }));
         setBookmarkedProfiles(profilesWithStatus);
         return profilesWithStatus;

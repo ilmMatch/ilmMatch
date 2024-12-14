@@ -62,7 +62,7 @@ export const siteConfig = {
     },
     {
       label: 'Accepted Requests',
-      href: '/requests',
+      href: '/admin/requests',
       icon: Heart,
     },
     {

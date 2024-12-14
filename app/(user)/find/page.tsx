@@ -22,9 +22,11 @@ export default function FindPage() {
         if (!data.success) {
             console.log(data.error);
         }
+
         const profilesWithStatus = data.profiles?.map(profile => ({
             ...profile,
-            status: requestedMe[profile.id] ? "requestedMe" : myrequests[profile.id] ? myrequests[profile.id] : undefined,
+            status: requestedMe[profile.id] ? requestedMe[profile.id] : myrequests[profile.id] ? myrequests[profile.id] : undefined,
+            statusFrom: requestedMe[profile.id] ? "requestedMe" : myrequests[profile.id] ? "myrequests" : undefined,
         }));
         setUsers(profilesWithStatus);
     }
