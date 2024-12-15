@@ -1,13 +1,13 @@
 'use client';
 import { auth, db } from '@/firebase';
+import { getInitials, getObjectDiff } from '@/lib/utils';
 import { Action } from '@/types';
 import {
-  FetchUserProfilesResult,
+  AuthContextType,
   RequestAction,
-  RequestCollection,
+  UserDataPrivateType,
   UserProfile,
 } from '@/types/firebase';
-import { set } from 'date-fns';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -15,10 +15,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   User,
-  UserCredential,
 } from 'firebase/auth';
 import {
-  addDoc,
   arrayRemove,
   arrayUnion,
   collection,
@@ -35,60 +33,8 @@ import {
 } from 'firebase/firestore';
 import { useContext, useState, useEffect, createContext } from 'react';
 
-interface UserDataPrivateType {
-  userName: string;
-  mobileNumber: number | null;
-  waliName: string;
-  waliMobileNumber: number | null;
-  dob: Date;
-  gender: string;
-}
 
-interface AuthContextType {
-  currentUser: User | null;
-  userDataPrivate: DocumentData | null;
-  userDataProfile: DocumentData | null;
-  setUserDataPrivate: (data: DocumentData | null) => void;
-  setUserDataProfile: (data: DocumentData | null) => void;
-  signup: (
-    email: string,
-    password: string,
-    userName: string,
-    gender: string
-  ) => Promise<UserCredential>;
-  login: (email: string, password: string) => Promise<UserCredential>;
-  forgetPassword: (email: string) => Promise<void>;
-  logout: () => Promise<void>;
-  roleManager: (userId: string, role: string) => Promise<void>;
-  userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<void>;
-  approvalUpdate: (data: string, uid: string) => Promise<void>;
-  getProfiles: (
-    limitx: number,
-    aprroved: string
-  ) => Promise<FetchUserProfilesResult>;
-  allProfiles: UserProfile[];
-  bookmarkUpdate: (
-    bookmarkUID: string,
-    action: 'add' | 'remove'
-  ) => Promise<void>;
-  profileRequestUpdate: (
-    userUID: string,
-    action: 'add' | 'remove'
-  ) => Promise<void>;
-  requestsUpdate: (
-    requestedof: string,
-    requestedby: string,
-    state: RequestAction,
-    action: Action
-  ) => Promise<void>;
-  getProfilebyUID: (uid: string) => Promise<DocumentData>;
-  getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
-  getRequestedMe: (uid: string) => Promise<RequestCollection>;
-  getMyRequested: (uid: string) => Promise<RequestCollection>;
-  getAllAccepted: () => Promise<[string, string][]>;
-  setMatchAdmin: (profile1: string, profile2: string) => Promise<void>;
-  loading: boolean;
-}
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -561,35 +507,3 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 }
 
-// *********************************************************************************
-// This function calculates the difference between two objects(oldData and newData)
-// and returns a new object containing only the keys that have been added or modified.
-function getObjectDiff<T extends Record<string, any>>(
-  oldData: T,
-  newData: T
-): Partial<T> {
-  const diff: Partial<T> = {};
-
-  // Iterate through all keys in the new data
-  for (const key in newData) {
-    // Check if the key doesn't exist in old data or the value has changed
-    if (
-      !(key in oldData) || // New key
-      JSON.stringify(oldData[key]) !== JSON.stringify(newData[key]) // Value changed
-    ) {
-      diff[key] = newData[key];
-    }
-  }
-
-  return diff;
-}
-
-function getInitials(fullName: string): string {
-  const nameParts = fullName.split(' ');
-
-  const initials = nameParts
-    .map((part) => part.charAt(0).toUpperCase())
-    .join('.');
-
-  return initials;
-}
