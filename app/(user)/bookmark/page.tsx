@@ -2,39 +2,45 @@
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
+import { set } from 'date-fns';
 import React, { use, useEffect, useState } from 'react';
 
 export default function BookmarkPage() {
   const {
     userDataPrivate,
-    allProfiles,
-    getProfiles,
     loading,
     currentUser,
     getRequestedMe,
     getMyRequested,
+    getProfilebyUIDs,
   } = useAuth();
-  const [bookmarkedProfiles, setBookmarkedProfiles] = useState<UserProfile[]>(
+
+  const [bookmarkedProfiles, setBookmarkedProfiles] = useState<UserProfile[] | undefined>(
     []
   );
 
-  useEffect(() => {
-    if (allProfiles.length === 0) {
-      getProfiles();
-    }
-  }, [allProfiles, getProfiles]);
 
   async function filterBookmark() {
     if (!currentUser) return 'you must be logged in';
-    if (!userDataPrivate?.bookmarks || allProfiles.length === 0) return [];
+    if (!userDataPrivate?.bookmarks) return [];
+    const bookmarkedUID = userDataPrivate.bookmarks
 
-    const filteredProfiles = allProfiles.filter((profile) =>
-      userDataPrivate.bookmarks.includes(profile.id)
-    );
+    if (bookmarkedUID?.length === 0) {
+      console.log('No bookmarks found for the current user.');
+      // add toast
+      return
+    }
+    const data = await getProfilebyUIDs(bookmarkedUID)
+    if (!data.success) {
+      console.log(data.error);
+      // add toast
+    }
+
+
     const myrequests = await getMyRequested(currentUser?.uid);
     const requestedMe = await getRequestedMe(currentUser.uid);
 
-    const profilesWithStatus = filteredProfiles?.map((profile) => ({
+    const profilesWithStatus = data.profiles?.map((profile) => ({
       ...profile,
       status: requestedMe[profile.id]
         ? requestedMe[profile.id]
@@ -51,9 +57,11 @@ export default function BookmarkPage() {
     return profilesWithStatus;
   }
 
+
+
   useEffect(() => {
     filterBookmark();
-  }, [userDataPrivate?.bookmarks, allProfiles]);
+  }, [userDataPrivate?.bookmarks]);
 
   if (loading) {
     return <div>Loading...</div>;

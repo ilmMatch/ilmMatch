@@ -153,19 +153,12 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       if (!userId || !role || !currentUser) {
         return { success: false, error: 'Please provide User ID and Role.' };
       }
-
-      console.log('Current User:', currentUser);
-
-      // Reference to the user document
       const userDoc = doc(db, 'users', userId);
-
-      // Update the role and assignment metadata
       await updateDoc(userDoc, {
         role,
         assignedBy: currentUser.uid,
         assignedAt: new Date().toISOString(),
       });
-
       return { success: true };
     } catch (error: any) {
       console.error('Error assigning role:', error);
