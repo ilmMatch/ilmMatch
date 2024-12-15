@@ -66,7 +66,11 @@ export default function ProfileForm() {
   async function requestReview() {
     if (!currentUser) throw 'you must be logged in';
     console.log(currentUser);
-    approvalUpdate('requested', currentUser.uid);
+    const data = await approvalUpdate('requested', currentUser.uid);
+    if (!data.success) {
+      console.log(data.error)
+      // add toast
+    }
   }
 
   if (loading) {
@@ -87,11 +91,11 @@ export default function ProfileForm() {
                 className={cn(
                   'absolute top-2 right-2 capitalize',
                   userDataProfile?.approved === 'requested' &&
-                    badgeVariants({ variant: 'requested' }),
+                  badgeVariants({ variant: 'requested' }),
                   userDataProfile?.approved === 'approved' &&
-                    badgeVariants({ variant: 'approved' }),
+                  badgeVariants({ variant: 'approved' }),
                   userDataProfile?.approved === 'notApproved' &&
-                    badgeVariants({ variant: 'notApproved' })
+                  badgeVariants({ variant: 'notApproved' })
                 )}
                 onClick={requestReview}
               >
@@ -118,7 +122,7 @@ export default function ProfileForm() {
                             className={cn(
                               'flex-grow',
                               !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           >

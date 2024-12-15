@@ -55,30 +55,32 @@ export function useAuth() {
 
 export function AuthProvider(props: { children: React.ReactNode }) {
   const { children } = props;
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
-  const [userDataPrivate, setUserDataPrivate] = useState<DocumentData | null>(
-    null
-  );
-  const [userDataProfile, setUserDataProfile] = useState<DocumentData | null>(
-    null
-  );
+  const [userDataPrivate, setUserDataPrivate] = useState<DocumentData | null>(null);
+  const [userDataProfile, setUserDataProfile] = useState<DocumentData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // AUTH HANDLERS
-  async function signup(email: string, password: string, userName: string, gender: string): Promise<VoidResult> {
+  async function signup(
+    email: string,
+    password: string,
+    userName: string,
+    gender: string
+  ): Promise<VoidResult> {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      // Create a new user with Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
       const user = userCredential.user;
       const userId = user.uid;
+
       const userRef = doc(db, 'users', userId);
       const userRefP = doc(db, 'usersprofile', userId);
       const timestamp = new Date().toISOString();
+
+      // Data for the `users` collection
       const userData = {
         userName,
         gender,
@@ -86,20 +88,28 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         email,
         timestamp,
       };
+
+      // Data for the `usersprofile` collection
       const userDataP = {
         initials: getInitials(userName),
         gender,
         timestamp,
-        approved: 'not approved',
+        approved: 'notApproved',
       };
+
+      // Write both documents in parallel for efficiency
       await Promise.all([setDoc(userRef, userData), setDoc(userRefP, userDataP)]);
 
       return { success: true };
     } catch (error: any) {
       console.error('Error during signup:', error.message);
-      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
+
 
 
   async function login(email: string, password: string): Promise<VoidResult> {
@@ -570,31 +580,44 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
-        // Set the user to our local context state
         setLoading(true);
-        setCurrentUser(user);
         if (!user) {
           console.log('No User Found');
+          setCurrentUser(null);
+          setUserDataPrivate(null);
+          setUserDataProfile(null);
           return;
         }
-        // if user exists, fetch data from firestore database
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-        let firebaseData = {};
-        if (docSnap.exists()) {
-          firebaseData = docSnap.data();
-        }
-        setUserDataPrivate(firebaseData);
 
-        const docRefP = doc(db, 'usersprofile', user.uid);
-        const docSnapP = await getDoc(docRefP);
-        let firebaseDataP = {};
-        if (docSnapP.exists()) {
-          firebaseDataP = docSnapP.data();
-        }
-        setUserDataProfile(firebaseDataP);
-      } catch (err: any) {
-        console.error('Error fetching user data:', err.message);
+        setCurrentUser(user);
+
+
+        const [privateDataSnap, profileDataSnap] = await Promise.all([
+          getDoc(doc(db, 'users', user.uid)),
+          getDoc(doc(db, 'usersprofile', user.uid)),
+        ]);
+
+        setUserDataPrivate(privateDataSnap.exists() ? privateDataSnap.data() : {});
+        setUserDataProfile(profileDataSnap.exists() ? profileDataSnap.data() : {});
+
+        // // if user exists, fetch data from firestore database
+        // const docRef = doc(db, 'users', user.uid);
+        // const docSnap = await getDoc(docRef);
+        // let firebaseData = {};
+        // if (docSnap.exists()) {
+        //   firebaseData = docSnap.data();
+        // }
+        // setUserDataPrivate(firebaseData);
+
+        // const docRefP = doc(db, 'usersprofile', user.uid);
+        // const docSnapP = await getDoc(docRefP);
+        // let firebaseDataP = {};
+        // if (docSnapP.exists()) {
+        //   firebaseDataP = docSnapP.data();
+        // }
+        // setUserDataProfile(firebaseDataP);
+      } catch (error: any) {
+        console.error('Error fetching user data:', error.message);
       } finally {
         setLoading(false);
       }

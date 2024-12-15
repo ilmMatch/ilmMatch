@@ -1,3 +1,39 @@
+//   async function signup(email: string, password: string, userName: string, gender: string): Promise<VoidResult> {
+//     try {
+//       const userCredential = await createUserWithEmailAndPassword(
+//         auth,
+//         email,
+//         password
+//       );
+
+//       const user = userCredential.user;
+//       const userId = user.uid;
+//       const userRef = doc(db, 'users', userId);
+//       const userRefP = doc(db, 'usersprofile', userId);
+//       const timestamp = new Date().toISOString();
+//       const userData = {
+//         userName,
+//         gender,
+//         role: 'user',
+//         email,
+//         timestamp,
+//       };
+//       const userDataP = {
+//         initials: getInitials(userName),
+//         gender,
+//         timestamp,
+//         approved: 'notApproved',
+//       };
+//       await Promise.all([setDoc(userRef, userData), setDoc(userRefP, userDataP)]);
+
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error during signup:', error.message);
+//       return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+//     }
+//   }
+
+
 //   const roleManager = async (userId: string, role: string): Promise<VoidResult> => {
 //     if (!userId || !role || !currentUser) {
 //       return { success: false, error: "Please provide User ID and Role." };
