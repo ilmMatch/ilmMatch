@@ -5,6 +5,8 @@ import { Action } from '@/types';
 import {
   AuthContextType,
   FetchUserProfilesResult,
+  PairResult,
+  ProfileResult,
   RequestAction,
   UserDataPrivateType,
   UserProfile,
@@ -237,7 +239,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function bookmarkUpdate(bookmarkUID: string, action: 'add' | 'remove') {
+  async function bookmarkUpdate(bookmarkUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
     try {
       if (!currentUser) throw 'You must be logged in';
       const userRef = doc(db, 'users', currentUser.uid);
@@ -246,17 +248,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       } else if (action === 'remove') {
         await updateDoc(userRef, { bookmarks: arrayRemove(bookmarkUID) });
       }
-      return;
-    } catch (error) {
-      console.error('Error during bookmark:', error);
-      throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during bookmark:', error.message);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
-  async function profileRequestUpdate(
-    userUID: string,
-    action: 'add' | 'remove'
-  ) {
+  async function profileRequestUpdate(userUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
     try {
       if (!currentUser) throw 'You must be logged in';
       const userRef = doc(db, 'users', currentUser.uid);
@@ -265,19 +268,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       } else if (action === 'remove') {
         await updateDoc(userRef, { requested: arrayRemove(userUID) });
       }
-      return;
-    } catch (error) {
-      console.error('Error during bookmark:', error);
-      throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during bookmark:', error.message);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
-  async function requestsUpdate(
-    requestedof: string,
-    requestedby: string,
-    state: RequestAction,
-    action: Action
-  ) {
+  async function requestsUpdate(requestedof: string, requestedby: string, state: RequestAction, action: Action): Promise<VoidResult> {
     // adds the current user to the requestedby document of the requestuser
     // requested user.ID { requestedby.UID: accepted | rejected | requested, requestedby.UID: accepted | rejected | requested, ... }
     try {
@@ -312,13 +314,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         await updateDoc(requestedme, { [requestedby]: deleteField() });
         await updateDoc(myrequested, { [requestedof]: deleteField() });
       }
-    } catch (error) {
-      console.error('Error Requesting:', error);
-      throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error Requesting:', error.message);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
-  async function getProfilebyUIDs(uids: string[]) {
+  async function getProfilebyUIDs(uids: string[]): Promise<FetchUserProfilesResult> {
     try {
       const usersProfileRef = collection(db, 'usersprofile');
       const q = query(usersProfileRef, where('__name__', 'in', uids));
@@ -345,7 +352,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function getProfilebyUID(uid: string) {
+  async function getProfilebyUID(uid: string): Promise<DocumentData> {
     try {
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
@@ -353,7 +360,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       if (docSnap.exists()) {
         firebaseData = docSnap.data();
       }
-      return firebaseData;
+      return { success: true, data: firebaseData, };
     } catch (error) {
       console.error('Error fetching profiles:', error);
       return {
@@ -364,7 +371,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function getRequestedMe(uid: string) {
+  async function getRequestedMe(uid: string): Promise<DocumentData> {
     try {
       if (!currentUser) throw 'You must be logged in';
       // requestedby: field that needs to be updated
@@ -376,14 +383,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       if (docSnap.exists()) {
         firebaseData = docSnap.data();
       }
-      return firebaseData;
-    } catch (error) {
-      console.error('Error Requesting:', error);
-      throw error;
+      return { success: true, data: firebaseData }
+    } catch (error: any) {
+      console.error('Error Requesting:', error.message);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
-  async function getMyRequested(uid: string) {
+  async function getMyRequested(uid: string): Promise<DocumentData> {
     try {
       if (!currentUser) throw 'You must be logged in';
       // requestedby: field that needs to be updated
@@ -395,64 +406,91 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       if (docSnap.exists()) {
         firebaseData = docSnap.data();
       }
-      return firebaseData;
-    } catch (error) {
-      console.error('Error Requesting:', error);
-      throw error;
+      return { success: true, data: firebaseData };
+    } catch (error: any) {
+      console.error('Error Requesting:', error.message);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
-  async function getAllAccepted() {
-    const myRequestCollection = collection(db, 'myrequested');
-    const querySnapshot = await getDocs(myRequestCollection);
+  async function getAllAccepted(): Promise<PairResult> {
+    try {
 
-    const result: [string, string][] = [];
 
-    querySnapshot.forEach((doc) => {
-      const docId = doc.id;
-      const data = doc.data();
+      const myRequestCollection = collection(db, 'myrequested');
+      const querySnapshot = await getDocs(myRequestCollection);
 
-      for (const [uid, status] of Object.entries(data)) {
-        if (status === 'accepted') {
-          result.push([docId, uid]);
+      const result: [string, string][] = [];
+
+      querySnapshot.forEach((doc) => {
+        const docId = doc.id;
+        const data = doc.data();
+
+        for (const [uid, status] of Object.entries(data)) {
+          if (status === 'accepted') {
+            result.push([docId, uid]);
+          }
         }
-      }
-    });
+      });
 
-    console.log(result, 'result');
-    return result;
+
+      return { success: true, data: result }
+    } catch (error: any) {
+      console.error('Error Requesting:', error.message);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
+    }
   }
 
-  async function setMatchAdmin(profile1: string, profile2: string) {
-    const docRef1 = doc(db, 'users', profile1);
-    const docRef2 = doc(db, 'users', profile2);
-    await setDoc(
-      docRef1,
-      { 'matched.true': arrayUnion(profile2) },
-      { merge: true }
-    );
-    await setDoc(
-      docRef2,
-      { 'matched.true': arrayUnion(profile1) },
-      { merge: true }
-    );
+  async function setMatchAdmin(profile1: string, profile2: string): Promise<VoidResult> {
+    try {
 
-    const requestedme1 = doc(db, 'requestedme', profile1);
-    const myrequested1 = doc(db, 'myrequested', profile1);
-    const requestedme2 = doc(db, 'requestedme', profile2);
-    const myrequested2 = doc(db, 'myrequested', profile2);
 
-    if (requestedme1) {
-      await updateDoc(requestedme1, { [profile2]: deleteField() });
-    }
-    if (myrequested1) {
-      await updateDoc(myrequested1, { [profile2]: deleteField() });
-    }
-    if (requestedme2) {
-      await updateDoc(requestedme2, { [profile1]: deleteField() });
-    }
-    if (myrequested2) {
-      await updateDoc(myrequested2, { [profile1]: deleteField() });
+      const docRef1 = doc(db, 'users', profile1);
+      const docRef2 = doc(db, 'users', profile2);
+      await setDoc(
+        docRef1,
+        { 'matched.true': arrayUnion(profile2) },
+        { merge: true }
+      );
+      await setDoc(
+        docRef2,
+        { 'matched.true': arrayUnion(profile1) },
+        { merge: true }
+      );
+
+      const requestedme1 = doc(db, 'requestedme', profile1);
+      const myrequested1 = doc(db, 'myrequested', profile1);
+      const requestedme2 = doc(db, 'requestedme', profile2);
+      const myrequested2 = doc(db, 'myrequested', profile2);
+
+      if (requestedme1) {
+        await updateDoc(requestedme1, { [profile2]: deleteField() });
+      }
+      if (myrequested1) {
+        await updateDoc(myrequested1, { [profile2]: deleteField() });
+      }
+      if (requestedme2) {
+        await updateDoc(requestedme2, { [profile1]: deleteField() });
+      }
+      if (myrequested2) {
+        await updateDoc(myrequested2, { [profile1]: deleteField() });
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error in setMatchAdmin:', error.message);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
@@ -495,6 +533,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     currentUser,
     userDataPrivate,
     userDataProfile,
+    allProfiles,
+    loading,
     setUserDataPrivate,
     setUserDataProfile,
     signup,
@@ -505,7 +545,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     userPrivateUpdate,
     approvalUpdate,
     getProfiles,
-    allProfiles,
     bookmarkUpdate,
     profileRequestUpdate,
     requestsUpdate,
@@ -515,7 +554,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     getMyRequested,
     getAllAccepted,
     setMatchAdmin,
-    loading,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

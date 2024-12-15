@@ -49,6 +49,9 @@ export type VoidResult =
   | { success: true }
   | { success: false; error: string };
 
+export type ProfileResult =
+  | { success: true, data: UserProfile }
+  | { success: false; error: string };
 
 
 export interface UserDataPrivateType {
@@ -59,6 +62,10 @@ export interface UserDataPrivateType {
   dob: Date;
   gender: string;
 }
+
+export type PairResult =
+  | { success: true; data: [string, string][] }
+  | { success: false; error: string };
 
 export interface AuthContextType {
   currentUser: User | null;
@@ -86,22 +93,22 @@ export interface AuthContextType {
   bookmarkUpdate: (
     bookmarkUID: string,
     action: 'add' | 'remove'
-  ) => Promise<void>;
+  ) => Promise<VoidResult>;
   profileRequestUpdate: (
     userUID: string,
     action: 'add' | 'remove'
-  ) => Promise<void>;
+  ) => Promise<VoidResult>;
   requestsUpdate: (
     requestedof: string,
     requestedby: string,
     state: RequestAction,
     action: Action
-  ) => Promise<void>;
+  ) => Promise<VoidResult>;
   getProfilebyUID: (uid: string) => Promise<DocumentData>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>;
   getMyRequested: (uid: string) => Promise<RequestCollection>;
-  getAllAccepted: () => Promise<[string, string][]>;
-  setMatchAdmin: (profile1: string, profile2: string) => Promise<void>;
+  getAllAccepted: () => Promise<PairResult>;
+  setMatchAdmin: (profile1: string, profile2: string) => Promise<VoidResult>;
   loading: boolean;
 }
