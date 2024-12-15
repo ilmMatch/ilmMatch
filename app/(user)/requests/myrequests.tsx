@@ -17,6 +17,11 @@ export default function MyRequests() {
       // add toast
     }
     const uids = Object.keys(myrequests.data);
+    if (uids.length === 0) {
+      console.log('you haven&t requested anyone.');
+      // add toast
+      return;
+    }
     const data = await getProfilebyUIDs(uids);
     if (!data.success) {
       console.log(data.error);

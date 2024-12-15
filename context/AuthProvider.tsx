@@ -27,6 +27,7 @@ import {
   deleteField,
   doc,
   DocumentData,
+  DocumentReference,
   getDoc,
   getDocs,
   limit,
@@ -281,98 +282,120 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function requestsUpdate(requestedof: string, requestedby: string, state: RequestAction, action: Action): Promise<VoidResult> {
-    // adds the current user to the requestedby document of the requestuser
-    // requested user.ID { requestedby.UID: accepted | rejected | requested, requestedby.UID: accepted | rejected | requested, ... }
+  async function requestsUpdate(
+    requestedof: string,
+    requestedby: string,
+    state: RequestAction,
+    action: Action
+  ): Promise<VoidResult> {
     try {
-      console.log("in request Update")
-      if (!currentUser) throw 'You must be logged in';
-      // requestedby: field that needs to be updated
-      // requestedof: document Id
+      // Ensure the user is logged in
+      if (!currentUser) throw new Error('You must be logged in');
+
+      // References to the Firestore documents
       const requestedme = doc(db, 'requestedme', requestedof);
       const myrequested = doc(db, 'myrequested', requestedby);
+
       if (state === 'unmatched') {
-        const docRef1 = doc(db, 'users', requestedof);
-        const docRef2 = doc(db, 'users', requestedby);
-        await setDoc(
-          docRef1,
-          {
-            unmatched: arrayUnion(requestedby),
-            matched: arrayRemove(requestedby),
-          },
-          { merge: true }
-        );
-        await setDoc(
-          docRef2,
-          {
-            unmatched: arrayUnion(requestedof),
-            matched: arrayRemove(requestedof),
-          },
-          { merge: true }
-        );
+        // Handle unmatched state by updating 'unmatched' and 'matched' arrays
+        await updateMatchStatus(requestedof, requestedby);
       } else if (action === 'add') {
-        await setDoc(requestedme, { [requestedby]: state }, { merge: true });
-        await setDoc(myrequested, { [requestedof]: state }, { merge: true });
+        // Add state to 'requestedme' and 'myrequested'
+        await updateRequestState(requestedme, requestedby, state);
+        await updateRequestState(myrequested, requestedof, state);
       } else if (action === 'remove') {
-        await updateDoc(requestedme, { [requestedby]: deleteField() });
-        await updateDoc(myrequested, { [requestedof]: deleteField() });
+        // Remove state from 'requestedme' and 'myrequested'
+        await removeRequestState(requestedme, requestedby);
+        await removeRequestState(myrequested, requestedof);
       }
+
       return { success: true };
     } catch (error: any) {
       console.error('Error Requesting:', error.message);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+  // Helper functions for update actions
+  async function updateMatchStatus(requestedof: string, requestedby: string) {
+    const docRef1 = doc(db, 'users', requestedof);
+    const docRef2 = doc(db, 'users', requestedby);
+
+    await setDoc(
+      docRef1,
+      {
+        unmatched: arrayUnion(requestedby),
+        matched: arrayRemove(requestedby),
+      },
+      { merge: true }
+    );
+
+    await setDoc(
+      docRef2,
+      {
+        unmatched: arrayUnion(requestedof),
+        matched: arrayRemove(requestedof),
+      },
+      { merge: true }
+    );
+  }
+  // Helper functions for update actions
+  async function updateRequestState(docRef: DocumentReference, key: string, state: RequestAction) {
+    await setDoc(docRef, { [key]: state }, { merge: true });
+  }
+  // Helper functions for update actions
+  async function removeRequestState(docRef: DocumentReference, key: string) {
+    await updateDoc(docRef, { [key]: deleteField() });
+  }
+
 
   async function getProfilebyUIDs(uids: string[]): Promise<FetchUserProfilesResult> {
     try {
+      // Fetch profiles from 'usersprofile' collection where document name is in uids
       const usersProfileRef = collection(db, 'usersprofile');
       const q = query(usersProfileRef, where('__name__', 'in', uids));
-      // Fetch the documents
       const querySnapshot = await getDocs(q);
 
-      // Process the results
-      const profiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
+      // Map the query snapshot docs to the desired structure
+      const profiles: UserProfile[] = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...(doc.data() as Omit<UserProfile, 'id'>),
+        ...doc.data() as Omit<UserProfile, 'id'>, // Spread the document data without the 'id'
       }));
 
       return {
         success: true,
-        profiles: profiles,
+        profiles,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching profiles:', error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
   async function getProfilebyUID(uid: string): Promise<DocumentData> {
     try {
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
-      let firebaseData = {};
-      if (docSnap.exists()) {
-        firebaseData = docSnap.data();
-      }
-      return { success: true, data: firebaseData, };
-    } catch (error) {
-      console.error('Error fetching profiles:', error);
+
+      // Return data only if the document exists
+      const firebaseData = docSnap.exists() ? docSnap.data() : {};
+
+      return { success: true, data: firebaseData };
+    } catch (error: unknown) {
+      console.error('Error fetching profile:', error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
   async function getRequestedMe(uid: string): Promise<DocumentData> {
     try {

@@ -1,3 +1,96 @@
+//   async function requestsUpdate(requestedof: string, requestedby: string, state: RequestAction, action: Action): Promise<VoidResult> {
+//     try {
+//       console.log("in request Update")
+//       if (!currentUser) throw 'You must be logged in';
+//       const requestedme = doc(db, 'requestedme', requestedof);
+//       const myrequested = doc(db, 'myrequested', requestedby);
+//       if (state === 'unmatched') {
+//         const docRef1 = doc(db, 'users', requestedof);
+//         const docRef2 = doc(db, 'users', requestedby);
+//         await setDoc(
+//           docRef1,
+//           {
+//             unmatched: arrayUnion(requestedby),
+//             matched: arrayRemove(requestedby),
+//           },
+//           { merge: true }
+//         );
+//         await setDoc(
+//           docRef2,
+//           {
+//             unmatched: arrayUnion(requestedof),
+//             matched: arrayRemove(requestedof),
+//           },
+//           { merge: true }
+//         );
+//       } else if (action === 'add') {
+//         await setDoc(requestedme, { [requestedby]: state }, { merge: true });
+//         await setDoc(myrequested, { [requestedof]: state }, { merge: true });
+//       } else if (action === 'remove') {
+//         await updateDoc(requestedme, { [requestedby]: deleteField() });
+//         await updateDoc(myrequested, { [requestedof]: deleteField() });
+//       }
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error Requesting:', error.message);
+//       return {
+//         success: false,
+//         error:
+//           error instanceof Error ? error.message : 'An unknown error occurred',
+//       };
+//     }
+//   }
+
+
+//  async function getProfilebyUIDs(uids: string[]): Promise<FetchUserProfilesResult> {
+//     try {
+//       const usersProfileRef = collection(db, 'usersprofile');
+//       const q = query(usersProfileRef, where('__name__', 'in', uids));
+//       // Fetch the documents
+//       const querySnapshot = await getDocs(q);
+
+//       // Process the results
+//       const profiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
+//         id: doc.id,
+//         ...(doc.data() as Omit<UserProfile, 'id'>),
+//       }));
+
+//       return {
+//         success: true,
+//         profiles: profiles,
+//       };
+//     } catch (error) {
+//       console.error('Error fetching profiles:', error);
+//       return {
+//         success: false,
+//         error:
+//           error instanceof Error ? error.message : 'An unknown error occurred',
+//       };
+//     }
+//   }
+
+
+
+//   async function getProfilebyUID(uid: string): Promise<DocumentData> {
+//     try {
+//       const docRef = doc(db, 'users', uid);
+//       const docSnap = await getDoc(docRef);
+//       let firebaseData = {};
+//       if (docSnap.exists()) {
+//         firebaseData = docSnap.data();
+//       }
+//       return { success: true, data: firebaseData, };
+//     } catch (error) {
+//       console.error('Error fetching profiles:', error);
+//       return {
+//         success: false,
+//         error:
+//           error instanceof Error ? error.message : 'An unknown error occurred',
+//       };
+//     }
+//   }
+
+
 //   async function getRequestedMe(uid: string): Promise<DocumentData> {
 //     try {
 //       if (!currentUser) throw 'You must be logged in';
