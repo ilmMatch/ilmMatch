@@ -138,41 +138,64 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
   const roleManager = async (userId: string, role: string): Promise<VoidResult> => {
-    if (!userId || !role || !currentUser) {
-      return { success: false, error: "Please provide User ID and Role." };
-    }
-    console.log('currentuser', currentUser);
     try {
+      // Validate required inputs
+      if (!userId || !role || !currentUser) {
+        return { success: false, error: 'Please provide User ID and Role.' };
+      }
+
+      console.log('Current User:', currentUser);
+
+      // Reference to the user document
       const userDoc = doc(db, 'users', userId);
+
+      // Update the role and assignment metadata
       await updateDoc(userDoc, {
         role,
         assignedBy: currentUser.uid,
         assignedAt: new Date().toISOString(),
       });
+
       return { success: true };
     } catch (error: any) {
-      console.error('Error assigning role:', error.message);
-      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+      console.error('Error assigning role:', error);
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   };
 
+
   async function userPrivateUpdate(UserProfileNew: UserDataPrivateType): Promise<VoidResult> {
     try {
-      if (!currentUser || !userDataPrivate) return { success: false, error: "Please provide User Details." };
+      // Validate required data
+      if (!currentUser || !userDataPrivate) {
+        return { success: false, error: 'Please provide User Details.' };
+      }
+
       const userId = currentUser.uid;
       const userRef = doc(db, 'users', userId);
       const userRefP = doc(db, 'usersprofile', userId);
 
+      // Convert date of birth to JavaScript Date if necessary
       const UserProfileInfo = userDataPrivate as UserDataPrivateType;
-      UserProfileInfo.dob = new Date(userDataPrivate.dob?.seconds * 1000);
+      if (userDataPrivate.dob?.seconds) {
+        UserProfileInfo.dob = new Date(userDataPrivate.dob.seconds * 1000);
+      }
+
+      // Calculate the differences between old and new user data
       const updates = getObjectDiff(userDataPrivate, UserProfileNew);
 
       if (Object.keys(updates).length === 0) {
-        return { success: false, error: "No changes to apply." };
+        return { success: false, error: 'No changes to apply.' };
       }
 
+      // Apply updates to the main user document
       await updateDoc(userRef, updates);
 
+      // Update additional profile fields if necessary
       if (updates.userName || updates.dob) {
         const updateData: Record<string, any> = {};
 
@@ -189,9 +212,14 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       return { success: true };
     } catch (error: any) {
       console.error('Error during profile update:', error.message);
-      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
+
 
   async function approvalUpdate(status: string, uid: string): Promise<VoidResult> {
     try {

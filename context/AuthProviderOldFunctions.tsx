@@ -1,3 +1,59 @@
+//   const roleManager = async (userId: string, role: string): Promise<VoidResult> => {
+//     if (!userId || !role || !currentUser) {
+//       return { success: false, error: "Please provide User ID and Role." };
+//     }
+//     console.log('currentuser', currentUser);
+//     try {
+//       const userDoc = doc(db, 'users', userId);
+//       await updateDoc(userDoc, {
+//         role,
+//         assignedBy: currentUser.uid,
+//         assignedAt: new Date().toISOString(),
+//       });
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error assigning role:', error.message);
+//       return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+//     }
+//   };
+
+//   async function userPrivateUpdate(UserProfileNew: UserDataPrivateType): Promise<VoidResult> {
+//     try {
+//       if (!currentUser || !userDataPrivate) return { success: false, error: "Please provide User Details." };
+//       const userId = currentUser.uid;
+//       const userRef = doc(db, 'users', userId);
+//       const userRefP = doc(db, 'usersprofile', userId);
+
+//       const UserProfileInfo = userDataPrivate as UserDataPrivateType;
+//       UserProfileInfo.dob = new Date(userDataPrivate.dob?.seconds * 1000);
+//       const updates = getObjectDiff(userDataPrivate, UserProfileNew);
+
+//       if (Object.keys(updates).length === 0) {
+//         return { success: false, error: "No changes to apply." };
+//       }
+
+//       await updateDoc(userRef, updates);
+
+//       if (updates.userName || updates.dob) {
+//         const updateData: Record<string, any> = {};
+
+//         if (updates.userName) {
+//           updateData.initials = getInitials(updates.userName);
+//         }
+//         if (updates.dob) {
+//           updateData.dob = updates.dob;
+//         }
+
+//         await updateDoc(userRefP, updateData);
+//       }
+
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error during profile update:', error.message);
+//       return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+//     }
+//   }
+
 //   async function approvalUpdate(status: string, uid: string): Promise<VoidResult> {
 //     try {
 //       const userRef = doc(db, 'usersprofile', uid);
