@@ -63,9 +63,11 @@ export interface UserDataPrivateType {
   gender: string;
 }
 
+
 export type PairResult =
   | { success: true; data: [string, string][] }
   | { success: false; error: string };
+
 
 export interface AuthContextType {
   currentUser: User | null;

@@ -16,13 +16,17 @@ export default function AdminRequestPage() {
 
   // Fetch all matched pairs
   async function fetchMatchedData() {
-    const matchedUsers = await getAllAccepted(); // Fetch pairs of matched UIDs
-    setMatchedData(matchedUsers);
+    const data = await getAllAccepted(); // Fetch pairs of matched UIDs
+    if (data.success) {
+      setMatchedData(data.data);
 
-    // Initialize with the first 10 pairs
-    const initialPairs = matchedUsers.slice(0, 10);
-    setVisiblePairs(initialPairs);
-    setHasMore(matchedUsers.length > 10); // Check if more pairs are available
+      // Initialize with the first 10 pairs
+      const initialPairs = data.data.slice(0, 10);
+      setVisiblePairs(initialPairs);
+      setHasMore(data.data.length > 10); // Check if more pairs are available
+    } else {
+      console.log(data.error); // add toast
+    }
   }
 
   // Fetch user profiles for UIDs in the pairs
@@ -33,12 +37,22 @@ export default function AdminRequestPage() {
     for (let [uid1, uid2] of pairs) {
       // Fetch profiles only if not already loaded
       if (!newProfiles.has(uid1)) {
-        const profile1 = await getProfilebyUID(uid1);
-        newProfiles.set(uid1, profile1);
+        const data = await getProfilebyUID(uid1);
+        if (!data.success) {
+          console.log(data.error);
+          // add toast no need for console
+          continue;
+        }
+        newProfiles.set(uid1, data.data);
       }
       if (!newProfiles.has(uid2)) {
-        const profile2 = await getProfilebyUID(uid2);
-        newProfiles.set(uid2, profile2);
+        const data = await getProfilebyUID(uid2);
+        if (!data.success) {
+          console.log(data.error);
+          // add toast no need for console
+          continue;
+        }
+        newProfiles.set(uid2, data.data);
       }
     }
 
@@ -164,11 +178,14 @@ export default function AdminRequestPage() {
         },
         body: JSON.stringify(emailData),
       });
-      console.log(response);
       if (response.status === 201) {
         console.log('Email sent successfully!');
         alert('Email sent!');
-        await setMatchAdmin(brotherUID, sisterUID);
+        const data = await setMatchAdmin(brotherUID, sisterUID);
+        if (!data.success) {
+          console.log("error in setMatchAdmin", data.error);
+          // add toast
+        }
       } else {
         const error = await response.json();
         console.error('Error sending email:', error);

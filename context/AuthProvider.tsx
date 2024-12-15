@@ -34,6 +34,8 @@ import {
   setDoc,
   updateDoc,
   where,
+  WriteBatch,
+  writeBatch,
 } from 'firebase/firestore';
 import { useContext, useState, useEffect, createContext } from 'react';
 
@@ -449,50 +451,60 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
+
   async function setMatchAdmin(profile1: string, profile2: string): Promise<VoidResult> {
-    try {
-
-
+    const updateMatchedDocs = (batch: WriteBatch) => {
       const docRef1 = doc(db, 'users', profile1);
       const docRef2 = doc(db, 'users', profile2);
-      await setDoc(
+
+      batch.set(
         docRef1,
         { 'matched.true': arrayUnion(profile2) },
         { merge: true }
       );
-      await setDoc(
+      batch.set(
         docRef2,
         { 'matched.true': arrayUnion(profile1) },
         { merge: true }
       );
+    };
 
-      const requestedme1 = doc(db, 'requestedme', profile1);
-      const myrequested1 = doc(db, 'myrequested', profile1);
-      const requestedme2 = doc(db, 'requestedme', profile2);
-      const myrequested2 = doc(db, 'myrequested', profile2);
+    const removeRequests = async (batch: WriteBatch) => {
+      const documentsToCheck = [
+        { ref: doc(db, 'requestedme', profile1), field: profile2 },
+        { ref: doc(db, 'myrequested', profile1), field: profile2 },
+        { ref: doc(db, 'requestedme', profile2), field: profile1 },
+        { ref: doc(db, 'myrequested', profile2), field: profile1 },
+      ];
 
-      if (requestedme1) {
-        await updateDoc(requestedme1, { [profile2]: deleteField() });
+      for (const { ref, field } of documentsToCheck) {
+        const docSnap = await getDoc(ref);
+        if (docSnap.exists()) {
+          batch.update(ref, { [field]: deleteField() });
+        } else {
+          console.warn(`Document ${ref.path} does not exist, skipping update.`);
+        }
       }
-      if (myrequested1) {
-        await updateDoc(myrequested1, { [profile2]: deleteField() });
-      }
-      if (requestedme2) {
-        await updateDoc(requestedme2, { [profile1]: deleteField() });
-      }
-      if (myrequested2) {
-        await updateDoc(myrequested2, { [profile1]: deleteField() });
-      }
+    };
+
+    try {
+      const batch = writeBatch(db);
+
+      updateMatchedDocs(batch);
+      await removeRequests(batch);
+
+      await batch.commit();
 
       return { success: true };
-    } catch (error: any) {
-      console.error('Error in setMatchAdmin:', error.message);
+    } catch (error: unknown) {
+      console.error('Error in setMatchAdmin:', error instanceof Error ? error.message : error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
