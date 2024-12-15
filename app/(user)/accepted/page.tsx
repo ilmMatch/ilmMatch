@@ -1,7 +1,8 @@
-import React from 'react'
+'use client'
+import { useAuth } from '@/context/AuthProvider';
+import React from 'react';
 
 export default function AcceptedPage() {
-    return (
-        <div>AcceptedPage</div>
-    )
+    const { userDataPrivate } = useAuth();
+    return <div>AcceptedPage</div>;
 }

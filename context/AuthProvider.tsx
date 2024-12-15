@@ -1,7 +1,12 @@
 'use client';
 import { auth, db } from '@/firebase';
 import { Action } from '@/types';
-import { FetchUserProfilesResult, RequestAction, RequestCollection, UserProfile } from '@/types/firebase';
+import {
+  FetchUserProfilesResult,
+  RequestAction,
+  RequestCollection,
+  UserProfile,
+} from '@/types/firebase';
 import { set } from 'date-fns';
 import {
   createUserWithEmailAndPassword,
@@ -22,6 +27,7 @@ import {
   DocumentData,
   getDoc,
   getDocs,
+  limit,
   query,
   setDoc,
   updateDoc,
@@ -56,16 +62,30 @@ interface AuthContextType {
   roleManager: (userId: string, role: string) => Promise<void>;
   userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<void>;
   approvalUpdate: (data: string, uid: string) => Promise<void>;
-  getProfiles: () => Promise<FetchUserProfilesResult>;
+  getProfiles: (
+    limitx: number,
+    aprroved: string
+  ) => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
-  bookmarkUpdate: (bookmarkUID: string, action: "add" | "remove") => Promise<void>;
-  profileRequestUpdate: (userUID: string, action: "add" | "remove") => Promise<void>;
-  requestsUpdate: (requestedof: string, requestedby: string, state: RequestAction, action: Action) => Promise<void>;
+  bookmarkUpdate: (
+    bookmarkUID: string,
+    action: 'add' | 'remove'
+  ) => Promise<void>;
+  profileRequestUpdate: (
+    userUID: string,
+    action: 'add' | 'remove'
+  ) => Promise<void>;
+  requestsUpdate: (
+    requestedof: string,
+    requestedby: string,
+    state: RequestAction,
+    action: Action
+  ) => Promise<void>;
   getProfilebyUID: (uid: string) => Promise<DocumentData>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
-  getRequestedMe: (uid: string) => Promise<RequestCollection>
-  getMyRequested: (uid: string) => Promise<RequestCollection>
-  getAllAccepted: () => Promise<[string, string][]>
+  getRequestedMe: (uid: string) => Promise<RequestCollection>;
+  getMyRequested: (uid: string) => Promise<RequestCollection>;
+  getAllAccepted: () => Promise<[string, string][]>;
   setMatchAdmin: (profile1: string, profile2: string) => Promise<void>;
   loading: boolean;
 }
@@ -205,10 +225,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function approvalUpdate(data: string, uid: string) {
+  async function approvalUpdate(status: string, uid: string) {
     try {
       const userRef = doc(db, 'usersprofile', uid);
-      await updateDoc(userRef, { approved: data });
+      await updateDoc(userRef, { approved: status });
 
       console.log('User profile updated successfully');
       return;
@@ -218,7 +238,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function getProfiles() {
+  async function getProfiles(
+    limitx: number = 10,
+    aprroved: string = 'approved'
+  ) {
     try {
       // Create a reference to the usersprofile collection
       const usersProfileRef = collection(db, 'usersprofile');
@@ -226,7 +249,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       // Create a query to fetch only approved profiles
       const q = query(
         usersProfileRef,
-        where('approved', 'not-in', ['requested', 'not approved'])
+        where('approved', '==', aprroved), //possible values = approved | notApproved | requested
+        limit(limitx)
       );
 
       // Execute the query
@@ -253,14 +277,13 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-
-  async function bookmarkUpdate(bookmarkUID: string, action: "add" | "remove") {
+  async function bookmarkUpdate(bookmarkUID: string, action: 'add' | 'remove') {
     try {
       if (!currentUser) throw 'You must be logged in';
       const userRef = doc(db, 'users', currentUser.uid);
-      if (action === "add") {
+      if (action === 'add') {
         await updateDoc(userRef, { bookmarks: arrayUnion(bookmarkUID) });
-      } else if (action === "remove") {
+      } else if (action === 'remove') {
         await updateDoc(userRef, { bookmarks: arrayRemove(bookmarkUID) });
       }
       return;
@@ -270,14 +293,16 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-
-  async function profileRequestUpdate(userUID: string, action: "add" | "remove") {
+  async function profileRequestUpdate(
+    userUID: string,
+    action: 'add' | 'remove'
+  ) {
     try {
       if (!currentUser) throw 'You must be logged in';
       const userRef = doc(db, 'users', currentUser.uid);
-      if (action === "add") {
+      if (action === 'add') {
         await updateDoc(userRef, { requested: arrayUnion(userUID) });
-      } else if (action === "remove") {
+      } else if (action === 'remove') {
         await updateDoc(userRef, { requested: arrayRemove(userUID) });
       }
       return;
@@ -287,7 +312,12 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function requestsUpdate(requestedof: string, requestedby: string, state: RequestAction, action: Action) {
+  async function requestsUpdate(
+    requestedof: string,
+    requestedby: string,
+    state: RequestAction,
+    action: Action
+  ) {
     // adds the current user to the requestedby document of the requestuser
     // requested user.ID { requestedby.UID: accepted | rejected | requested, requestedby.UID: accepted | rejected | requested, ... }
     try {
@@ -297,35 +327,47 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const requestedme = doc(db, 'requestedme', requestedof);
       const myrequested = doc(db, 'myrequested', requestedby);
 
-      if (action === "add") {
+      if (action === 'add') {
         await setDoc(requestedme, { [requestedby]: state }, { merge: true });
         await setDoc(myrequested, { [requestedof]: state }, { merge: true });
-      } else if (action === "remove") {
+      } else if (action === 'remove') {
         await updateDoc(requestedme, { [requestedby]: deleteField() });
         await updateDoc(myrequested, { [requestedof]: deleteField() });
-      } else if (state === "unmatched") {
+      } else if (state === 'unmatched') {
         const docRef1 = doc(db, 'users', requestedof);
         const docRef2 = doc(db, 'users', requestedby);
-        await setDoc(docRef1, { "matched.false": arrayUnion(requestedby), "matched.true": arrayRemove(requestedby) }, { merge: true });
-        await setDoc(docRef2, { "matched.false": arrayUnion(requestedof), "matched.true": arrayRemove(requestedof) }, { merge: true });
+        await setDoc(
+          docRef1,
+          {
+            'matched.false': arrayUnion(requestedby),
+            'matched.true': arrayRemove(requestedby),
+          },
+          { merge: true }
+        );
+        await setDoc(
+          docRef2,
+          {
+            'matched.false': arrayUnion(requestedof),
+            'matched.true': arrayRemove(requestedof),
+          },
+          { merge: true }
+        );
       }
-
     } catch (error) {
       console.error('Error Requesting:', error);
       throw error;
     }
   }
 
-
   async function getProfilebyUIDs(uids: string[]) {
     try {
-      const usersProfileRef = collection(db, "usersprofile");
-      const q = query(usersProfileRef, where("__name__", "in", uids));
+      const usersProfileRef = collection(db, 'usersprofile');
+      const q = query(usersProfileRef, where('__name__', 'in', uids));
       // Fetch the documents
       const querySnapshot = await getDocs(q);
 
       // Process the results
-      const profiles: UserProfile[] = querySnapshot.docs.map(doc => ({
+      const profiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
@@ -335,7 +377,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         profiles: profiles,
       };
     } catch (error) {
-      console.error("Error fetching profiles:", error);
+      console.error('Error fetching profiles:', error);
       return {
         success: false,
         error:
@@ -352,9 +394,9 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       if (docSnap.exists()) {
         firebaseData = docSnap.data();
       }
-      return firebaseData
+      return firebaseData;
     } catch (error) {
-      console.error("Error fetching profiles:", error);
+      console.error('Error fetching profiles:', error);
       return {
         success: false,
         error:
@@ -376,7 +418,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         firebaseData = docSnap.data();
       }
       return firebaseData;
-
     } catch (error) {
       console.error('Error Requesting:', error);
       throw error;
@@ -396,7 +437,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         firebaseData = docSnap.data();
       }
       return firebaseData;
-
     } catch (error) {
       console.error('Error Requesting:', error);
       throw error;
@@ -404,7 +444,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
   async function getAllAccepted() {
-    const myRequestCollection = collection(db, "myrequested");
+    const myRequestCollection = collection(db, 'myrequested');
     const querySnapshot = await getDocs(myRequestCollection);
 
     const result: [string, string][] = [];
@@ -414,29 +454,34 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const data = doc.data();
 
       for (const [uid, status] of Object.entries(data)) {
-        if (status === "accepted") {
+        if (status === 'accepted') {
           result.push([docId, uid]);
         }
       }
     });
 
-    console.log(result, "result");
+    console.log(result, 'result');
     return result;
   }
 
   async function setMatchAdmin(profile1: string, profile2: string) {
     const docRef1 = doc(db, 'users', profile1);
     const docRef2 = doc(db, 'users', profile2);
-    await setDoc(docRef1, { "matched.true": arrayUnion(profile2) }, { merge: true });
-    await setDoc(docRef2, { "matched.true": arrayUnion(profile1) }, { merge: true });
-
-
+    await setDoc(
+      docRef1,
+      { 'matched.true': arrayUnion(profile2) },
+      { merge: true }
+    );
+    await setDoc(
+      docRef2,
+      { 'matched.true': arrayUnion(profile1) },
+      { merge: true }
+    );
 
     const requestedme1 = doc(db, 'requestedme', profile1);
     const myrequested1 = doc(db, 'myrequested', profile1);
     const requestedme2 = doc(db, 'requestedme', profile2);
     const myrequested2 = doc(db, 'myrequested', profile2);
-
 
     if (requestedme1) {
       await updateDoc(requestedme1, { [profile2]: deleteField() });
@@ -450,7 +495,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     if (myrequested2) {
       await updateDoc(myrequested2, { [profile1]: deleteField() });
     }
-
   }
 
   useEffect(() => {

@@ -188,7 +188,7 @@ export function PrivateForm() {
                             className={cn(
                               'flex-grow w-full',
                               !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           />
@@ -214,7 +214,7 @@ export function PrivateForm() {
                               editing={editing}
                               className={cn(
                                 !editing &&
-                                'pointer-events-none opacity-50 cursor-default'
+                                  'pointer-events-none opacity-50 cursor-default'
                               )}
                             />
                           </FormControl>
@@ -239,7 +239,7 @@ export function PrivateForm() {
                               className={cn(
                                 'flex-grow',
                                 !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                               )}
                               disabled={!editing}
                             />
@@ -267,7 +267,7 @@ export function PrivateForm() {
                             className={cn(
                               'flex-grow w-full',
                               !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           />
@@ -294,7 +294,7 @@ export function PrivateForm() {
                               editing={editing}
                               className={cn(
                                 !editing &&
-                                'pointer-events-none opacity-50 cursor-default'
+                                  'pointer-events-none opacity-50 cursor-default'
                               )}
                             />
                           </FormControl>
@@ -319,7 +319,7 @@ export function PrivateForm() {
                               className={cn(
                                 'flex-grow',
                                 !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                               )}
                               disabled={!editing}
                             />

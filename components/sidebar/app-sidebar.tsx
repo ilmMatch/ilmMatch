@@ -79,11 +79,9 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
               <SidebarTrigger />
             </span>
           </SidebarMenuItem>
-
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-
         <SidebarGroup>
           <SidebarGroupLabel>Ilm Match</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -103,7 +101,7 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
         </SidebarGroup>
         <SidebarSeparator />
 
-        {isAdmin &&
+        {isAdmin && (
           <Collapsible defaultOpen className="group/collapsible">
             <SidebarGroup>
               <SidebarGroupLabel asChild>
@@ -130,7 +128,7 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
               </CollapsibleContent>
             </SidebarGroup>
           </Collapsible>
-        }
+        )}
 
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>

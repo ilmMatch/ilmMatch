@@ -10,19 +10,17 @@ export interface UserProfile {
   // Add any other fields your profile might have
 }
 
-
 export interface UserPrivate {
   bookmark?: string[];
-  countryCode: number,
-  waliCountryCode: number,
-  mobileNumber: number,
-  waliMobileNumber: number,
-  userName: string,
-  waliName: string
+  countryCode: number;
+  waliCountryCode: number;
+  mobileNumber: number;
+  waliMobileNumber: number;
+  userName: string;
+  waliName: string;
   approved: string;
   dob: Date;
 }
-
 
 // Define the return type of the function
 export interface FetchUserProfilesResult {
@@ -31,11 +29,13 @@ export interface FetchUserProfilesResult {
   error?: string;
 }
 
-
-
-export type RequestAction = 'requested' | 'rejected' | 'accepted' | 'unmatched' | 're-requested';
+export type RequestAction =
+  | 'requested'
+  | 'rejected'
+  | 'accepted'
+  | 'unmatched'
+  | 're-requested';
 
 export interface RequestCollection {
   [key: string]: RequestAction;
 }
-

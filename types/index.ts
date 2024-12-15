@@ -10,5 +10,4 @@ export type CountryCode = {
   code: number;
 };
 
-
-export type Action = "add" | "remove";
+export type Action = 'add' | 'remove';
