@@ -4,9 +4,11 @@ import { getInitials, getObjectDiff } from '@/lib/utils';
 import { Action } from '@/types';
 import {
   AuthContextType,
+  FetchUserProfilesResult,
   RequestAction,
   UserDataPrivateType,
   UserProfile,
+  VoidResult,
 } from '@/types/firebase';
 import {
   createUserWithEmailAndPassword,
@@ -59,12 +61,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // AUTH HANDLERS
-  async function signup(
-    email: string,
-    password: string,
-    userName: string,
-    gender: string
-  ) {
+  async function signup(email: string, password: string, userName: string, gender: string): Promise<VoidResult> {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -72,51 +69,72 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         password
       );
 
-      // Step 2: Get the user ID (UID)
       const user = userCredential.user;
       const userId = user.uid;
       const userRef = doc(db, 'users', userId);
       const userRefP = doc(db, 'usersprofile', userId);
+      const timestamp = new Date().toISOString();
       const userData = {
         userName,
         gender,
         role: 'user',
         email,
-        timestamp: new Date().toISOString(),
+        timestamp,
       };
       const userDataP = {
         initials: getInitials(userName),
         gender,
-        timestamp: new Date().toISOString(),
+        timestamp,
         approved: 'not approved',
       };
-      await setDoc(userRef, userData);
-      await setDoc(userRefP, userDataP);
-      return userCredential;
-    } catch (error) {
-      console.error('Error during sign-up:', error);
-      throw error; // Re-throw or handle as per your app's needs
+      await Promise.all([setDoc(userRef, userData), setDoc(userRefP, userDataP)]);
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during signup:', error.message);
+      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
     }
   }
 
-  async function login(email: string, password: string) {
-    return signInWithEmailAndPassword(auth, email, password);
+
+  async function login(email: string, password: string): Promise<VoidResult> {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during login:', error.message);
+      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+    }
   }
 
-  async function forgetPassword(email: string) {
-    await sendPasswordResetEmail(auth, email);
+
+
+  async function forgetPassword(email: string): Promise<VoidResult> {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during password reset:', error.message);
+      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+    }
   }
 
-  async function logout() {
-    setUserDataPrivate(null);
-    setCurrentUser(null);
-    return signOut(auth);
+
+  async function logout(): Promise<VoidResult> {
+    try {
+      await signOut(auth);
+      setUserDataPrivate(null);
+      setCurrentUser(null);
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during logout:', error.message);
+      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+    }
   }
 
-  const roleManager = async (userId: string, role: string) => {
+  const roleManager = async (userId: string, role: string): Promise<VoidResult> => {
     if (!userId || !role || !currentUser) {
-      alert('Please provide both User ID and Role.');
-      return;
+      return { success: false, error: "Please provide User ID and Role." };
     }
     console.log('currentuser', currentUser);
     try {
@@ -126,16 +144,16 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         assignedBy: currentUser.uid,
         assignedAt: new Date().toISOString(),
       });
-      alert(`Role '${role}' assigned to user '${userId}'`);
-    } catch (err: any) {
-      console.error('Error assigning role:', err.message);
-      alert('Failed to assign role.');
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error assigning role:', error.message);
+      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
     }
   };
 
-  async function userPrivateUpdate(UserProfileNew: UserDataPrivateType) {
+  async function userPrivateUpdate(UserProfileNew: UserDataPrivateType): Promise<VoidResult> {
     try {
-      if (!currentUser || !userDataPrivate) throw 'You must be logged in';
+      if (!currentUser || !userDataPrivate) return { success: false, error: "Please provide User Details." };
       const userId = currentUser.uid;
       const userRef = doc(db, 'users', userId);
       const userRefP = doc(db, 'usersprofile', userId);
@@ -145,8 +163,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const updates = getObjectDiff(userDataPrivate, UserProfileNew);
 
       if (Object.keys(updates).length === 0) {
-        console.log('No updates to apply');
-        return;
+        return { success: false, error: "No changes to apply." };
       }
 
       await updateDoc(userRef, updates);
@@ -164,30 +181,27 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         await updateDoc(userRefP, updateData);
       }
 
-      console.log('User profile updated successfully');
-    } catch (error) {
-      console.error('Error during profile update:', error);
-      throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during profile update:', error.message);
+      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
     }
   }
 
-  async function approvalUpdate(status: string, uid: string) {
+  async function approvalUpdate(status: string, uid: string): Promise<VoidResult> {
     try {
       const userRef = doc(db, 'usersprofile', uid);
       await updateDoc(userRef, { approved: status });
-
-      console.log('User profile updated successfully');
-      return;
-    } catch (error) {
-      console.error('Error during updation:', error);
-      throw error;
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during updation:', error.message);
+      return {
+        success: false, error: error instanceof Error ? error.message : 'An unknown error occurred'
+      };
     }
   }
 
-  async function getProfiles(
-    limitx: number = 10,
-    aprroved: string = 'approved'
-  ) {
+  async function getProfiles(limitx: number = 10, aprroved: string = 'approved'): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
       const usersProfileRef = collection(db, 'usersprofile');

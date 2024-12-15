@@ -42,7 +42,7 @@ export default function SignupPage() {
     try {
       await signup(email, password, userName, gender);
     } catch (err: any) {
-      console.log(err.message);
+      console.log(err.message, "signup");
     } finally {
       setSubmitting(false);
     }

@@ -45,6 +45,9 @@ export interface RequestCollection {
   [key: string]: RequestAction;
 }
 
+export type VoidResult =
+  | { success: true }
+  | { success: false; error: string };
 
 
 
@@ -68,13 +71,13 @@ export interface AuthContextType {
     password: string,
     userName: string,
     gender: string
-  ) => Promise<UserCredential>;
-  login: (email: string, password: string) => Promise<UserCredential>;
-  forgetPassword: (email: string) => Promise<void>;
-  logout: () => Promise<void>;
-  roleManager: (userId: string, role: string) => Promise<void>;
-  userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<void>;
-  approvalUpdate: (data: string, uid: string) => Promise<void>;
+  ) => Promise<VoidResult>;
+  login: (email: string, password: string) => Promise<VoidResult>;
+  forgetPassword: (email: string) => Promise<VoidResult>;
+  logout: () => Promise<VoidResult>;
+  roleManager: (userId: string, role: string) => Promise<VoidResult>;
+  userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<VoidResult>;
+  approvalUpdate: (data: string, uid: string) => Promise<VoidResult>;
   getProfiles: (
     limitx: number,
     aprroved: string
