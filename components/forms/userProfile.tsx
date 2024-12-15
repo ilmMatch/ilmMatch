@@ -90,7 +90,7 @@ export default function ProfileForm() {
                     badgeVariants({ variant: 'requested' }),
                   userDataProfile?.approved === 'approved' &&
                     badgeVariants({ variant: 'approved' }),
-                  userDataProfile?.approved === 'not approved' &&
+                  userDataProfile?.approved === 'notApproved' &&
                     badgeVariants({ variant: 'notApproved' })
                 )}
                 onClick={requestReview}

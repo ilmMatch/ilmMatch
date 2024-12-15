@@ -326,32 +326,31 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       // requestedof: document Id
       const requestedme = doc(db, 'requestedme', requestedof);
       const myrequested = doc(db, 'myrequested', requestedby);
-
-      if (action === 'add') {
-        await setDoc(requestedme, { [requestedby]: state }, { merge: true });
-        await setDoc(myrequested, { [requestedof]: state }, { merge: true });
-      } else if (action === 'remove') {
-        await updateDoc(requestedme, { [requestedby]: deleteField() });
-        await updateDoc(myrequested, { [requestedof]: deleteField() });
-      } else if (state === 'unmatched') {
+      if (state === 'unmatched') {
         const docRef1 = doc(db, 'users', requestedof);
         const docRef2 = doc(db, 'users', requestedby);
         await setDoc(
           docRef1,
           {
-            'matched.false': arrayUnion(requestedby),
-            'matched.true': arrayRemove(requestedby),
+            unmatched: arrayUnion(requestedby),
+            matched: arrayRemove(requestedby),
           },
           { merge: true }
         );
         await setDoc(
           docRef2,
           {
-            'matched.false': arrayUnion(requestedof),
-            'matched.true': arrayRemove(requestedof),
+            unmatched: arrayUnion(requestedof),
+            matched: arrayRemove(requestedof),
           },
           { merge: true }
         );
+      } else if (action === 'add') {
+        await setDoc(requestedme, { [requestedby]: state }, { merge: true });
+        await setDoc(myrequested, { [requestedof]: state }, { merge: true });
+      } else if (action === 'remove') {
+        await updateDoc(requestedme, { [requestedby]: deleteField() });
+        await updateDoc(myrequested, { [requestedof]: deleteField() });
       }
     } catch (error) {
       console.error('Error Requesting:', error);
