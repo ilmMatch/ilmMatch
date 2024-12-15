@@ -196,38 +196,47 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   async function approvalUpdate(status: string, uid: string): Promise<VoidResult> {
     try {
       const userRef = doc(db, 'usersprofile', uid);
+
+      // Update the 'approved' field in the document
       await updateDoc(userRef, { approved: status });
+
       return { success: true };
     } catch (error: any) {
-      console.error('Error during updation:', error.message);
+      console.error('Error during approval update:', error.message);
+
       return {
-        success: false, error: error instanceof Error ? error.message : 'An unknown error occurred'
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-  async function getProfiles(limitx: number = 10, aprroved: string = 'approved'): Promise<FetchUserProfilesResult> {
+
+  async function getProfiles(limitx: number = 10, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
       const usersProfileRef = collection(db, 'usersprofile');
 
-      // Create a query to fetch only approved profiles
+      // Create the query to fetch only approved profiles
       const q = query(
         usersProfileRef,
-        where('approved', '==', aprroved), //possible values = approved | notApproved | requested
+        where('approved', '==', approved), // approved | notApproved | requested
         limit(limitx)
       );
 
-      // Execute the query
+      // Execute the query to get the documents
       const querySnapshot = await getDocs(q);
 
-      // Map the documents to an array of data
+      // Extract user profiles from the documents
       const userProfiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
+
+      // Optionally log and set the profiles if needed
       console.log('userProfiles', userProfiles);
-      setAllProfiles(userProfiles);
+      setAllProfiles(userProfiles);  // Assuming this is a state update or some other logic
+
       return {
         success: true,
         profiles: userProfiles,
@@ -236,31 +245,37 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error fetching user profiles:', error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
+
   async function bookmarkUpdate(bookmarkUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
     try {
-      if (!currentUser) throw 'You must be logged in';
-      const userRef = doc(db, 'users', currentUser.uid);
-      if (action === 'add') {
-        await updateDoc(userRef, { bookmarks: arrayUnion(bookmarkUID) });
-      } else if (action === 'remove') {
-        await updateDoc(userRef, { bookmarks: arrayRemove(bookmarkUID) });
+      // Ensure the user is logged in
+      if (!currentUser) {
+        throw new Error('You must be logged in');
       }
+
+      const userRef = doc(db, 'users', currentUser.uid);
+
+      // Determine the action to take on the bookmarks
+      const updateAction = action === 'add' ? arrayUnion(bookmarkUID) : arrayRemove(bookmarkUID);
+
+      // Update the user's bookmarks in Firestore
+      await updateDoc(userRef, { bookmarks: updateAction });
+
       return { success: true };
     } catch (error: any) {
-      console.error('Error during bookmark:', error.message);
+      console.error('Error during bookmark update:', error.message);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
   async function profileRequestUpdate(userUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
     try {
@@ -576,7 +591,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     approvalUpdate,
     getProfiles,
     bookmarkUpdate,
-    profileRequestUpdate,
+    profileRequestUpdate, // i believe it's unused
     requestsUpdate,
     getProfilebyUIDs,
     getProfilebyUID,

@@ -1,3 +1,93 @@
+//   async function approvalUpdate(status: string, uid: string): Promise<VoidResult> {
+//     try {
+//       const userRef = doc(db, 'usersprofile', uid);
+//       await updateDoc(userRef, { approved: status });
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error during updation:', error.message);
+//       return {
+//         success: false, error: error instanceof Error ? error.message : 'An unknown error occurred'
+//       };
+//     }
+//   }
+
+
+//   async function getProfiles(limitx: number = 10, aprroved: string = 'approved'): Promise<FetchUserProfilesResult> {
+//     try {
+//       // Create a reference to the usersprofile collection
+//       const usersProfileRef = collection(db, 'usersprofile');
+
+//       // Create a query to fetch only approved profiles
+//       const q = query(
+//         usersProfileRef,
+//         where('approved', '==', aprroved), //possible values = approved | notApproved | requested
+//         limit(limitx)
+//       );
+
+//       // Execute the query
+//       const querySnapshot = await getDocs(q);
+
+//       // Map the documents to an array of data
+//       const userProfiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
+//         id: doc.id,
+//         ...(doc.data() as Omit<UserProfile, 'id'>),
+//       }));
+//       console.log('userProfiles', userProfiles);
+//       setAllProfiles(userProfiles);
+//       return {
+//         success: true,
+//         profiles: userProfiles,
+//       };
+//     } catch (error: any) {
+//       console.error('Error fetching user profiles:', error);
+//       return {
+//         success: false,
+//         error:
+//           error instanceof Error ? error.message : 'An unknown error occurred',
+//       };
+//     }
+//   }
+
+//   async function bookmarkUpdate(bookmarkUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
+//     try {
+//       if (!currentUser) throw 'You must be logged in';
+//       const userRef = doc(db, 'users', currentUser.uid);
+//       if (action === 'add') {
+//         await updateDoc(userRef, { bookmarks: arrayUnion(bookmarkUID) });
+//       } else if (action === 'remove') {
+//         await updateDoc(userRef, { bookmarks: arrayRemove(bookmarkUID) });
+//       }
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error during bookmark:', error.message);
+//       return {
+//         success: false,
+//         error:
+//           error instanceof Error ? error.message : 'An unknown error occurred',
+//       };
+//     }
+//   }
+
+//   async function profileRequestUpdate(userUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
+//     try {
+//       if (!currentUser) throw 'You must be logged in';
+//       const userRef = doc(db, 'users', currentUser.uid);
+//       if (action === 'add') {
+//         await updateDoc(userRef, { requested: arrayUnion(userUID) });
+//       } else if (action === 'remove') {
+//         await updateDoc(userRef, { requested: arrayRemove(userUID) });
+//       }
+//       return { success: true };
+//     } catch (error: any) {
+//       console.error('Error during bookmark:', error.message);
+//       return {
+//         success: false,
+//         error:
+//           error instanceof Error ? error.message : 'An unknown error occurred',
+//       };
+//     }
+//   }
+
 //   async function requestsUpdate(requestedof: string, requestedby: string, state: RequestAction, action: Action): Promise<VoidResult> {
 //     try {
 //       console.log("in request Update")
