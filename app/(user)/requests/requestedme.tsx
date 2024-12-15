@@ -11,9 +11,14 @@ export default function RequestedMe() {
   async function getUsers() {
     if (!currentUser) return 'you must be logged in';
     const requestedMe = await getRequestedMe(currentUser.uid);
-    const uids = Object.keys(requestedMe);
+    if (!requestedMe.success) {
+      console.log(requestedMe.error);
+      // add toast
+    }
+    const uids = Object.keys(requestedMe.data);
     if (uids.length === 0) {
       console.log('No requests found for the current user.');
+      // add toast
       return;
     }
     const data = await getProfilebyUIDs(uids);
@@ -25,7 +30,7 @@ export default function RequestedMe() {
 
     const requestsWithStatus = data.profiles?.map((profile) => ({
       ...profile,
-      status: requestedMe[profile.id] ? requestedMe[profile.id] : 'rejected',
+      status: requestedMe.data[profile.id as keyof typeof requestedMe.data] ? requestedMe.data[profile.id as keyof typeof requestedMe.data]?.toString() : 'rejected',
       statusFrom: 'requestedMe',
     }));
 

@@ -285,6 +285,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     // adds the current user to the requestedby document of the requestuser
     // requested user.ID { requestedby.UID: accepted | rejected | requested, requestedby.UID: accepted | rejected | requested, ... }
     try {
+      console.log("in request Update")
       if (!currentUser) throw 'You must be logged in';
       // requestedby: field that needs to be updated
       // requestedof: document Id
@@ -375,81 +376,75 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
   async function getRequestedMe(uid: string): Promise<DocumentData> {
     try {
-      if (!currentUser) throw 'You must be logged in';
-      // requestedby: field that needs to be updated
-      // requestedof: document Id
-      const userRef = doc(db, 'requestedme', uid);
-
-      const docSnap = await getDoc(userRef);
-      let firebaseData = {};
-      if (docSnap.exists()) {
-        firebaseData = docSnap.data();
+      if (!currentUser) {
+        throw new Error('You must be logged in');
       }
-      return { success: true, data: firebaseData }
-    } catch (error: any) {
-      console.error('Error Requesting:', error.message);
+
+      const userRef = doc(db, 'requestedme', uid);
+      const docSnap = await getDoc(userRef);
+
+      // Return data only if the document exists
+      const firebaseData = docSnap.exists() ? docSnap.data() : {};
+
+      return { success: true, data: firebaseData };
+    } catch (error: unknown) {
+      console.error('Error fetching requested data:', error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
   async function getMyRequested(uid: string): Promise<DocumentData> {
     try {
-      if (!currentUser) throw 'You must be logged in';
-      // requestedby: field that needs to be updated
-      // requestedof: document Id
-      const userRef = doc(db, 'myrequested', uid);
-
-      const docSnap = await getDoc(userRef);
-      let firebaseData = {};
-      if (docSnap.exists()) {
-        firebaseData = docSnap.data();
+      if (!currentUser) {
+        throw new Error('Authentication Error - try logging out and logging back in');
       }
+
+      const userRef = doc(db, 'myrequested', uid);
+      const docSnap = await getDoc(userRef);
+
+      // Return data only if the document exists
+      const firebaseData = docSnap.exists() ? docSnap.data() : {};
+
       return { success: true, data: firebaseData };
-    } catch (error: any) {
-      console.error('Error Requesting:', error.message);
+    } catch (error: unknown) {
+      console.error('Error fetching requested data:', error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
   async function getAllAccepted(): Promise<PairResult> {
     try {
-
-
       const myRequestCollection = collection(db, 'myrequested');
       const querySnapshot = await getDocs(myRequestCollection);
 
-      const result: [string, string][] = [];
-
-      querySnapshot.forEach((doc) => {
+      // Extract accepted requests into a result array
+      const result = querySnapshot.docs.flatMap((doc) => {
         const docId = doc.id;
         const data = doc.data();
 
-        for (const [uid, status] of Object.entries(data)) {
-          if (status === 'accepted') {
-            result.push([docId, uid]);
-          }
-        }
+        return Object.entries(data)
+          .filter(([, status]) => status === 'accepted') // Filter accepted entries
+          .map(([uid]) => [docId, uid] as [string, string]); // Map to [docId, uid]
       });
 
-
-      return { success: true, data: result }
-    } catch (error: any) {
-      console.error('Error Requesting:', error.message);
+      return { success: true, data: result };
+    } catch (error: unknown) {
+      console.error('Error fetching accepted requests:', error);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
+
 
 
   async function setMatchAdmin(profile1: string, profile2: string): Promise<VoidResult> {

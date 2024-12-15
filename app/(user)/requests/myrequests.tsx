@@ -10,20 +10,24 @@ export default function MyRequests() {
   const [myrequests, setMyRequests] = useState<UserProfile[] | undefined>([]);
   async function getUsers() {
     if (!currentUser) return 'you must be logged in';
+    console.log("myrequested")
     const myrequests = await getMyRequested(currentUser?.uid);
-    if (!myrequests) return 'no requests found';
-
-    const uids = Object.keys(myrequests);
+    if (!myrequests.success) {
+      console.log("error")
+      // add toast
+    }
+    const uids = Object.keys(myrequests.data);
     const data = await getProfilebyUIDs(uids);
     if (!data.success) {
       console.log(data.error);
     }
     const profilesWithStatus = data.profiles?.map((profile) => ({
       ...profile,
-      status: myrequests[profile.id],
+      status: myrequests.data[profile.id as keyof typeof myrequests.data]?.toString(),
       statusFrom: 'myrequests',
     }));
 
+    console.log(profilesWithStatus, "profilesWithStatus")
     setMyRequests(profilesWithStatus);
   }
 
