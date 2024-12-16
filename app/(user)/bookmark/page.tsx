@@ -22,7 +22,10 @@ export default function BookmarkPage() {
 
   async function filterBookmark() {
     if (!currentUser) return 'you must be logged in';
-    if (!userDataPrivate?.bookmarks) return [];
+    if (!userDataPrivate?.bookmarks || userDataPrivate?.bookmarks?.length === 0) {
+      // add toast no bookmarks found
+      return
+    };
     const bookmarkedUID = userDataPrivate.bookmarks
 
     if (bookmarkedUID?.length === 0) {
@@ -31,25 +34,24 @@ export default function BookmarkPage() {
       return
     }
     const data = await getProfilebyUIDs(bookmarkedUID)
-    if (!data.success) {
-      console.log(data.error);
-      // add toast
-    }
-
-
     const myrequests = await getMyRequested(currentUser?.uid);
     const requestedMe = await getRequestedMe(currentUser.uid);
 
+    if (!data.success || !myrequests.success || !requestedMe.success) {
+      console.log(data.error);
+      // add toast
+      return
+    }
     const profilesWithStatus = data.profiles?.map((profile) => ({
       ...profile,
-      status: requestedMe[profile.id]
-        ? requestedMe[profile.id]
-        : myrequests[profile.id]
-          ? myrequests[profile.id]
+      status: requestedMe.data[profile.id as keyof typeof requestedMe.data]
+        ? requestedMe.data[profile.id as keyof typeof requestedMe.data]?.toString()
+        : myrequests.data[profile.id as keyof typeof myrequests.data]
+          ? myrequests.data[profile.id as keyof typeof myrequests.data]?.toString()
           : undefined,
-      statusFrom: requestedMe[profile.id]
+      statusFrom: requestedMe.data[profile.id as keyof typeof requestedMe.data]
         ? 'requestedMe'
-        : myrequests[profile.id]
+        : myrequests.data[profile.id as keyof typeof myrequests.data]?.toString()
           ? 'myrequests'
           : undefined,
     }));
@@ -72,7 +74,7 @@ export default function BookmarkPage() {
         bookmarkedProfiles.map((user) => (
           <div key={user.id}>
             <strong>{user.initials}</strong> - {user.id}
-            <UserModal user={user} />
+            <UserModal user={user} setStateUsers={setBookmarkedProfiles} stateUsers={bookmarkedProfiles} />
           </div>
         ))}
     </>

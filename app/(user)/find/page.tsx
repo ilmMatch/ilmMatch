@@ -23,6 +23,7 @@ export default function FindPage() {
 
     if (!data.success || !myrequests.success || !requestedMe.success) {
       console.log(data.error);
+      // add toast
       return
     }
 

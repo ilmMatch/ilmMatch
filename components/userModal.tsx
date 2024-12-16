@@ -151,7 +151,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             user.id === userUID ? {
                 ...user,
                 status: state,
-                ...(state === undefined && { statusFrom: undefined })
+                ...(state === undefined ? { statusFrom: undefined } : { statusFrom })
             } : user
         );
         console.log("updatedUsers", updatedUsers)
