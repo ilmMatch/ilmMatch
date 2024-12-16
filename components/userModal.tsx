@@ -207,6 +207,32 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             return
         };
 
+
+    const handleMatchedClick =
+        (action: Action, state: RequestAction) => async () => {
+            setSubmitting(true);
+            const requestedmeCollectionID = currentUserUID;
+            const myrequestedCollectionID = userUID;
+            const result = await requestsUpdate(
+                requestedmeCollectionID,
+                myrequestedCollectionID,
+                state,
+                action
+            );
+            if (result.success) {
+                updateUser(state, 'matched')
+                // add success toast
+                setSubmitting(false);
+                return
+            }
+            console.log("error", result.error);
+            // add toast
+            setSubmitting(false);
+            return
+        };
+
+
+
     const handleUserApproveClickAdmin = async (status: string) => {
         setSubmitting(true);
         const voidResult = await approvalUpdate(status, userUID);
@@ -221,6 +247,10 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         setSubmitting(false);
         return
     };
+
+
+
+
 
     if (!status && !statusFrom) {
         return (
@@ -357,7 +387,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         return (
             <Button
                 disabled={submitting}
-                onClick={handleRequestedMeClick('remove', 'unmatched')}
+                onClick={handleMatchedClick('remove', 'unmatched')}
                 variant="destructive"
             >
                 {submitting && <Loader2 className="animate-spin" />}

@@ -33,7 +33,7 @@ export default function AcceptedPage() {
         users.map((user) => (
           <div key={user.id} className="border">
             <p>{user.initials}</p>
-            <UserModal user={user} />
+            <UserModal user={user} setStateUsers={setUsers} stateUsers={users} />
           </div>
         ))}
     </>
