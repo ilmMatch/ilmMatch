@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Eye, Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -28,13 +29,13 @@ export default function LoginPage() {
     }
     setAuthenticating(true);
 
-    try {
-      await login(email, password);
-    } catch (err: any) {
-      console.error(err.message);
-    } finally {
-      setAuthenticating(false);
+    const data = await login(email, password);
+    if (!data.success) {
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
     }
+    setAuthenticating(false);
   }
 
   if (loading) {

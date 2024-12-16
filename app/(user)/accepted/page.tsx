@@ -3,6 +3,7 @@ import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import React, { use, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AcceptedPage() {
   const { userDataPrivate, getProfilebyUIDs } = useAuth();
@@ -12,8 +13,9 @@ export default function AcceptedPage() {
     if (!userDataPrivate || userDataPrivate.matched.length === 0) return;
     const data = await getProfilebyUIDs(userDataPrivate.matched);
     if (!data.success) {
-      console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
       return
     }
 

@@ -3,6 +3,7 @@ import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function RequestedMe() {
   const { currentUser, getProfilebyUIDs, userDataPrivate, getRequestedMe } =
@@ -12,21 +13,24 @@ export default function RequestedMe() {
     if (!currentUser) return 'you must be logged in';
     const requestedMe = await getRequestedMe(currentUser.uid);
     if (!requestedMe.success) {
-      console.log(requestedMe.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: requestedMe.error,
+      })
       return
     }
     const uids = Object.keys(requestedMe.data);
     if (uids.length === 0) {
-      console.log('No requests found for the current user.');
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: "No requests found",
+      })
       return;
     }
     const data = await getProfilebyUIDs(uids);
 
     if (!data.success) {
-      console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
       return;
     }
 

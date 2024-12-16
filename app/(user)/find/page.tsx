@@ -35,15 +35,25 @@ export default function FindPage() {
 
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
-      console.log(myrequests.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: myrequests.error,
+        action: {
+          label: "close",
+          onClick: () => console.log("close"),
+        },
+      })
       return;
     }
 
     const requestedMe = await getRequestedMe(currentUser.uid);
     if (!requestedMe.success) {
-      console.log(requestedMe.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: requestedMe.error,
+        action: {
+          label: "close",
+          onClick: () => console.log("close"),
+        },
+      })
       return;
     }
 

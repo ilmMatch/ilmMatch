@@ -3,6 +3,7 @@ import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function MyRequests() {
   const { getProfilebyUIDs, userDataPrivate, currentUser, getMyRequested } =
@@ -13,20 +14,23 @@ export default function MyRequests() {
     console.log("myrequested")
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
-      console.log("error")
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: myrequests.error,
+      })
       return
     }
     const uids = Object.keys(myrequests.data);
     if (uids.length === 0) {
-      console.log('you haven&t requested anyone.');
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: "you haven't requested anyone.",
+      })
       return;
     }
     const data = await getProfilebyUIDs(uids);
     if (!data.success) {
-      console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
       return;
     }
     const profilesWithStatus = data.data?.map((profile) => ({

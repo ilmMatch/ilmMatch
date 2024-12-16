@@ -10,6 +10,7 @@ import { fontSans } from '@/config/fonts';
 import { Navbar } from '@/components/navbar';
 import { AuthProvider } from '@/context/AuthProvider';
 import { SidebarComponent } from '@/components/sidebar/app-sidebar';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: {
@@ -47,6 +48,7 @@ export default function RootLayout({
           <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
             <SidebarProvider>
               <SidebarComponent />
+              <Toaster position="top-right" richColors closeButton />
               <div className="relative flex flex-col w-full">
                 <Navbar />
                 <main className="container mx-auto px-6 flex-grow">

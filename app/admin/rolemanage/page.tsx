@@ -5,6 +5,7 @@ import LoginModal from '@/components/LoginModal';
 import { UserPrivate, UserProfile } from '@/types/firebase';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
+import { toast } from 'sonner';
 
 export default function RoleManager() {
   const { currentUser, roleManager, getProfiles, getPrivatebyUIDs } = useAuth();
@@ -17,13 +18,15 @@ export default function RoleManager() {
   async function getUsers() {
     const data = await getProfiles(10, skip, 'requested');
     if (!data.success) {
-      console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
       return
     }
     if (data.data?.length === 0) {
-      console.log("no data");
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: "No Data Found",
+      })
       return
     }
 
@@ -35,8 +38,9 @@ export default function RoleManager() {
     const result = await getPrivatebyUIDs(uids)
 
     if (!result.success) {
-      console.log(result.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: result.error,
+      })
       return
     }
 

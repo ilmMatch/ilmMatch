@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Eye, Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 export default function LoginModal() {
   const [email, setEmail] = useState('');
@@ -28,13 +29,16 @@ export default function LoginModal() {
       return;
     }
     setAuthenticating(true);
-    try {
-      await login(email, password);
-    } catch (err: any) {
-      console.error(err.message);
-    } finally {
-      setAuthenticating(false);
+
+    const data = await login(email, password);
+    if (!data.success) {
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
     }
+    setAuthenticating(false);
+
+
   }
 
   function handleClose() {

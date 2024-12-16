@@ -4,6 +4,7 @@ import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserPrivate, UserProfile } from '@/types/firebase';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function UserApprovePage() {
   const { getProfiles, getPrivatebyUIDs } = useAuth();
@@ -17,8 +18,9 @@ export default function UserApprovePage() {
   async function getUsers() {
     const data = await getProfiles(10, skip, 'requested');
     if (!data.success) {
-      console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
       return
     }
     const isEnd = data.data ? data.data.length < 10 : true
@@ -34,8 +36,9 @@ export default function UserApprovePage() {
     });
     const result = await getPrivatebyUIDs(uids)
     if (!result.success) {
-      console.log(result.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: result.error,
+      })
       return
     }
 

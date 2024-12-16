@@ -15,6 +15,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { Action } from '@/types';
 import { badgeVariants } from './ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface UserModalProps {
     user: UserProfile;
@@ -32,7 +33,9 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
         const result = await bookmarkUpdate(user.id, action);
         if (result.success) {
             setBookmarking(false)
-            // add success toast
+            toast.success("Success", {
+                description: "Bookmarked State Changed",
+            })
             return
         }
         console.log("error", result.error);
@@ -180,12 +183,16 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
 
 
                 updateUser(state, 'myrequests') //updates the setUsers in parent component
-                // add success toast
+                toast.success("Success", {
+                    description: action == "remove" ? "Request Cancelled" : state == "requested" ? "Request sent Successfully" : state == "rejected" ? "Rejected: user will be informed" : "Unmatched",
+                })
+
                 setSubmitting(false);
                 return
             }
-            console.log("error", result.error);
-            // add toast
+            toast.error("Uh oh! Something went wrong.", {
+                description: result.error,
+            })
             setSubmitting(false);
             return
         };
@@ -203,12 +210,15 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             );
             if (result.success) {
                 updateUser(state, 'requestedMe')
-                // add success toast
+                toast.success("Success", {
+                    description: state == "accepted" ? "Request Accepted" : state == "rejected" ? "Rejected: user will be informed" : "Unmatched",
+                })
                 setSubmitting(false);
                 return
             }
-            console.log("error", result.error);
-            // add toast
+            toast.error("Uh oh! Something went wrong.", {
+                description: result.error,
+            })
             setSubmitting(false);
             return
         };
@@ -227,12 +237,15 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             );
             if (result.success) {
                 updateUser(state, 'matched')
-                // add success toast
+                toast.success("Success", {
+                    description: state == "unmatched" && "Unmatched",
+                })
                 setSubmitting(false);
                 return
             }
-            console.log("error", result.error);
-            // add toast
+            toast.error("Uh oh! Something went wrong.", {
+                description: result.error,
+            })
             setSubmitting(false);
             return
         };
@@ -244,12 +257,15 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         const voidResult = await approvalUpdate(status, userUID);
         if (voidResult.success) {
             updateUser(status, 'adminApprove') //updates the setUsers in parent component
-            // add success toast
+            toast.success("Success", {
+                description: status == "approved" ? "User Profile Approved" : "User Profile not Approved",
+            })
             setSubmitting(false);
             return
         }
-        console.log("error", voidResult.error);
-        // add toast
+        toast.error("Uh oh! Something went wrong.", {
+            description: voidResult.error,
+        })
         setSubmitting(false);
         return
     };

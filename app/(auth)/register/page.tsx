@@ -15,6 +15,7 @@ import { Eye, Loader, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -39,13 +40,13 @@ export default function SignupPage() {
       return;
     }
     setSubmitting(true);
-    try {
-      await signup(email, password, userName, gender);
-    } catch (err: any) {
-      console.log(err.message, "signup");
-    } finally {
-      setSubmitting(false);
+    const data = await signup(email, password, userName, gender);
+    if (!data.success) {
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
     }
+    setSubmitting(false);
   }
 
   if (loading) {

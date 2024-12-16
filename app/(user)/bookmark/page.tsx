@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import { set } from 'date-fns';
 import React, { use, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function BookmarkPage() {
   const {
@@ -23,35 +24,41 @@ export default function BookmarkPage() {
   async function filterBookmark() {
     if (!currentUser) return 'you must be logged in';
     if (!userDataPrivate?.bookmarks || userDataPrivate?.bookmarks?.length === 0) {
-      // add toast no bookmarks found
+      toast.error("Uh oh!", {
+        description: "No bookmark found",
+      })
       return
     };
     const bookmarkedUID = userDataPrivate.bookmarks
 
     if (bookmarkedUID?.length === 0) {
-      console.log('No bookmarks found for the current user.');
-      // add toast
+      toast.error("Uh oh!", {
+        description: "No bookmark found",
+      })
       return
     }
 
     const data = await getProfilebyUIDs(bookmarkedUID)
     if (!data.success) {
-      console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+      })
       return;
     }
 
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
-      console.log(myrequests.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: myrequests.error,
+      })
       return;
     }
 
     const requestedMe = await getRequestedMe(currentUser.uid);
     if (!requestedMe.success) {
-      console.log(requestedMe.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: requestedMe.error,
+      })
       return;
     }
 

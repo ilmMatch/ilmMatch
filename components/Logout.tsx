@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthProvider';
 import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export function LogoutButton() {
   const { logout } = useAuth();
@@ -29,10 +30,21 @@ export function LogoutMobile() {
   const router = useRouter();
   async function handleSubmit() {
     try {
-      await logout();
+      const result = await logout();
+      if (!result.success) {
+        toast.error("Uh oh! Something went wrong.", {
+          description: result.error,
+        })
+        return
+      }
+      toast.success("Success.", {
+        description: "Logged Out Successfully",
+      })
       router.push('/');
     } catch (err: any) {
-      console.log(err.message);
+      toast.error("Uh oh! Something went wrong.", {
+        description: err.message,
+      })
     }
   }
   return (
