@@ -8,6 +8,8 @@ import {
   PairResult,
   ProfileResult,
   RequestAction,
+  RequestCollection,
+  SingleProfileResult,
   UserDataPrivateType,
   UserProfile,
   VoidResult,
@@ -290,13 +292,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
-
-      // Determine the action to take on the bookmarks
       const updateAction = action === 'add' ? arrayUnion(bookmarkUID) : arrayRemove(bookmarkUID);
-
-      // Update the user's bookmarks in Firestore
       await updateDoc(userRef, { bookmarks: updateAction });
-
+      const updateUserPrivateData = await getDoc(userRef)
+      setUserDataPrivate(updateUserPrivateData.data() as UserDataPrivateType);
       return { success: true };
     } catch (error: any) {
       console.error('Error during bookmark update:', error.message);
@@ -424,13 +423,14 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
-  async function getProfilebyUID(uid: string): Promise<DocumentData> {
+  async function getProfilebyUID(uid: string): Promise<SingleProfileResult> {
     try {
-      const docRef = doc(db, 'users', uid);
+      const docRef = doc(db, 'usersprofile', uid);
       const docSnap = await getDoc(docRef);
 
       // Return data only if the document exists
-      const firebaseData = docSnap.exists() ? docSnap.data() : {};
+      const firebaseData: UserProfile = { id: docSnap.id, ...docSnap.data() as Omit<UserProfile, 'id'> };
+
 
       return { success: true, data: firebaseData };
     } catch (error: unknown) {
@@ -443,7 +443,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
-  async function getRequestedMe(uid: string): Promise<DocumentData> {
+  async function getRequestedMe(uid: string): Promise<RequestCollection> {
     try {
       if (!currentUser) {
         throw new Error('You must be logged in');
@@ -466,7 +466,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
-  async function getMyRequested(uid: string): Promise<DocumentData> {
+  async function getMyRequested(uid: string): Promise<RequestCollection> {
     try {
       if (!currentUser) {
         throw new Error('Authentication Error - try logging out and logging back in');
@@ -477,7 +477,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       // Return data only if the document exists
       const firebaseData = docSnap.exists() ? docSnap.data() : {};
-
       return { success: true, data: firebaseData };
     } catch (error: unknown) {
       console.error('Error fetching requested data:', error);

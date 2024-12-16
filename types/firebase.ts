@@ -34,16 +34,21 @@ export interface FetchUserProfilesResult {
   error?: string;
 }
 
+export type SingleProfileResult =
+  | { success: true; data: UserProfile }
+  | { success: false; error: string };
+
 export type RequestAction =
   | 'requested'
   | 'rejected'
   | 'accepted'
   | 'unmatched'
-  | 're-requested';
+  | 're-requested'
+  | undefined;
 
-export interface RequestCollection {
-  [key: string]: RequestAction;
-}
+export type RequestCollection =
+  | { success: true; data: { [key: string]: RequestAction } }
+  | { success: false; error: string };
 
 export type VoidResult =
   | { success: true }
@@ -106,7 +111,7 @@ export interface AuthContextType {
     state: RequestAction,
     action: Action
   ) => Promise<VoidResult>;
-  getProfilebyUID: (uid: string) => Promise<DocumentData>;
+  getProfilebyUID: (uid: string) => Promise<SingleProfileResult>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>;
   getMyRequested: (uid: string) => Promise<RequestCollection>;

@@ -10,19 +10,29 @@ import {
 } from '@nextui-org/react';
 import { Button } from '@/components/ui/button';
 import { RequestAction, UserProfile } from '@/types/firebase';
-import { BookmarkCheck, BookmarkIcon } from 'lucide-react';
+import { BookmarkCheck, BookmarkIcon, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { Action } from '@/types';
 import { badgeVariants } from './ui/badge';
 import { cn } from '@/lib/utils';
 
-export default function UserModal({ user }: { user: UserProfile }) {
+export default function UserModal({ user, setStateUsers, stateUsers }: { user: UserProfile, setStateUsers: (newData: UserProfile[]) => void, stateUsers: UserProfile[]; }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const { currentUser, bookmarkUpdate, userDataPrivate } = useAuth();
+    const { currentUser, bookmarkUpdate, userDataPrivate, setUserDataPrivate } = useAuth();
     const [matched, setMatched] = useState<string | undefined>();
-
+    const [bookmarking, setBookmarking] = useState<boolean>(false);
     async function handleBookMark(action: Action) {
-        await bookmarkUpdate(user.id, action);
+        setBookmarking(true)
+        const result = await bookmarkUpdate(user.id, action);
+        if (result.success) {
+            setBookmarking(false)
+            // add success toast
+            return
+        }
+        console.log("error", result.error);
+        setBookmarking(false)
+        // add toast
+
     }
 
     useEffect(() => {
@@ -52,6 +62,7 @@ export default function UserModal({ user }: { user: UserProfile }) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        disabled={bookmarking}
                                         onClick={() =>
                                             handleBookMark(
                                                 userDataPrivate?.bookmarks?.includes(user.id)
@@ -93,6 +104,8 @@ export default function UserModal({ user }: { user: UserProfile }) {
                                     statusFrom={user.statusFrom}
                                     currentUserUID={currentUser.uid}
                                     userUID={user.id}
+                                    setStateUsers={setStateUsers}
+                                    stateUsers={stateUsers}
                                 // handleAction={handleProfileMatchRequest}
                                 />
                             </ModalFooter>
@@ -111,6 +124,8 @@ interface UserButtonStatusProps {
     statusFrom?: string;
     currentUserUID: string;
     userUID: string;
+    stateUsers: UserProfile[];
+    setStateUsers: (newData: UserProfile[]) => void;
     // handleAction: (
     //     requestedmeCollectionID: string,
     //     myrequestedCollectionID: string,
@@ -125,42 +140,96 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     statusFrom,
     currentUserUID,
     userUID,
+    stateUsers,
+    setStateUsers,
 }) => {
-    const { approvalUpdate, requestsUpdate } = useAuth();
+    const { approvalUpdate, requestsUpdate, getProfilebyUID } = useAuth();
+    const [submitting, setSubmitting] = useState(false);
+
+    const updateUser = (state: string | undefined, statusFrom: string) => {
+        const updatedUsers = stateUsers.map((user) =>
+            user.id === userUID ? {
+                ...user,
+                status: state,
+                ...(state === undefined && { statusFrom: undefined })
+            } : user
+        );
+        console.log("updatedUsers", updatedUsers)
+        setStateUsers(updatedUsers);
+
+    }
     const handleMyRequestsClick =
         (action: Action, state: RequestAction) => async () => {
             const requestedmeCollectionID = userUID;
             const myrequestedCollectionID = currentUserUID;
+            setSubmitting(true);
 
-            await requestsUpdate(
+            const result = await requestsUpdate(
                 requestedmeCollectionID,
                 myrequestedCollectionID,
                 state,
                 action
             );
+            if (result.success) {
+
+
+                updateUser(state, 'myrequests') //updates the setUsers in parent component
+                // add success toast
+                setSubmitting(false);
+                return
+            }
+            console.log("error", result.error);
+            // add toast
+            setSubmitting(false);
+            return
         };
 
     const handleRequestedMeClick =
         (action: Action, state: RequestAction) => async () => {
+            setSubmitting(true);
             const requestedmeCollectionID = currentUserUID;
             const myrequestedCollectionID = userUID;
-            await requestsUpdate(
+            const result = await requestsUpdate(
                 requestedmeCollectionID,
                 myrequestedCollectionID,
                 state,
                 action
             );
+            if (result.success) {
+                updateUser(state, 'requestedMe')
+                // add success toast
+                setSubmitting(false);
+                return
+            }
+            console.log("error", result.error);
+            // add toast
+            setSubmitting(false);
+            return
         };
 
-    const handleUserApproveClick = async (status: string) => {
-        await approvalUpdate(status, userUID);
+    const handleUserApproveClickAdmin = async (status: string) => {
+        setSubmitting(true);
+        const voidResult = await approvalUpdate(status, userUID);
+        if (voidResult.success) {
+            updateUser(status, 'adminApprove') //updates the setUsers in parent component
+            // add success toast
+            setSubmitting(false);
+            return
+        }
+        console.log("error", voidResult.error);
+        // add toast
+        setSubmitting(false);
+        return
     };
+
     if (!status && !statusFrom) {
         return (
             <Button
+                disabled={submitting}
                 onClick={handleMyRequestsClick('add', 'requested')}
                 variant="default"
             >
+                {submitting && <Loader2 className="animate-spin" />}
                 Request
             </Button>
         );
@@ -169,7 +238,10 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     if (statusFrom === 'myrequests') {
         if (status === 'rejected') {
             return (
-                <Button variant="outline" className="text-destructive">
+                <Button
+                    disabled={submitting}
+                    variant="outline" className="text-destructive">
+                    {submitting && <Loader2 className="animate-spin" />}
                     Rejected
                 </Button>
             );
@@ -178,9 +250,11 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         if (status === 'accepted') {
             return (
                 <Button
+                    disabled={submitting}
                     onClick={handleMyRequestsClick('add', 'unmatched')}
                     variant="destructive"
                 >
+                    {submitting && <Loader2 className="animate-spin" />}
                     Not Moving Forward
                 </Button>
             );
@@ -189,9 +263,11 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         if (status === 'unmatched') {
             return (
                 <Button
-                    onClick={handleMyRequestsClick('add', 'accepted')}
+                    disabled={submitting}
+                    onClick={handleMyRequestsClick('add', undefined)}
                     variant="secondary"
                 >
+                    {submitting && <Loader2 className="animate-spin" />}
                     if still considering
                 </Button>
             );
@@ -200,9 +276,11 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         return (
             // requested and re-requested
             <Button
-                onClick={handleMyRequestsClick('remove', 'requested')}
+                disabled={submitting}
+                onClick={handleMyRequestsClick('remove', undefined)}
                 variant="destructive"
             >
+                {submitting && <Loader2 className="animate-spin" />}
                 Cancel Request
             </Button>
         );
@@ -213,11 +291,13 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             return (
                 <>
                     <Button
+                        disabled={submitting}
                         onClick={handleRequestedMeClick('add', 'accepted')}
                         variant="default"
                     >
                         {' '}
                         {/* // Re-request */}
+                        {submitting && <Loader2 className="animate-spin" />}
                         Reconsider
                     </Button>
                 </>
@@ -227,9 +307,11 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         if (status === 'accepted') {
             return (
                 <Button
+                    disabled={submitting}
                     onClick={handleRequestedMeClick('add', 'unmatched')}
                     variant="destructive"
                 >
+                    {submitting && <Loader2 className="animate-spin" />}
                     Not Moving Forward?
                 </Button>
             );
@@ -238,9 +320,11 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         if (status === 'unmatched') {
             return (
                 <Button
+                    disabled={submitting}
                     onClick={handleRequestedMeClick('add', 'accepted')}
                     variant="secondary"
                 >
+                    {submitting && <Loader2 className="animate-spin" />}
                     if still considering
                 </Button>
             );
@@ -250,15 +334,19 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             // requested and re-requested
             <>
                 <Button
+                    disabled={submitting}
                     onClick={handleRequestedMeClick('add', 'rejected')}
                     variant="destructive"
                 >
+                    {submitting && <Loader2 className="animate-spin" />}
                     Reject
                 </Button>
                 <Button
+                    disabled={submitting}
                     onClick={handleRequestedMeClick('add', 'accepted')}
                     variant="default"
                 >
+                    {submitting && <Loader2 className="animate-spin" />}
                     Accept
                 </Button>
             </>
@@ -268,9 +356,11 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     if (statusFrom === 'matched') {
         return (
             <Button
+                disabled={submitting}
                 onClick={handleRequestedMeClick('remove', 'unmatched')}
                 variant="destructive"
             >
+                {submitting && <Loader2 className="animate-spin" />}
                 Not Moving Forward?
             </Button>
         );
@@ -281,15 +371,19 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             return (
                 <>
                     <Button
-                        onClick={() => handleUserApproveClick('notApproved')}
+                        disabled={submitting}
+                        onClick={() => handleUserApproveClickAdmin('notApproved')}
                         variant="destructive"
                     >
+                        {submitting && <Loader2 className="animate-spin" />}
                         Reject
                     </Button>
                     <Button
-                        onClick={() => handleUserApproveClick('approved')}
+                        disabled={submitting}
+                        onClick={() => handleUserApproveClickAdmin('approved')}
                         variant="default"
                     >
+                        {submitting && <Loader2 className="animate-spin" />}
                         Approve
                     </Button>
                 </>
@@ -299,10 +393,23 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             return (
                 <>
                     <Button
-                        onClick={() => handleUserApproveClick('notApproved')}
+                        disabled={submitting}
+                        onClick={() => handleUserApproveClickAdmin('notApproved')}
                         variant="destructive"
                     >
+                        {submitting && <Loader2 className="animate-spin" />}
                         Cancel Approved | Block
+                    </Button>
+                </>
+            );
+        }
+        if (status === 'notApproved') {
+            return (
+                <>
+                    <Button
+                        variant="secondary"
+                    >
+                        Not Requested
                     </Button>
                 </>
             );

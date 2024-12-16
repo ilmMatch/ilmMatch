@@ -36,7 +36,7 @@ export default function UserApprovePage() {
             <p>{user.initials}</p>
             <p>{user.statusFrom}</p>
             <p>{user.status}</p>
-            <UserModal user={user} />
+            <UserModal user={user} setStateUsers={setUnApprovedProfiles} stateUsers={unApprovedProfiles} />
           </div>
         ))}
     </div>
