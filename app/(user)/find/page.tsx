@@ -4,7 +4,7 @@ import { UserProfile } from '@/types/firebase';
 import React, { useEffect, useState } from 'react';
 import UserModal from '@/components/userModal';
 import { Button } from '@/components/ui/button';
-
+import { toast } from "sonner"
 export default function FindPage() {
   const {
     getProfiles,
@@ -23,7 +23,13 @@ export default function FindPage() {
     const data = await getProfiles(10, skip, 'approved');
     if (!data.success) {
       console.log(data.error);
-      // add toast
+      toast.error("Uh oh! Something went wrong.", {
+        description: data.error,
+        action: {
+          label: "close",
+          onClick: () => console.log("close"),
+        },
+      })
       return;
     }
 

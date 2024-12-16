@@ -37,6 +37,7 @@ import {
   limit,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   startAfter,
   updateDoc,
@@ -394,7 +395,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
   // Helper functions for update actions
   async function updateRequestState(docRef: DocumentReference, key: string, state: RequestAction) {
-    await setDoc(docRef, { [key]: state }, { merge: true });
+    await setDoc(docRef, { [key]: state, createdAt: serverTimestamp(), }, { merge: true });
   }
   // Helper functions for update actions
   async function removeRequestState(docRef: DocumentReference, key: string) {
@@ -524,7 +525,14 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   async function getAllAccepted(): Promise<PairResult> {
     try {
       const myRequestCollection = collection(db, 'myrequested');
-      const querySnapshot = await getDocs(myRequestCollection);
+      const q = query(
+        myRequestCollection,
+        // limit(limitx),
+        // orderBy('createdAt'),
+        // startAfter(skip)
+      );
+
+      const querySnapshot = await getDocs(q);
 
       // Extract accepted requests into a result array
       const result = querySnapshot.docs.flatMap((doc) => {
