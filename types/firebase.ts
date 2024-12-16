@@ -16,6 +16,7 @@ export interface UserProfile {
 }
 
 export interface UserPrivate {
+  id: string;
   bookmark?: string[];
   countryCode: number;
   waliCountryCode: number;
@@ -33,6 +34,10 @@ export interface FetchUserProfilesResult {
   profiles?: UserProfile[];
   error?: string;
 }
+
+export type FetchUserPrivatesResult =
+  | { success: true; data: UserPrivate[]; }
+  | { success: false; error: string };
 
 export type SingleProfileResult =
   | { success: true; data: UserProfile }
@@ -114,6 +119,7 @@ export interface AuthContextType {
   ) => Promise<VoidResult>;
   getProfilebyUID: (uid: string) => Promise<SingleProfileResult>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
+  getPrivatebyUIDs: (uids: string[]) => Promise<FetchUserPrivatesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>;
   getMyRequested: (uid: string) => Promise<RequestCollection>;
   getAllAccepted: () => Promise<PairResult>;

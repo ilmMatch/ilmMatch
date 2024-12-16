@@ -4,6 +4,7 @@ import { getInitials, getObjectDiff } from '@/lib/utils';
 import { Action } from '@/types';
 import {
   AuthContextType,
+  FetchUserPrivatesResult,
   FetchUserProfilesResult,
   PairResult,
   ProfileResult,
@@ -11,6 +12,7 @@ import {
   RequestCollection,
   SingleProfileResult,
   UserDataPrivateType,
+  UserPrivate,
   UserProfile,
   VoidResult,
 } from '@/types/firebase';
@@ -257,7 +259,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         usersProfileRef,
         where('approved', '==', approved), // approved | notApproved | requested
         limit(limitx),
-        orderBy('createdAt'),
+        orderBy('approved'),
         startAfter(skip)
       );
 
@@ -416,6 +418,33 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       return {
         success: true,
         profiles,
+      };
+    } catch (error: unknown) {
+      console.error('Error fetching profiles:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      };
+    }
+  }
+
+
+  async function getPrivatebyUIDs(uids: string[]): Promise<FetchUserPrivatesResult> {
+    try {
+      // Fetch profiles from 'usersprofile' collection where document name is in uids
+      const usersProfileRef = collection(db, 'users');
+      const q = query(usersProfileRef, where('__name__', 'in', uids));
+      const querySnapshot = await getDocs(q);
+
+      // Map the query snapshot docs to the desired structure
+      const profiles: UserPrivate[] = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data() as Omit<UserPrivate, 'id'>, // Spread the document data without the 'id'
+      }));
+
+      return {
+        success: true,
+        data: profiles,
       };
     } catch (error: unknown) {
       console.error('Error fetching profiles:', error);
@@ -641,6 +670,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     profileRequestUpdate, // i believe it's unused
     requestsUpdate,
     getProfilebyUIDs,
+    getPrivatebyUIDs,
     getProfilebyUID,
     getRequestedMe,
     getMyRequested,

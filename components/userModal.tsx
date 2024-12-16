@@ -9,14 +9,20 @@ import {
     useDisclosure,
 } from '@nextui-org/react';
 import { Button } from '@/components/ui/button';
-import { RequestAction, UserProfile } from '@/types/firebase';
+import { RequestAction, UserPrivate, UserProfile } from '@/types/firebase';
 import { BookmarkCheck, BookmarkIcon, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { Action } from '@/types';
 import { badgeVariants } from './ui/badge';
 import { cn } from '@/lib/utils';
 
-export default function UserModal({ user, setStateUsers, stateUsers }: { user: UserProfile, setStateUsers: (newData: UserProfile[]) => void, stateUsers: UserProfile[]; }) {
+interface UserModalProps {
+    user: UserProfile;
+    setStateUsers: (newData: UserProfile[]) => void;
+    stateUsers: UserProfile[];
+    privateInfo?: UserPrivate
+}
+export default function UserModal({ user, setStateUsers, stateUsers, privateInfo }: UserModalProps) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const { currentUser, bookmarkUpdate, userDataPrivate, setUserDataPrivate } = useAuth();
     const [matched, setMatched] = useState<string | undefined>();
@@ -53,6 +59,8 @@ export default function UserModal({ user, setStateUsers, stateUsers }: { user: U
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 placement={'center'}
+                scrollBehavior="inside"
+                size="xl"
             >
                 <ModalContent>
                     {(onClose: any) => (
@@ -79,7 +87,7 @@ export default function UserModal({ user, setStateUsers, stateUsers }: { user: U
                                     </Button>
                                     <span> {user.initials}</span>
                                 </div>
-                                {matched && <span
+                                {(matched && !user.statusFrom?.includes('admin')) && <span
                                     className={cn(
                                         'absolute top-5 right-8 capitalize',
                                         matched === 'Matched' &&
@@ -92,7 +100,11 @@ export default function UserModal({ user, setStateUsers, stateUsers }: { user: U
                                 </span>}
                             </ModalHeader>
                             <ModalBody>
+
+                                {privateInfo && <>{JSON.stringify(privateInfo, null, 2)}</>}
+                                <br />-----------------------------------------------------<br />
                                 <>{JSON.stringify(user, null, 2)}</>
+                                {privateInfo && <>{JSON.stringify(privateInfo, null, 2)}</>}
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="link" onClick={onClose}>
@@ -126,12 +138,6 @@ interface UserButtonStatusProps {
     userUID: string;
     stateUsers: UserProfile[];
     setStateUsers: (newData: UserProfile[]) => void;
-    // handleAction: (
-    //     requestedmeCollectionID: string,
-    //     myrequestedCollectionID: string,
-    //     action: Action,
-    //     state: RequestAction
-    // ) => Promise<void>;
 }
 // ===================================================***************************************************
 

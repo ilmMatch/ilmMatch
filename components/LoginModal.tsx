@@ -47,6 +47,7 @@ export default function LoginModal() {
         isOpen={true}
         onClose={handleClose}
         placement={'center'}
+        isDismissable={false}
       >
         <ModalContent>
           {(onClose: any) => (
