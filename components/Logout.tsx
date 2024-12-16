@@ -37,9 +37,6 @@ export function LogoutMobile() {
         })
         return
       }
-      toast.success("Success.", {
-        description: "Logged Out Successfully",
-      })
       router.push('/');
     } catch (err: any) {
       toast.error("Uh oh! Something went wrong.", {

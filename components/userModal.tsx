@@ -114,11 +114,10 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
                                     Close
                                 </Button>
 
+
                                 <UserActionButtons
-                                    status={user.status}
-                                    statusFrom={user.statusFrom}
                                     currentUserUID={currentUser.uid}
-                                    userUID={user.id}
+                                    user={user}
                                     setStateUsers={setStateUsers}
                                     stateUsers={stateUsers}
                                 // handleAction={handleProfileMatchRequest}
@@ -135,29 +134,26 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
 // ===================================================***************************************************
 
 interface UserButtonStatusProps {
-    status?: string;
-    statusFrom?: string;
     currentUserUID: string;
-    userUID: string;
+    user: UserProfile;
     stateUsers: UserProfile[];
     setStateUsers: (newData: UserProfile[]) => void;
 }
 // ===================================================***************************************************
 
 const UserActionButtons: React.FC<UserButtonStatusProps> = ({
-    status,
-    statusFrom,
     currentUserUID,
-    userUID,
+    user,
     stateUsers,
     setStateUsers,
 }) => {
-    const { approvalUpdate, requestsUpdate, getProfilebyUID } = useAuth();
+    const { approvalUpdate, requestsUpdate, getProfilebyUID, userDataPrivate } = useAuth();
     const [submitting, setSubmitting] = useState(false);
+    const sameGender = user.gender == userDataPrivate?.gender
 
     const updateUser = (state: string | undefined, statusFrom: string) => {
         const updatedUsers = stateUsers.map((user) =>
-            user.id === userUID ? {
+            user.id === user.id ? {
                 ...user,
                 status: state,
                 ...(state === undefined ? { statusFrom: undefined } : { statusFrom })
@@ -169,7 +165,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     }
     const handleMyRequestsClick =
         (action: Action, state: RequestAction) => async () => {
-            const requestedmeCollectionID = userUID;
+            const requestedmeCollectionID = user.id;
             const myrequestedCollectionID = currentUserUID;
             setSubmitting(true);
 
@@ -201,7 +197,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         (action: Action, state: RequestAction) => async () => {
             setSubmitting(true);
             const requestedmeCollectionID = currentUserUID;
-            const myrequestedCollectionID = userUID;
+            const myrequestedCollectionID = user.id;
             const result = await requestsUpdate(
                 requestedmeCollectionID,
                 myrequestedCollectionID,
@@ -228,7 +224,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         (action: Action, state: RequestAction) => async () => {
             setSubmitting(true);
             const requestedmeCollectionID = currentUserUID;
-            const myrequestedCollectionID = userUID;
+            const myrequestedCollectionID = user.id;
             const result = await requestsUpdate(
                 requestedmeCollectionID,
                 myrequestedCollectionID,
@@ -250,11 +246,9 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             return
         };
 
-
-
     const handleUserApproveClickAdmin = async (status: string) => {
         setSubmitting(true);
-        const voidResult = await approvalUpdate(status, userUID);
+        const voidResult = await approvalUpdate(status, user.id);
         if (voidResult.success) {
             updateUser(status, 'adminApprove') //updates the setUsers in parent component
             toast.success("Success", {
@@ -274,7 +268,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
 
 
 
-    if (!status && !statusFrom) {
+    if (!user.status && !user.statusFrom && !sameGender) {
         return (
             <Button
                 disabled={submitting}
@@ -287,8 +281,8 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         );
     }
 
-    if (statusFrom === 'myrequests') {
-        if (status === 'rejected') {
+    if (user.statusFrom === 'myrequests' && !sameGender) {
+        if (user.status === 'rejected') {
             return (
                 <Button
                     disabled={submitting}
@@ -299,7 +293,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             );
         }
 
-        if (status === 'accepted') {
+        if (user.status === 'accepted') {
             return (
                 <Button
                     disabled={submitting}
@@ -312,7 +306,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             );
         }
 
-        if (status === 'unmatched') {
+        if (user.status === 'unmatched') {
             return (
                 <Button
                     disabled={submitting}
@@ -338,8 +332,8 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         );
     }
 
-    if (statusFrom === 'requestedMe') {
-        if (status === 'rejected') {
+    if (user.statusFrom === 'requestedMe' && !sameGender) {
+        if (user.status === 'rejected') {
             return (
                 <>
                     <Button
@@ -356,7 +350,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             );
         }
 
-        if (status === 'accepted') {
+        if (user.status === 'accepted') {
             return (
                 <Button
                     disabled={submitting}
@@ -369,7 +363,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             );
         }
 
-        if (status === 'unmatched') {
+        if (user.status === 'unmatched') {
             return (
                 <Button
                     disabled={submitting}
@@ -405,7 +399,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         );
     }
 
-    if (statusFrom === 'matched') {
+    if (user.statusFrom === 'matched' && !sameGender) {
         return (
             <Button
                 disabled={submitting}
@@ -418,8 +412,8 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         );
     }
 
-    if (statusFrom === 'adminApprove') {
-        if (status === 'requested') {
+    if (user.statusFrom === 'adminApprove') {
+        if (user.status === 'requested') {
             return (
                 <>
                     <Button
@@ -441,7 +435,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
                 </>
             );
         }
-        if (status === 'approved') {
+        if (user.status === 'approved') {
             return (
                 <>
                     <Button
@@ -455,7 +449,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
                 </>
             );
         }
-        if (status === 'notApproved') {
+        if (user.status === 'notApproved') {
             return (
                 <>
                     <Button

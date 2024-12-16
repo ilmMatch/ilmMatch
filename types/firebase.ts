@@ -12,6 +12,7 @@ export interface UserProfile {
   email?: string;
   status?: string;
   statusFrom?: string;
+  gender: string;
   // Add any other fields your profile might have
 }
 

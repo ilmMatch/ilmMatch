@@ -253,12 +253,14 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   async function getProfiles(limitx: number = 10, skip: number, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
+      if (!currentUser) throw new Error("you must be logged in")
       const usersProfileRef = collection(db, 'usersprofile');
 
       // Create the query to fetch only approved profiles
       const q = query(
         usersProfileRef,
         where('approved', '==', approved), // approved | notApproved | requested
+        where('__name__', "!=", currentUser.uid),
         limit(limitx),
         orderBy('approved'),
         startAfter(skip)
