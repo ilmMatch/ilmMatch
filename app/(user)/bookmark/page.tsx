@@ -33,16 +33,30 @@ export default function BookmarkPage() {
       // add toast
       return
     }
-    const data = await getProfilebyUIDs(bookmarkedUID)
-    const myrequests = await getMyRequested(currentUser?.uid);
-    const requestedMe = await getRequestedMe(currentUser.uid);
 
-    if (!data.success || !myrequests.success || !requestedMe.success) {
+    const data = await getProfilebyUIDs(bookmarkedUID)
+    if (!data.success) {
       console.log(data.error);
       // add toast
-      return
+      return;
     }
-    const profilesWithStatus = data.profiles?.map((profile) => {
+
+    const myrequests = await getMyRequested(currentUser?.uid);
+    if (!myrequests.success) {
+      console.log(myrequests.error);
+      // add toast
+      return;
+    }
+
+    const requestedMe = await getRequestedMe(currentUser.uid);
+    if (!requestedMe.success) {
+      console.log(requestedMe.error);
+      // add toast
+      return;
+    }
+
+
+    const profilesWithStatus = data.data.map((profile) => {
       const requestedStatus = requestedMe.data[profile.id as keyof typeof requestedMe.data];
       const myRequestStatus = myrequests.data[profile.id as keyof typeof myrequests.data];
 

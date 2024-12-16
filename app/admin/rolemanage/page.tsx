@@ -16,15 +16,22 @@ export default function RoleManager() {
   const [end, setEnd] = useState(false);
   async function getUsers() {
     const data = await getProfiles(10, skip, 'requested');
-    if (!data.success || data.profiles?.length === 0) {
+    if (!data.success) {
       console.log(data.error);
       // add toast
       return
     }
-    const isEnd = data.profiles ? data.profiles.length < 10 : true
+    if (data.data?.length === 0) {
+      console.log("no data");
+      // add toast
+      return
+    }
+
+
+    const isEnd = data.data ? data.data.length < 10 : true
     setEnd(isEnd);
 
-    const uids: string[] = data.profiles?.map(profile => profile.id) || [];
+    const uids: string[] = data.data?.map(profile => profile.id) || [];
     const result = await getPrivatebyUIDs(uids)
 
     if (!result.success) {
@@ -33,7 +40,7 @@ export default function RoleManager() {
       return
     }
 
-    const profilesWithStatus: UserProfile[] = (data.profiles ?? []).map((profile) => {
+    const profilesWithStatus: UserProfile[] = (data.data ?? []).map((profile) => {
       const matchingProfile = result.data?.find(profileP => profileP.id === profile.id);
       return matchingProfile ? {
         ...profile, status: matchingProfile.role,

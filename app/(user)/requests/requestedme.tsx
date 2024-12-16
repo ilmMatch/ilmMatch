@@ -26,10 +26,11 @@ export default function RequestedMe() {
 
     if (!data.success) {
       console.log(data.error);
+      // add toast
       return;
     }
 
-    const requestsWithStatus = data.profiles?.map((profile) => ({
+    const requestsWithStatus = data.data?.map((profile) => ({
       ...profile,
       status: requestedMe.data[profile.id as keyof typeof requestedMe.data] ? requestedMe.data[profile.id as keyof typeof requestedMe.data]?.toString() : 'rejected',
       statusFrom: 'requestedMe',

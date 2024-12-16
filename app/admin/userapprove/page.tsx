@@ -21,10 +21,10 @@ export default function UserApprovePage() {
       // add toast
       return
     }
-    const isEnd = data.profiles ? data.profiles.length < 10 : true
+    const isEnd = data.data ? data.data.length < 10 : true
     setEnd(isEnd);
     const uids: string[] = []
-    const profilesWithStatus = (data.profiles ?? []).map((profile) => {
+    const profilesWithStatus = (data.data ?? []).map((profile) => {
       uids.push(profile.id);
       return {
         ...profile,

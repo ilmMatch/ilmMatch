@@ -13,9 +13,11 @@ export default function AcceptedPage() {
     const data = await getProfilebyUIDs(userDataPrivate.matched);
     if (!data.success) {
       console.log(data.error);
+      // add toast
+      return
     }
 
-    const profilesWithStatus = data.profiles?.map((profile) => ({
+    const profilesWithStatus = data.data.map((profile) => ({
       ...profile,
       status: 'matched',
       statusFrom: 'matched',

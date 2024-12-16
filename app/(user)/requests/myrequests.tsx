@@ -26,8 +26,10 @@ export default function MyRequests() {
     const data = await getProfilebyUIDs(uids);
     if (!data.success) {
       console.log(data.error);
+      // add toast
+      return;
     }
-    const profilesWithStatus = data.profiles?.map((profile) => ({
+    const profilesWithStatus = data.data?.map((profile) => ({
       ...profile,
       status: myrequests.data[profile.id as keyof typeof myrequests.data]?.toString(),
       statusFrom: 'myrequests',
