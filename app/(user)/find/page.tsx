@@ -27,19 +27,24 @@ export default function FindPage() {
       return
     }
 
-    const profilesWithStatus = data.profiles?.map((profile) => ({
-      ...profile,
-      status: requestedMe.data[profile.id as keyof typeof requestedMe.data]
-        ? requestedMe.data[profile.id as keyof typeof requestedMe.data]?.toString()
-        : myrequests.data[profile.id as keyof typeof myrequests.data]
-          ? myrequests.data[profile.id as keyof typeof myrequests.data]?.toString()
-          : undefined,
-      statusFrom: requestedMe.data[profile.id as keyof typeof requestedMe.data]
-        ? 'requestedMe'
-        : myrequests.data[profile.id as keyof typeof myrequests.data]?.toString()
-          ? 'myrequests'
-          : undefined,
-    }));
+    const profilesWithStatus = data.profiles?.map((profile) => {
+      const requestedStatus = requestedMe.data[profile.id as keyof typeof requestedMe.data];
+      const myRequestStatus = myrequests.data[profile.id as keyof typeof myrequests.data];
+
+      return {
+        ...profile,
+        status: requestedStatus
+          ? requestedStatus.toString()
+          : myRequestStatus
+            ? myRequestStatus.toString()
+            : undefined,
+        statusFrom: requestedStatus
+          ? 'requestedMe'
+          : myRequestStatus
+            ? 'myrequests'
+            : undefined,
+      };
+    });
     setUsers(profilesWithStatus);
   }
 
