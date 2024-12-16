@@ -13,7 +13,7 @@ export default function AdminRequestPage() {
 
     async function fetchMatchedData() {
 
-        const data = await getAllAccepted(10, skip); // Fetch pairs of matched UIDs
+        const data = await getAllAccepted(); // Fetch pairs of matched UIDs
         if (data.success) {
             setMatchedData(prevData => [...(prevData ?? []), ...data.data]);
             setEnd(data.data.length < 10);
@@ -74,7 +74,7 @@ export default function AdminRequestPage() {
                                 </p>
                                 {/* Add other profile fields here */}
                                 <Button
-                                    onClick={() => sendEmail(profile1, uid1, profile2, uid2)}
+                                // onClick={() => sendEmail(profile1, uid1, profile2, uid2)}
                                 >
                                     Send Email
                                 </Button>
@@ -87,9 +87,9 @@ export default function AdminRequestPage() {
             })}
 
 
-            end? "You have reached the end":
-            <Button onClick={() => setSkip(skip + 10)}>Load More</Button>
-                }
+            {end ? "You have reached the end" :
+                <Button onClick={() => setSkip(skip + 10)}>Load More</Button>
+            }
         </div>
     )
 }
