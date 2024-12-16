@@ -278,7 +278,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       return {
         success: true,
-        profiles: userProfiles,
+        data: userProfiles,
       };
     } catch (error: any) {
       console.error('Error fetching user profiles:', error);
@@ -417,7 +417,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       return {
         success: true,
-        profiles,
+        data: profiles,
       };
     } catch (error: unknown) {
       console.error('Error fetching profiles:', error);

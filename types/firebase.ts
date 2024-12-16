@@ -22,6 +22,7 @@ export interface UserPrivate {
   waliCountryCode: number;
   mobileNumber: number;
   waliMobileNumber: number;
+  role: string;
   userName: string;
   waliName: string;
   approved: string;
@@ -29,11 +30,11 @@ export interface UserPrivate {
 }
 
 // Define the return type of the function
-export interface FetchUserProfilesResult {
-  success: boolean;
-  profiles?: UserProfile[];
-  error?: string;
-}
+
+export type FetchUserProfilesResult =
+  | { success: true; data: UserProfile[]; }
+  | { success: false; error: string };
+
 
 export type FetchUserPrivatesResult =
   | { success: true; data: UserPrivate[]; }

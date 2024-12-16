@@ -24,7 +24,7 @@ export default function UserApprovePage() {
     const isEnd = data.profiles ? data.profiles.length < 10 : true
     setEnd(isEnd);
     const uids: string[] = []
-    const profilesWithStatus = data.profiles?.map((profile) => {
+    const profilesWithStatus = (data.profiles ?? []).map((profile) => {
       uids.push(profile.id);
       return {
         ...profile,
@@ -32,14 +32,15 @@ export default function UserApprovePage() {
         statusFrom: 'adminApprove',
       }
     });
-    setUnApprovedProfiles(profilesWithStatus);
     const result = await getPrivatebyUIDs(uids)
     if (!result.success) {
       console.log(result.error);
       // add toast
       return
     }
-    setPrivateInfo(result.data)
+
+    setUnApprovedProfiles(prevProfiles => [...(prevProfiles ?? []), ...profilesWithStatus]);
+    setPrivateInfo(prevPrivateInfo => [...prevPrivateInfo, ...result.data])
 
 
   }
