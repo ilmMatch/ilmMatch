@@ -33,8 +33,10 @@ import {
   getDoc,
   getDocs,
   limit,
+  orderBy,
   query,
   setDoc,
+  startAfter,
   updateDoc,
   where,
   WriteBatch,
@@ -245,7 +247,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
-  async function getProfiles(limitx: number = 10, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
+  async function getProfiles(limitx: number = 10, skip: number, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
       const usersProfileRef = collection(db, 'usersprofile');
@@ -254,7 +256,9 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const q = query(
         usersProfileRef,
         where('approved', '==', approved), // approved | notApproved | requested
-        limit(limitx)
+        limit(limitx),
+        orderBy('createdAt'),
+        startAfter(skip)
       );
 
       // Execute the query to get the documents

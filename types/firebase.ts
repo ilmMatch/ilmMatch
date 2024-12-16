@@ -94,6 +94,7 @@ export interface AuthContextType {
   approvalUpdate: (data: string, uid: string) => Promise<VoidResult>;
   getProfiles: (
     limitx: number,
+    skip: number,
     aprroved: string
   ) => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
