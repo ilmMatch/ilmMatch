@@ -14,6 +14,7 @@ export default function RequestedMe() {
     if (!requestedMe.success) {
       console.log(requestedMe.error);
       // add toast
+      return
     }
     const uids = Object.keys(requestedMe.data);
     if (uids.length === 0) {
@@ -48,9 +49,10 @@ export default function RequestedMe() {
     <>
       {requests &&
         requests.map((user) => (
+          user.status &&
           <div key={user.id}>
             <strong>{user.initials}</strong> - {user.id}
-            <UserModal user={user} />
+            <UserModal user={user} setStateUsers={setRequests} stateUsers={requests} />
           </div>
         ))}
     </>
