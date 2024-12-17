@@ -4,16 +4,36 @@ import { Action } from ".";
 
 
 export interface UserProfile {
-  id: string;
-  approved: string;
-  // Add other fields specific to your user profile
-  // For example:
-  initials?: string;
-  email?: string;
+  id: string
+  childern: string
+  beard: string
+  born: string
+  polygamy: string
+  spouseBrief: string
+  initials: string
+  languages: string
+  maritalStatus: string
+  ethnicity: string
+  pray: string
+  height: number
+  countryResiding: string
+  build: string
+  masjidName: string
+  occupation: string
+  approved: string
+  education: string
+  scholars: string
+  briefAboutYou: string
+  sect: string
+  spouseAge: string
+  countryMoving: string
+  hijab: string
+  dob: { seconds: number; nanoseconds: number }
+  gender: string
+  nationality: string
+  islamicEducation: string
   status?: string;
   statusFrom?: string;
-  gender: string;
-  // Add any other fields your profile might have
 }
 
 export interface UserPrivate {

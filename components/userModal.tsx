@@ -103,11 +103,7 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
                                 </span>}
                             </ModalHeader>
                             <ModalBody>
-
-                                {privateInfo && <>{JSON.stringify(privateInfo, null, 2)}</>}
-                                <br />-----------------------------------------------------<br />
-                                <>{JSON.stringify(user, null, 2)}</>
-                                {privateInfo && <>{JSON.stringify(privateInfo, null, 2)}</>}
+                                <ProfileContent profile={user} userPrivate={privateInfo} />
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="link" onClick={onClose}>
@@ -132,14 +128,102 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
 }
 
 // ===================================================***************************************************
+function ProfileContent({ profile, userPrivate }: { profile: UserProfile; userPrivate: UserPrivate | undefined }) {
+    return (
+        <div className="space-y-4">
+            {(userPrivate && profile.statusFrom?.includes('admin')) &&
+                <ProfileSection title="Private Information">
+                    <ProfileItem label="Gender" value={profile.gender} />
+                    <ProfileItem label="Nationality" value={profile.nationality} />
+                    <ProfileItem label="Ethnicity" value={profile.ethnicity} />
+                    <ProfileItem label="Age" value={calculateAge(profile.dob.seconds)} />
+                    <ProfileItem label="Height" value={`${profile.height} cm`} />
+                    <ProfileItem label="Build" value={profile.build} />
+                </ProfileSection>
+            }
 
+            <ProfileSection title="Personal Information">
+                <ProfileItem label="Gender" value={profile.gender} />
+                <ProfileItem label="Nationality" value={profile.nationality} />
+                <ProfileItem label="Ethnicity" value={profile.ethnicity} />
+                <ProfileItem label="Age" value={calculateAge(profile.dob.seconds)} />
+                <ProfileItem label="Height" value={`${profile.height} cm`} />
+                <ProfileItem label="Build" value={profile.build} />
+            </ProfileSection>
+
+            <ProfileSection title="Religious Information">
+                <ProfileItem label="Born" value={profile.born} />
+                <ProfileItem label="Sect" value={profile.sect} />
+                <ProfileItem label="Pray" value={profile.pray} />
+                <ProfileItem label="Hijab" value={profile.hijab} />
+                <ProfileItem label="Islamic Education" value={profile.islamicEducation} />
+                <ProfileItem label="Scholars" value={profile.scholars} />
+            </ProfileSection>
+
+            <ProfileSection title="Education and Occupation">
+                <ProfileItem label="Education" value={profile.education} />
+                <ProfileItem label="Occupation" value={profile.occupation} />
+                <ProfileItem label="Languages" value={profile.languages} />
+            </ProfileSection>
+
+            <ProfileSection title="Location">
+                <ProfileItem label="Country Residing" value={profile.countryResiding} />
+                <ProfileItem label="Country Moving" value={profile.countryMoving} />
+                <ProfileItem label="Masjid Name" value={profile.masjidName} />
+            </ProfileSection>
+
+            <ProfileSection title="Marital Information">
+                <ProfileItem label="Marital Status" value={profile.maritalStatus} />
+                <ProfileItem label="Children" value={profile.childern} />
+                <ProfileItem label="Polygamy" value={profile.polygamy} />
+                <ProfileItem label="Preferred Spouse Age" value={profile.spouseAge} />
+            </ProfileSection>
+
+            <ProfileSection title="About">
+                <p className="text-sm text-muted-foreground">{profile.briefAboutYou}</p>
+            </ProfileSection>
+
+            <ProfileSection title="Spouse Brief">
+                <p className="text-sm text-muted-foreground">{profile.spouseBrief}</p>
+            </ProfileSection>
+        </div>
+    )
+}
+
+
+function ProfileSection({ title, children }: { title: string; children: React.ReactNode }) {
+    return (
+        <div>
+            <h4 className="text-md font-semibold text-accent-foreground mb-2">{title} {title.includes('Private') && <span className="text-xs text-muted-foreground">{" "}Visible to Admin only</span>}</h4>
+            <div className="bg-secondary rounded-lg p-4 space-y-2">{children}</div>
+        </div>
+    )
+}
+
+function ProfileItem({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="flex justify-between">
+            <span className="text-sm font-medium text-muted-foreground capitalize pr-2">{label}:</span>
+            <span className="text-sm text-accent-foreground capitalize">{value}</span>
+        </div>
+    )
+}
+
+function calculateAge(dobSeconds: number): string {
+    const dob = new Date(dobSeconds * 1000);
+    const ageDifMs = Date.now() - dob.getTime();
+    const ageDate = new Date(ageDifMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970).toString();
+}
+
+
+// ===================================================***************************************************
 interface UserButtonStatusProps {
     currentUserUID: string;
     user: UserProfile;
     stateUsers: UserProfile[];
     setStateUsers: (newData: UserProfile[]) => void;
 }
-// ===================================================***************************************************
 
 const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     currentUserUID,
