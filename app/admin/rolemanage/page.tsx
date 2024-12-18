@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 
 export default function RoleManager() {
-  const { currentUser, roleManager, getProfiles, getPrivatebyUIDs } = useAuth();
+  const { currentUser, getProfiles, getPrivatebyUIDs } = useAuth();
   const [profiles, setProfiles] = useState<
     UserProfile[] | undefined
   >([]);

@@ -194,7 +194,7 @@ function ProfileContent({ profile, userPrivate }: { profile: UserProfile; userPr
 function ProfileSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div>
-            <h4 className="text-md font-semibold text-accent-foreground mb-2">{title} {title.includes('Private') && <span className="text-xs text-muted-foreground">{" "}Visible to Admin only</span>}</h4>
+            <h4 className="text-md font-semibold text-accent-foreground mb-2">{title}</h4>
             <div className="bg-secondary rounded-lg p-4 space-y-2">{children}</div>
         </div>
     )
@@ -231,7 +231,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     stateUsers,
     setStateUsers,
 }) => {
-    const { approvalUpdate, requestsUpdate, getProfilebyUID, userDataPrivate } = useAuth();
+    const { approvalUpdate, requestsUpdate, getProfilebyUID, userDataPrivate, roleManager } = useAuth();
     const [submitting, setSubmitting] = useState(false);
     const sameGender = user.gender == userDataPrivate?.gender
 
@@ -243,9 +243,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
                 ...(state === undefined ? { statusFrom: undefined } : { statusFrom })
             } : stateUser
         );
-        console.log("updatedUsers", updatedUsers)
         setStateUsers(updatedUsers);
-
     }
     const handleMyRequestsClick =
         (action: Action, state: RequestAction) => async () => {
@@ -349,7 +347,23 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     };
 
 
-
+    const handleRole = async (role: string) => {
+        setSubmitting(true);
+        const voidResult = await roleManager(user.id, role);
+        if (voidResult.success) {
+            toast.success("Success", {
+                description: "Role Updated",
+            })
+            updateUser(role, 'adminAssign')
+            setSubmitting(false);
+            return
+        }
+        toast.error("Uh oh! Something went wrong.", {
+            description: voidResult.error,
+        })
+        setSubmitting(false);
+        return
+    }
 
 
     if (!user.status && !user.statusFrom && !sameGender) {
@@ -540,6 +554,38 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
                         variant="secondary"
                     >
                         Not Requested
+                    </Button>
+                </>
+            );
+        }
+    }
+
+
+    if (user.statusFrom === 'adminAssign') {
+        if (user.status === 'user') {
+            return (
+                <>
+                    <Button
+                        disabled={submitting}
+                        onClick={() => handleRole('admin')}
+                        variant="default"
+                    >
+                        {submitting && <Loader2 className="animate-spin" />}
+                        Make Admin
+                    </Button>
+                </>
+            );
+        }
+        if (user.status === 'admin') {
+            return (
+                <>
+                    <Button
+                        disabled={submitting}
+                        onClick={() => handleRole('user')}
+                        variant="destructive"
+                    >
+                        {submitting && <Loader2 className="animate-spin" />}
+                        Remove Admin
                     </Button>
                 </>
             );
