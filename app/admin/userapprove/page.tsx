@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserPrivate, UserProfile } from '@/types/firebase';
-import React, { useEffect, useState } from 'react';
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function UserApprovePage() {
@@ -12,22 +13,25 @@ export default function UserApprovePage() {
     UserProfile[] | undefined
   >([]);
   const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([])
-  const [skip, setSkip] = useState(0);
+  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+
   const [end, setEnd] = useState(false);
 
   async function getUsers() {
-    const data = await getProfiles(10, skip, 'requested');
+    const data = await getProfiles(10, lastVisibleDoc.current, 'requested');
     if (!data.success) {
       toast.error("Uh oh! Something went wrong.", {
         description: data.error,
       })
       return
     }
-    if (data.data?.length === 0) {
-      setEnd(true);
-      return
+    console.log(data.data)
+    if (data.data.length > 0) {
+      lastVisibleDoc.current = data.lastVisibleDoc
+    } else {
+      setEnd(data.data?.length === 0); return
     }
-    setSkip(skip + 10);
+
     const uids: string[] = []
     const profilesWithStatus = (data.data ?? []).map((profile) => {
       uids.push(profile.id);

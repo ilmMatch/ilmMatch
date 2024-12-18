@@ -1,10 +1,11 @@
 'use client';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import UserModal from '@/components/userModal';
 import { Button } from '@/components/ui/button';
 import { toast } from "sonner"
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 export default function FindPage() {
   const {
     getProfiles,
@@ -13,14 +14,13 @@ export default function FindPage() {
     getMyRequested,
   } = useAuth();
   const [users, setUsers] = useState<UserProfile[] | undefined>([]);
-  const [skip, setSkip] = useState(0);
   const [end, setEnd] = useState(false);
+  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   async function getUsers() {
     if (!currentUser) return 'you must be logged in';
 
-
-    const data = await getProfiles(10, skip, 'approved');
+    const data = await getProfiles(10, lastVisibleDoc.current, 'approved');
     if (!data.success) {
       console.log(data.error);
       toast.error("Uh oh! Something went wrong.", {
@@ -32,7 +32,7 @@ export default function FindPage() {
       })
       return;
     }
-
+    console.log(data.data)
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
       toast.error("Uh oh! Something went wrong.", {
@@ -76,13 +76,13 @@ export default function FindPage() {
       };
     });
 
-    setEnd(profilesWithStatus?.length < 10);
-    setUsers(profilesWithStatus);
+    data.data.length > 0 ? lastVisibleDoc.current = data.lastVisibleDoc : setEnd(profilesWithStatus?.length === 0);
+    setUsers(prevData => [...(prevData ?? []), ...profilesWithStatus]);
   }
 
   useEffect(() => {
     getUsers();
-  }, [currentUser, skip]);
+  }, [currentUser]);
 
   return (
     <div>
@@ -95,7 +95,7 @@ export default function FindPage() {
           </div>
         ))}
       {end ? "You've reached the end" :
-        <Button onClick={() => setSkip(skip + 10)}>Load More</Button>
+        <Button onClick={() => getUsers()}>Load More</Button>
       }
     </div>
   );

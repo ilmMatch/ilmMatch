@@ -236,12 +236,12 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     const sameGender = user.gender == userDataPrivate?.gender
 
     const updateUser = (state: string | undefined, statusFrom: string) => {
-        const updatedUsers = stateUsers.map((user) =>
-            user.id === user.id ? {
-                ...user,
+        const updatedUsers = stateUsers.map((stateUser) =>
+            stateUser.id === user.id ? {
+                ...stateUser,
                 status: state,
                 ...(state === undefined ? { statusFrom: undefined } : { statusFrom })
-            } : user
+            } : stateUser
         );
         console.log("updatedUsers", updatedUsers)
         setStateUsers(updatedUsers);

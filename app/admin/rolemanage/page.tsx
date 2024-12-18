@@ -1,11 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthProvider';
 import LoginModal from '@/components/LoginModal';
 import { UserPrivate, UserProfile } from '@/types/firebase';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { toast } from 'sonner';
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 
 export default function RoleManager() {
   const { currentUser, roleManager, getProfiles, getPrivatebyUIDs } = useAuth();
@@ -13,24 +14,24 @@ export default function RoleManager() {
     UserProfile[] | undefined
   >([]);
   const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([])
-  const [skip, setSkip] = useState(0);
+  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+
   const [end, setEnd] = useState(false);
   async function getUsers() {
-    console.log("geruser", skip);
-    const data = await getProfiles(10, skip, 'requested');
+    const data = await getProfiles(10, lastVisibleDoc.current, 'requested');
     if (!data.success) {
       toast.error("Uh oh! Something went wrong.", {
         description: data.error,
       })
       return
     }
-    if (data.data?.length === 0) {
-      setEnd(true);
-      return
+    if (data.data.length > 0) {
+      lastVisibleDoc.current = data.lastVisibleDoc
+    } else {
+      setEnd(data.data?.length === 0); return
     }
 
 
-    setSkip(skip + 10);
     const uids: string[] = data.data?.map(profile => profile.id) || [];
     const result = await getPrivatebyUIDs(uids)
 

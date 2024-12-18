@@ -37,6 +37,7 @@ import {
   limit,
   orderBy,
   query,
+  QueryDocumentSnapshot,
   serverTimestamp,
   setDoc,
   startAfter,
@@ -250,21 +251,24 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   }
 
 
-  async function getProfiles(limitx: number = 10, skip: number, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
+  async function getProfiles(limitx: number = 10, lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null = null, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
       if (!currentUser) throw new Error("you must be logged in")
       const usersProfileRef = collection(db, 'usersprofile');
 
       // Create the query to fetch only approved profiles
-      const q = query(
+      let q = query(
         usersProfileRef,
         where('approved', '==', approved), // approved | notApproved | requested
         where('__name__', "!=", currentUser.uid),
-        limit(limitx),
         orderBy('approved'),
-        startAfter(skip)
+        limit(limitx)
       );
+      if (lastVisibleDoc) {
+        // If we have a last visible document, start after it
+        q = query(q, startAfter(lastVisibleDoc));
+      }
 
       // Execute the query to get the documents
       const querySnapshot = await getDocs(q);
@@ -275,9 +279,11 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
 
+      const newLastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
       return {
         success: true,
         data: userProfiles,
+        lastVisibleDoc: newLastVisibleDoc,
       };
     } catch (error: any) {
       console.error('Error fetching user profiles:', error);
@@ -414,9 +420,12 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         ...doc.data() as Omit<UserProfile, 'id'>, // Spread the document data without the 'id'
       }));
 
+
+
       return {
         success: true,
         data: profiles,
+        lastVisibleDoc: null
       };
     } catch (error: unknown) {
       console.error('Error fetching profiles:', error);
@@ -458,6 +467,25 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   async function getProfilebyUID(uid: string): Promise<SingleProfileResult> {
     try {
       const docRef = doc(db, 'usersprofile', uid);
+      const docSnap = await getDoc(docRef);
+
+      // Return data only if the document exists
+      const firebaseData: UserProfile = { id: docSnap.id, ...docSnap.data() as Omit<UserProfile, 'id'> };
+
+
+      return { success: true, data: firebaseData };
+    } catch (error: unknown) {
+      console.error('Error fetching profile:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      };
+    }
+  }
+
+  async function getPrivatebyUID(uid: string): Promise<SingleProfileResult> {
+    try {
+      const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
 
       // Return data only if the document exists
@@ -678,6 +706,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     getProfilebyUIDs,
     getPrivatebyUIDs,
     getProfilebyUID,
+    getPrivatebyUID,
     getRequestedMe,
     getMyRequested,
     getAllAccepted,

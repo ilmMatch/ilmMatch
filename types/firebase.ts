@@ -1,5 +1,5 @@
 import { User, UserCredential } from "firebase/auth";
-import { DocumentData } from "firebase/firestore";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 import { Action } from ".";
 
 
@@ -53,7 +53,7 @@ export interface UserPrivate {
 // Define the return type of the function
 
 export type FetchUserProfilesResult =
-  | { success: true; data: UserProfile[]; }
+  | { success: true; data: UserProfile[]; lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null; }
   | { success: false; error: string };
 
 
@@ -121,7 +121,7 @@ export interface AuthContextType {
   approvalUpdate: (data: string, uid: string) => Promise<VoidResult>;
   getProfiles: (
     limitx: number,
-    skip: number,
+    lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null,
     aprroved: string
   ) => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
@@ -140,6 +140,7 @@ export interface AuthContextType {
     action: Action
   ) => Promise<VoidResult>;
   getProfilebyUID: (uid: string) => Promise<SingleProfileResult>;
+  getPrivatebyUID: (uid: string) => Promise<SingleProfileResult>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
   getPrivatebyUIDs: (uids: string[]) => Promise<FetchUserPrivatesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>;

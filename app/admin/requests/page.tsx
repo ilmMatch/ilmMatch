@@ -9,10 +9,11 @@ export default function AdminRequestPage() {
     const [matchedData, setMatchedData] = useState<[string, string][]>([]); // Array of matched pairs
     const [visiblePairs, setVisiblePairs] = useState<[string, string][]>([]); // Pairs currently displayed
     const [profiles, setProfiles] = useState<Map<string, any>>(new Map()); // Stores profiles by UID
+    const [privateProfiles, setPrivateProfiles] = useState<Map<string, any>>(new Map()); // Stores profiles by UID
     const [loading, setLoading] = useState(false); // Flag for loading profiles
     const [hasMore, setHasMore] = useState(true); // Flag to check if more pairs need to be loaded
 
-    const { getAllAccepted, getProfilebyUID, setMatchAdmin } = useAuth(); // Auth functions
+    const { getAllAccepted, getProfilebyUID, setMatchAdmin, getPrivatebyUID } = useAuth(); // Auth functions
     const loaderRef = useRef<HTMLDivElement>(null); // Reference for scroll detection
 
     // Fetch all matched pairs
@@ -35,6 +36,7 @@ export default function AdminRequestPage() {
         setLoading(true);
 
         const newProfiles = new Map(profiles);
+        const newPrivateProfiles = new Map(privateProfiles);
         for (let [uid1, uid2] of pairs) {
             // Fetch profiles only if not already loaded
             if (!newProfiles.has(uid1)) {
@@ -56,6 +58,27 @@ export default function AdminRequestPage() {
                     continue;
                 }
                 newProfiles.set(uid2, data.data);
+            }
+
+            if (!newPrivateProfiles.has(uid1)) {
+                const data = await getPrivatebyUID(uid1);
+                if (!data.success) {
+                    toast.error("Uh oh! Something went wrong.", {
+                        description: data.error,
+                    })
+                    continue;
+                }
+                newPrivateProfiles.set(uid1, data.data);
+            }
+            if (!newPrivateProfiles.has(uid2)) {
+                const data = await getPrivatebyUID(uid2);
+                if (!data.success) {
+                    toast.error("Uh oh! Something went wrong.", {
+                        description: data.error,
+                    })
+                    continue;
+                }
+                newPrivateProfiles.set(uid2, data.data);
             }
         }
 
@@ -212,7 +235,9 @@ export default function AdminRequestPage() {
             <div>
                 {visiblePairs.map(([uid1, uid2], index) => {
                     const profile1 = profiles.get(uid1);
+                    const privateProfile1 = privateProfiles.get(uid1);
                     const profile2 = profiles.get(uid2);
+                    const privateProfile2 = privateProfiles.get(uid2);
                     // const brother = profile1.gender === 'brother' ? profile1 : profile2;
                     // const sister = profile1.gender === 'sister' ? profile1 : profile2;
 
@@ -221,10 +246,10 @@ export default function AdminRequestPage() {
                             {profile1 && profile2 ? (
                                 <div>
                                     <p>
-                                        {profile1.userName} -- {profile1.email} --
+                                        {privateProfile1.userName} -- {privateProfile1.email} --
                                     </p>
                                     <p>
-                                        {profile2.userName} -- {profile2.email} --
+                                        {privateProfile2.userName} -- {privateProfile2.email} --
                                     </p>
                                     {/* Add other profile fields here */}
                                     <Button
