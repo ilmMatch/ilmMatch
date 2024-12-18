@@ -275,10 +275,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
 
-      // Optionally log and set the profiles if needed
-      console.log('userProfiles', userProfiles);
-      setAllProfiles(userProfiles);  // Assuming this is a state update or some other logic
-
       return {
         success: true,
         data: userProfiles,

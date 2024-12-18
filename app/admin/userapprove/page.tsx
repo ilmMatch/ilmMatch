@@ -23,8 +23,11 @@ export default function UserApprovePage() {
       })
       return
     }
-    const isEnd = data.data ? data.data.length < 10 : true
-    setEnd(isEnd);
+    if (data.data?.length === 0) {
+      setEnd(true);
+      return
+    }
+    setSkip(skip + 10);
     const uids: string[] = []
     const profilesWithStatus = (data.data ?? []).map((profile) => {
       uids.push(profile.id);
@@ -49,7 +52,7 @@ export default function UserApprovePage() {
   }
   useEffect(() => {
     getUsers();
-  }, [skip]);
+  }, []);
 
   return (
     <div>
@@ -68,7 +71,7 @@ export default function UserApprovePage() {
           </div>)
         })}
       {end ? "You have reached the end" :
-        <Button onClick={() => setSkip(skip + 10)}>Load More</Button>
+        <Button onClick={() => getUsers()}>Load More</Button>
       }
     </div>
   );

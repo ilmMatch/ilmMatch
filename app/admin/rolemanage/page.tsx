@@ -16,6 +16,7 @@ export default function RoleManager() {
   const [skip, setSkip] = useState(0);
   const [end, setEnd] = useState(false);
   async function getUsers() {
+    console.log("geruser", skip);
     const data = await getProfiles(10, skip, 'requested');
     if (!data.success) {
       toast.error("Uh oh! Something went wrong.", {
@@ -24,16 +25,12 @@ export default function RoleManager() {
       return
     }
     if (data.data?.length === 0) {
-      toast.error("Uh oh! Something went wrong.", {
-        description: "No Data Found",
-      })
+      setEnd(true);
       return
     }
 
 
-    const isEnd = data.data ? data.data.length < 10 : true
-    setEnd(isEnd);
-
+    setSkip(skip + 10);
     const uids: string[] = data.data?.map(profile => profile.id) || [];
     const result = await getPrivatebyUIDs(uids)
 
@@ -59,7 +56,7 @@ export default function RoleManager() {
 
   useEffect(() => {
     getUsers();
-  }, [skip]);
+  }, []);
   // const handleAssignRole = async () => {
   //   setLoading(true);
   //   try {
@@ -90,7 +87,7 @@ export default function RoleManager() {
           </div>)
         })}
       {end ? "You have reached the end" :
-        <Button onClick={() => setSkip(skip + 10)}>Load More</Button>
+        <Button onClick={() => getUsers()}>Load More</Button>
       }
     </div>
   );
