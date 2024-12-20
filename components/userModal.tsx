@@ -10,7 +10,7 @@ import {
 } from '@nextui-org/react';
 import { Button } from '@/components/ui/button';
 import { RequestAction, UserPrivate, UserProfile } from '@/types/firebase';
-import { BookmarkCheck, BookmarkIcon, Loader2 } from 'lucide-react';
+import { BookmarkCheck, BookmarkIcon, ChevronRight, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { Action } from '@/types';
 import { badgeVariants } from './ui/badge';
@@ -45,10 +45,10 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
     }
 
     useEffect(() => {
-        if (userDataPrivate?.matched?.includes(user.id)) {
+        if (userDataPrivate?.matched?.true?.includes(user.id)) {
             setMatched("Matched");
         }
-        if (userDataPrivate?.unmatched?.includes(user.id)) {
+        if (userDataPrivate?.matched?.false?.includes(user.id)) {
             setMatched("Matched before");
         }
 
@@ -56,7 +56,9 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
     if (!currentUser) return <>loading</>;
     return (
         <>
-            <Button onClick={onOpen}>Open Profile</Button>
+            <Button variant="outline" className="rounded-full" onClick={onOpen}>
+                <ChevronRight className="h-4 w-4" />
+            </Button>
             <Modal
                 backdrop={'blur'}
                 isOpen={isOpen}

@@ -1,4 +1,5 @@
 'use client';
+import ProfileCard from '@/components/profileCard';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
@@ -55,9 +56,8 @@ export default function MyRequests() {
         myrequests.map((user) => (
           user.status &&
           <div key={user.id}>
-            {user.status}
-            <strong>{user.initials}</strong> - {user.id}
-            <UserModal user={user} setStateUsers={setMyRequests} stateUsers={myrequests} />
+            {/* <UserModal  /> */}
+            <ProfileCard user={user} setStateUsers={setMyRequests} stateUsers={myrequests} />
           </div>
 
         ))}

@@ -6,6 +6,7 @@ import UserModal from '@/components/userModal';
 import { Button } from '@/components/ui/button';
 import { toast } from "sonner"
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import ProfileCard from '@/components/profileCard';
 export default function FindPage() {
   const {
     getProfiles,
@@ -89,9 +90,8 @@ export default function FindPage() {
       {users &&
         users.map((user) => (
           <div key={user.id}>
-            <strong>{user.initials}</strong> - {user.id}
-            {user.status && <p>{user.status}</p>}
-            <UserModal user={user} setStateUsers={setUsers} stateUsers={users} />
+            <ProfileCard user={user} setStateUsers={setUsers} stateUsers={users} />
+            {/* <UserModal user={user} setStateUsers={setUsers} stateUsers={users} /> */}
           </div>
         ))}
       {end ? "You've reached the end" :

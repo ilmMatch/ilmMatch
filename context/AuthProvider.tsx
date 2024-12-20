@@ -10,6 +10,7 @@ import {
   ProfileResult,
   RequestAction,
   RequestCollection,
+  SinglePrivateResult,
   SingleProfileResult,
   UserDataPrivateType,
   UserPrivate,
@@ -382,8 +383,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     await setDoc(
       docRef1,
       {
-        unmatched: arrayUnion(requestedby),
-        matched: arrayRemove(requestedby),
+        matched: {
+          true: arrayRemove(requestedby),
+          false: arrayUnion(requestedby),
+        }
       },
       { merge: true }
     );
@@ -391,8 +394,11 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     await setDoc(
       docRef2,
       {
-        unmatched: arrayUnion(requestedof),
-        matched: arrayRemove(requestedof),
+        matched: {
+          true: arrayRemove(requestedof),
+          false: arrayUnion(requestedof),
+
+        }
       },
       { merge: true }
     );
@@ -483,13 +489,13 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-  async function getPrivatebyUID(uid: string): Promise<SingleProfileResult> {
+  async function getPrivatebyUID(uid: string): Promise<SinglePrivateResult> {
     try {
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
 
       // Return data only if the document exists
-      const firebaseData: UserProfile = { id: docSnap.id, ...docSnap.data() as Omit<UserProfile, 'id'> };
+      const firebaseData: UserPrivate = { id: docSnap.id, ...docSnap.data() as Omit<UserPrivate, 'id'> };
 
 
       return { success: true, data: firebaseData };
@@ -589,12 +595,20 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       batch.set(
         docRef1,
-        { 'matched.true': arrayUnion(profile2) },
+        {
+          matched: {
+            true: arrayUnion(profile2),
+          },
+        },
         { merge: true }
       );
       batch.set(
         docRef2,
-        { 'matched.true': arrayUnion(profile1) },
+        {
+          matched: {
+            true: arrayUnion(profile1),
+          },
+        },
         { merge: true }
       );
     };

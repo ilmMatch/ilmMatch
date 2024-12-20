@@ -1,4 +1,5 @@
 'use client';
+import ProfileCard from '@/components/profileCard';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
@@ -99,8 +100,8 @@ export default function BookmarkPage() {
       {bookmarkedProfiles &&
         bookmarkedProfiles.map((user) => (
           <div key={user.id}>
-            <strong>{user.initials}</strong> - {user.id}
-            <UserModal user={user} setStateUsers={setBookmarkedProfiles} stateUsers={bookmarkedProfiles} />
+            {/* <UserModal /> */}
+            <ProfileCard user={user} setStateUsers={setBookmarkedProfiles} stateUsers={bookmarkedProfiles} />
           </div>
         ))}
     </>

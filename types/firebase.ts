@@ -38,16 +38,18 @@ export interface UserProfile {
 
 export interface UserPrivate {
   id: string;
-  bookmark?: string[];
+  email: string;
+  userName: string;
+  mobileNumber: number;
+  waliName: string;
+  waliMobileNumber: number;
+  gender: string;
+  dob: { seconds: number; nanoseconds: number } | Date;
+  role: string;
   countryCode: number;
   waliCountryCode: number;
-  mobileNumber: number;
-  waliMobileNumber: number;
-  role: string;
-  userName: string;
-  waliName: string;
   approved: string;
-  dob: Date;
+  bookmark?: string[];
 }
 
 // Define the return type of the function
@@ -63,6 +65,10 @@ export type FetchUserPrivatesResult =
 
 export type SingleProfileResult =
   | { success: true; data: UserProfile }
+  | { success: false; error: string };
+
+export type SinglePrivateResult =
+  | { success: true; data: UserPrivate }
   | { success: false; error: string };
 
 export type RequestAction =
@@ -140,7 +146,7 @@ export interface AuthContextType {
     action: Action
   ) => Promise<VoidResult>;
   getProfilebyUID: (uid: string) => Promise<SingleProfileResult>;
-  getPrivatebyUID: (uid: string) => Promise<SingleProfileResult>;
+  getPrivatebyUID: (uid: string) => Promise<SinglePrivateResult>;
   getProfilebyUIDs: (uids: string[]) => Promise<FetchUserProfilesResult>;
   getPrivatebyUIDs: (uids: string[]) => Promise<FetchUserPrivatesResult>;
   getRequestedMe: (uid: string) => Promise<RequestCollection>;

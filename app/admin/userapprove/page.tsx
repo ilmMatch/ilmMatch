@@ -1,4 +1,5 @@
 'use client';
+import AdminApprovalCard from '@/components/adminApprovalCard';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
@@ -66,12 +67,11 @@ export default function UserApprovePage() {
           const userPrivateInfo = privateInfo.find(
             (info) => info.id === user.id
           );
-          return (<div key={user.id} className="border">
-            <p>{user.initials}</p>
-            <p>{user.statusFrom}</p>
-            <p>{user.status}</p>
-            {userPrivateInfo && <p>{userPrivateInfo.userName}</p>}
-            <UserModal user={user} setStateUsers={setUnApprovedProfiles} stateUsers={unApprovedProfiles} privateInfo={userPrivateInfo} />
+          console.log(userPrivateInfo, user)
+          return (<div key={user.id} >
+            {userPrivateInfo &&
+              <AdminApprovalCard user={user} setStateUsers={setUnApprovedProfiles} stateUsers={unApprovedProfiles} privateInfo={userPrivateInfo} />
+            }
           </div>)
         })}
       {end ? "You have reached the end" :

@@ -1,4 +1,5 @@
 'use client';
+import ProfileCard from '@/components/profileCard';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
@@ -10,8 +11,14 @@ export default function AcceptedPage() {
   const [users, setUsers] = useState<UserProfile[] | undefined>(undefined);
 
   async function getMatchedProfiles() {
-    if (!userDataPrivate || userDataPrivate.matched.length === 0) return;
-    const data = await getProfilebyUIDs(userDataPrivate.matched);
+    if (!userDataPrivate || userDataPrivate.matched.true.length === 0) {
+
+      toast.error("Uh oh! No matches found.", {
+        description: "if you've accepted a request, wait till admin confirms",
+      })
+      return
+    };
+    const data = await getProfilebyUIDs(userDataPrivate.matched.true);
     if (!data.success) {
       toast.error("Uh oh! Something went wrong.", {
         description: data.error,
@@ -27,7 +34,7 @@ export default function AcceptedPage() {
     setUsers(profilesWithStatus);
   }
   useEffect(() => {
-    if (!users) {
+    if (userDataPrivate) {
       getMatchedProfiles();
     }
   }, [userDataPrivate]);
@@ -35,9 +42,8 @@ export default function AcceptedPage() {
     <>
       {users &&
         users.map((user) => (
-          <div key={user.id} className="border">
-            <p>{user.initials}</p>
-            <UserModal user={user} setStateUsers={setUsers} stateUsers={users} />
+          <div key={user.id}>
+            <ProfileCard user={user} setStateUsers={setUsers} stateUsers={users} />
           </div>
         ))}
     </>

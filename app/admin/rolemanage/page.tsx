@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import AdminApprovalCard from '@/components/adminApprovalCard';
 
 export default function RoleManager() {
   const { currentUser, getProfiles, getPrivatebyUIDs } = useAuth();
@@ -79,12 +80,10 @@ export default function RoleManager() {
           const userPrivateInfo = privateInfo.find(
             (info) => info.id === user.id
           );
-          return (<div key={user.id} className="border">
-            <p>{user.initials}</p>
-            <p>{user.statusFrom}</p>
-            <p>{user.status}</p>
-            {userPrivateInfo && <p>{userPrivateInfo.userName}</p>}
-            <UserModal user={user} setStateUsers={setProfiles} stateUsers={profiles} privateInfo={userPrivateInfo} />
+          return (<div key={user.id} >
+            {userPrivateInfo &&
+              <AdminApprovalCard user={user} setStateUsers={setProfiles} stateUsers={profiles} privateInfo={userPrivateInfo} />
+            }
           </div>)
         })}
       {end ? "You have reached the end" :
