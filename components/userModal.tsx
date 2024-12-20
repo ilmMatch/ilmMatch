@@ -56,7 +56,7 @@ export default function UserModal({ user, setStateUsers, stateUsers, privateInfo
     if (!currentUser) return <>loading</>;
     return (
         <>
-            <Button variant="outline" className="rounded-full" onClick={onOpen}>
+            <Button variant="outline" className="rounded-full bg-secondary" onClick={onOpen}>
                 <ChevronRight className="h-4 w-4" />
             </Button>
             <Modal
