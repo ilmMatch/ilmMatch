@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
-import AdminApprovalCard from '@/components/adminApprovalCard';
+import AdminApprovalCard from '@/components/cards/adminApprovalCard';
 
 export default function RoleManager() {
   const { currentUser, getProfiles, getPrivatebyUIDs } = useAuth();

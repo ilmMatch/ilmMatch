@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import MatchProfilesComponent from '@/components/requestMatchCard';
+import MatchProfilesComponent from '@/components/cards/requestMatchCard';
 import { UserPrivate } from '@/types/firebase';
 import { sendEmail } from './sendEmail';
 

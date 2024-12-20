@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserPrivate, UserProfile } from '@/types/firebase';
-import UserModal from './userModal';
+import UserModal from '../userModal';
 
 
 interface UserCardProps {

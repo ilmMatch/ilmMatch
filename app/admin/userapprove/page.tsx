@@ -1,5 +1,5 @@
 'use client';
-import AdminApprovalCard from '@/components/adminApprovalCard';
+import AdminApprovalCard from '@/components/cards/adminApprovalCard';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';

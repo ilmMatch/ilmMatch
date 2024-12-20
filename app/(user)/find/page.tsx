@@ -6,7 +6,7 @@ import UserModal from '@/components/userModal';
 import { Button } from '@/components/ui/button';
 import { toast } from "sonner"
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
-import ProfileCard from '@/components/profileCard';
+import ProfileCard from '@/components/cards/profileCard';
 export default function FindPage() {
   const {
     getProfiles,
