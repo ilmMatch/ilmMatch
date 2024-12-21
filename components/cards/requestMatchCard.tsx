@@ -31,7 +31,7 @@ function ProfileCard({
 }) {
   const [stateUsers, setStateUsers] = useState<UserProfile[]>([]);
   return (
-    <Card className="w-full max-w-md overflow-hidden">
+    <Card className="w-full  overflow-hidden">
       <CardContent className="p-6">
         <div className="flex items-center space-x-4 mb-4">
           <Avatar className="h-16 w-16 border-2 border-white shadow-lg">
@@ -40,7 +40,7 @@ function ProfileCard({
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold">
               {privateInfo.userName}
             </h2>
             <p className="text-sm text-gray-500">{profile.occupation}</p>
@@ -49,27 +49,27 @@ function ProfileCard({
         <div className="grid grid-cols-1 gap-3 mb-4">
           <div className="flex items-center space-x-2">
             <CalendarDays className="h-5 w-5 text-gray-400" />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm ">
               age years, {profile.maritalStatus}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPin className="h-5 w-5 text-gray-400" />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm ">
               {profile.nationality}, {profile.countryResiding} →{' '}
               {profile.countryMoving}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <GraduationCap className="h-5 w-5 text-gray-400" />
-            <span className="text-sm text-gray-600">{profile.education}</span>
+            <span className="text-sm ">{profile.education}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Briefcase className="h-5 w-5 text-gray-400" />
-            <span className="text-sm text-gray-600">{profile.occupation}</span>
+            <span className="text-sm ">{profile.occupation}</span>
           </div>
         </div>
-        <div className="text-sm text-gray-600 mb-4">
+        <div className="text-sm  mb-4">
           <strong>Preferred spouse age:</strong> {profile.spouseAge}
         </div>
         <UserModal
@@ -91,15 +91,15 @@ export default function MatchProfilesComponent({
   handleMatchClick,
 }: RequestCardProps) {
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center md:items-stretch space-y-6 md:space-y-0 md:space-x-6 p-6 bg-gray-100 min-h-screen">
+    <div className="flex flex-col md:flex-row justify-center items-center relative rounded-sm border p-2 my-2">
       <ProfileCard profile={profile1} privateInfo={privateInfo1} />
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center absolute md:left-1/3 md:top-10">
         <Button
           onClick={() => handleMatchClick(privateInfo1, privateInfo2)}
-          className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+          className="px-6 py-3 bg-red-500 hover:bg-red-600 rounded-md shadow-lg text-white"
         >
-          <Heart className="h-6 w-6 mr-2" />
-          Match
+          {/* <Heart className="h-6 w-6 mr-2" /> */}
+          Exchange Information
         </Button>
       </div>
       <ProfileCard profile={profile2} privateInfo={privateInfo2} />

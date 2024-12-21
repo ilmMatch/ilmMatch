@@ -157,7 +157,7 @@ export default function AdminRequestPage() {
           const privateProfile2 = privateProfiles.get(uid2);
 
           return (
-            <div key={index} className="border p-2">
+            <div key={index} >
               {profile1 && profile2 && privateProfile1 && privateProfile2 ? (
                 <div>
                   <MatchProfilesComponent
