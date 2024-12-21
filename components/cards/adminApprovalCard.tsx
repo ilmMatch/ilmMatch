@@ -9,6 +9,7 @@ import { UserPrivate, UserProfile } from '@/types/firebase';
 import UserModal from '../userModal';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthProvider';
+import { generateRandomColor, getRandomGradientDirection } from './gradient';
 
 
 interface UserCardProps {
@@ -80,105 +81,117 @@ export default function AdminApprovalCard({ user, setStateUsers, stateUsers, pri
     }
 
     return (
-        <Card className="w-full max-w-4xl overflow-hidden">
-            <CardContent className="p-6">
-                <div className="flex items-start space-x-6 flex-col md:flex-row">
-                    <div className='md:w-[12%] flex justify-center items-center'>
-                        <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-                            <AvatarFallback className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-green-400 text-white">
-                                {user.initials}
-                            </AvatarFallback>
-                        </Avatar>
-                    </div>
-                    <div className="flex-grow">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800">{privateInfo.userName}</h2>
-                                <p className="text-sm text-gray-500">{privateInfo.gender}</p>
-                            </div>
-                            <Badge variant={user.status === 'requested' || 'user' ? 'outline' : 'approved'}>
-                                {user.status}
-                            </Badge>
-                        </div>
-                        <div className="mt-4 grid md:grid-cols-2 grid-cols-2 gap-4">
-                            <div className="flex items-center space-x-2">
-                                <CalendarDays className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">{age} years old, {user.maritalStatus}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <MapPin className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">{user.nationality}, {user.countryResiding}</span>
-                            </div>
+        <div className='w-full'>
+            <Card className="w-full max-md:max-w-3xl md:w-4/5  overflow-hidden my-2 mx-auto">
+                <CardContent className="p-0">
+                    <div className="flex items-center max-sm:flex-col">
+                        <div className="p-6 sm:flex-shrink-0 flex items-center justify-between  max-sm:w-11/12">
+                            <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                                <AvatarFallback className="text-2xl font-bold text-white"
+                                    style={{
+                                        background: `linear-gradient(${getRandomGradientDirection()}, ${generateRandomColor(40)}, ${generateRandomColor(46)})`
+                                    }}>
+                                    {user.initials}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="p-6 sm:hidden">
 
-                            <div className="flex items-center space-x-2">
-                                <Phone className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">+{privateInfo.countryCode}{" "}{privateInfo.mobileNumber}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Mail className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">{privateInfo.email}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <User className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">Wali: {privateInfo.waliName}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Phone className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">Wali: +{privateInfo.waliCountryCode}{" "}{privateInfo.waliMobileNumber}</span>
-                            </div>
-                            <div className="flex items-center space-x-2 col-span-3">
-                                <Link className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600">Islamic Education jjkjbskdjfbilzdugf sdhbflasidhflidsb</span>
+                                <UserModal user={user} setStateUsers={setStateUsers} stateUsers={stateUsers} privateInfo={privateInfo} />
+
                             </div>
                         </div>
+                        <div className="flex-grow p-6">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h2 className="text-2xl font-bold ">{privateInfo.userName}</h2>
+                                    <p className="text-sm ">{privateInfo.gender}</p>
+                                </div>
+                                <Badge variant={user.status === 'requested' || 'user' ? 'outline' : 'approved'}>
+                                    {user.status}
+                                </Badge>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="flex items-center space-x-2">
+                                    <CalendarDays className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">{age} years old, {user.maritalStatus}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <MapPin className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">{user.nationality}, {user.countryResiding}</span>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Phone className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">+{privateInfo.countryCode}{" "}{privateInfo.mobileNumber}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Mail className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">{privateInfo.email}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <User className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">Wali: {privateInfo.waliName}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Phone className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">Wali: +{privateInfo.waliCountryCode}{" "}{privateInfo.waliMobileNumber}</span>
+                                </div>
+                                <div className="flex items-center space-x-2 sm:col-span-2 md:col-span-3">
+                                    <Link className="h-5 w-5 text-gray-400" />
+                                    <span className="text-sm">Islamic Education jjkjbskdjfbilzdugf sdhbflasidhflidsb</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </CardContent>
-            <CardFooter className=" flex justify-between items-center">
-                <div className="flex space-x-2">
+                </CardContent>
+                <CardFooter className=" flex justify-between items-center">
+                    <div className="flex space-x-2 max-sm:w-full">
 
-                    {user.statusFrom == 'adminApprove' &&
-                        <>
-                            <Button variant="destructive" onClick={() => handleUserApproveClickAdmin('notApproved')} disabled={submitting} >
-                                {submitting && <Loader2 className="animate-spin" />}Reject</Button>
-                            <Button variant="default" onClick={() => handleUserApproveClickAdmin('approved')} disabled={submitting} >
-                                {submitting && <Loader2 className="animate-spin" />}Approve</Button>
-                        </>}
+                        {user.statusFrom == 'adminApprove' &&
+                            <div className='flex justify-between max-sm:w-full gap-2'>
+                                <Button variant="destructive" onClick={() => handleUserApproveClickAdmin('notApproved')} disabled={submitting} >
+                                    {submitting && <Loader2 className="animate-spin" />}Reject</Button>
+                                <Button variant="default" onClick={() => handleUserApproveClickAdmin('approved')} disabled={submitting} >
+                                    {submitting && <Loader2 className="animate-spin" />}Approve</Button>
+                            </div>}
 
-                    {user.statusFrom == 'adminAssign' &&
-                        user.status === 'user'
-                        ? (
-                            <>
-                                <Button
-                                    disabled={submitting}
-                                    onClick={() => handleRole('admin')}
-                                    variant="default"
-                                >
-                                    {submitting && <Loader2 className="animate-spin" />}
-                                    Make Admin
-                                </Button>
-                            </>
-                        )
-                        :
-                        user.status === 'admin' &&
-                        (
-                            <>
-                                <Button
-                                    disabled={submitting}
-                                    onClick={() => handleRole('user')}
-                                    variant="destructive"
-                                >
-                                    {submitting && <Loader2 className="animate-spin" />}
-                                    Remove Admin
-                                </Button>
-                            </>
-                        )
+                        {user.statusFrom == 'adminAssign' &&
+                            user.status === 'user'
+                            ? (
+                                <>
+                                    <Button
+                                        disabled={submitting}
+                                        onClick={() => handleRole('admin')}
+                                        variant="default"
+                                    >
+                                        {submitting && <Loader2 className="animate-spin" />}
+                                        Make Admin
+                                    </Button>
+                                </>
+                            )
+                            :
+                            user.status === 'admin' &&
+                            (
+                                <>
+                                    <Button
+                                        disabled={submitting}
+                                        onClick={() => handleRole('user')}
+                                        variant="destructive"
+                                    >
+                                        {submitting && <Loader2 className="animate-spin" />}
+                                        Remove Admin
+                                    </Button>
+                                </>
+                            )
 
-                    }
-                </div>
-                <UserModal user={user} setStateUsers={setStateUsers} stateUsers={stateUsers} privateInfo={privateInfo} />
-            </CardFooter>
-        </Card >
+                        }
+                    </div>
+                    <div className='hidden sm:flex'>
+                        <UserModal user={user} setStateUsers={setStateUsers} stateUsers={stateUsers} privateInfo={privateInfo} />
+                    </div>
+                </CardFooter>
+            </Card >
+        </div>
     );
 };
 
