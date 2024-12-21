@@ -8,7 +8,6 @@ export function getFilterConditions(filters: FilterOptions) {
     const exactMatchFields = [
         'countryResiding',
         'countryMoving',
-        'gender',
         'ethnicity',
         'polygamy',
         'spouseAge',
@@ -37,7 +36,9 @@ export function getFilterConditions(filters: FilterOptions) {
         }
     }
 
-    // Text search conditions (using array-contains or string includes)
+    if (filters.gender && filters.gender !== 'all') filterConditions.push(where('gender', '==', filters.gender));
+    if (filters.polygamy && filters.polygamy !== 'all') filterConditions.push(where('polygamy', '==', filters.polygamy));
+
     if (filters.spouseAgeMin && filters.spouseAgeMax) {
         filterConditions.push(where('spouseAge', '>=', filters.spouseAgeMin.toString()));
         filterConditions.push(where('spouseAge', '<=', filters.spouseAgeMax.toString()));
@@ -57,31 +58,54 @@ export function getFilterConditions(filters: FilterOptions) {
         filterConditions.push(where('education', '<=', filters.education + '\uf8ff'));
     }
 
-    const handleCommaField = (fieldValue: string | undefined, fieldName: string) => {
-        if (fieldValue) {
-            // Convert search terms to lowercase for case-insensitive comparison
-            const searchTerms = fieldValue.toLowerCase().split(',').map(term => term.trim());
 
-            // Create conditions for each term
-            const termConditions = searchTerms.map(term =>
-                and(
-                    where(fieldName, '>=', term),
-                    where(fieldName, '<=', term + '\uf8ff')
-                )
-            );
-
-            if (termConditions.length > 0) {
-                filterConditions.push(or(...termConditions));
-            }
-        }
-    };
-
-    // Apply the comma-separated field handling to both languages and scholars
-    handleCommaField(filters.languages, 'languages');
-    handleCommaField(filters.scholars, 'scholars');
+    if (filters.scholars && filters.scholars.length > 0) {
+        filterConditions.push(where('scholars', 'array-contains-any', filters.scholars));
+    }
+    if (filters.languages && filters.languages.length > 0) {
+        filterConditions.push(where('languages', 'array-contains-any', filters.languages));
+    }
 
     return filterConditions
 }
+
+
+
+
+
+
+
+
+
+
+
+
+// const handleCommaField = (fieldValue: string | undefined, fieldName: string) => {
+//     if (fieldValue) {
+//         // Convert search terms to lowercase for case-insensitive comparison
+//         const searchTerms = fieldValue.toLowerCase().split(',').map(term => term.trim());
+
+//         // Create conditions for each term
+//         const termConditions = searchTerms.map(term =>
+//             and(
+//                 where(fieldName, '>=', term),
+//                 where(fieldName, '<=', term + '\uf8ff')
+//             )
+//         );
+
+//         if (termConditions.length > 0) {
+//             filterConditions.push(or(...termConditions));
+//         }
+//     }
+// };
+
+// // Apply the comma-separated field handling to both languages and scholars
+// handleCommaField(filters.languages, 'languages');
+// handleCommaField(filters.scholars, 'scholars');
+
+
+
+
 // export function getFilterConditions(filters: FilterOptions): QueryFieldFilterConstraint[] {
 //     const conditions: QueryFieldFilterConstraint[] = [];
 

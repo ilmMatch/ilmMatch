@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthProvider';
 import LoginModal from '@/components/LoginModal';
-import { UserPrivate, UserProfile } from '@/types/firebase';
+import { FilterOptions, UserPrivate, UserProfile } from '@/types/firebase';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { toast } from 'sonner';
@@ -16,10 +16,23 @@ export default function RoleManager() {
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
   );
+  const [filters, setFilters] = useState<FilterOptions>({
+    name: '',
+    gender: '',
+    education: '',
+    ethnicity: '',
+    // languages: [],
+    // scholars: [],
+    polygamy: '',
+    // spouseAgeMin: 18,
+    // spouseAgeMax: 60,
+    // heightMin: 150,
+    // heightMax: 200,
+  });
 
   const [end, setEnd] = useState(false);
   async function getUsers() {
-    const data = await getProfiles(10, lastVisibleDoc.current, 'requested');
+    const data = await getProfiles(10, lastVisibleDoc.current, 'requested', filters);
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,
@@ -50,10 +63,10 @@ export default function RoleManager() {
         );
         return matchingProfile
           ? {
-              ...profile,
-              status: matchingProfile.role,
-              statusFrom: 'adminAssign',
-            }
+            ...profile,
+            status: matchingProfile.role,
+            statusFrom: 'adminAssign',
+          }
           : profile;
       }
     );

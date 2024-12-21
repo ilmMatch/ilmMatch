@@ -153,7 +153,7 @@ export function FilterModal({ filters, setFilters }: FilterModalProps) {
                                     <SelectItem value="all">All</SelectItem>
                                     <SelectItem value="yes">Yes</SelectItem>
                                     <SelectItem value="no">No</SelectItem>
-                                    <SelectItem value="under certain Circumstances">Under Certain Circumstances</SelectItem>
+                                    <SelectItem value="under certain circumstances">Under Certain Circumstances</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
