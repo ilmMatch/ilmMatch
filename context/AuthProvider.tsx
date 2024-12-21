@@ -652,6 +652,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         {
           matched: {
             true: arrayUnion(profile2),
+            false: arrayRemove(profile2),
           },
         },
         { merge: true }
@@ -661,6 +662,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         {
           matched: {
             true: arrayUnion(profile1),
+            false: arrayRemove(profile1),
           },
         },
         { merge: true }

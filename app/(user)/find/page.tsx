@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import ProfileCard from '@/components/cards/profileCard';
 export default function FindPage() {
-  const { getProfiles, currentUser, getRequestedMe, getMyRequested } =
+  const { getProfiles, currentUser, getRequestedMe, getMyRequested, userDataPrivate } =
     useAuth();
   const [users, setUsers] = useState<UserProfile[] | undefined>([]);
   const [end, setEnd] = useState(false);
@@ -17,7 +17,7 @@ export default function FindPage() {
   );
 
   async function getUsers() {
-    if (!currentUser) return 'you must be logged in';
+    if (!currentUser || !userDataPrivate) return 'you must be logged in';
 
     const data = await getProfiles(10, lastVisibleDoc.current, 'approved');
     if (!data.success) {
@@ -61,6 +61,7 @@ export default function FindPage() {
         requestedMe.data[profile.id as keyof typeof requestedMe.data];
       const myRequestStatus =
         myrequests.data[profile.id as keyof typeof myrequests.data];
+      const matched = userDataPrivate?.matched?.true?.includes(profile.id);
 
       return {
         ...profile,
@@ -68,12 +69,12 @@ export default function FindPage() {
           ? requestedStatus.toString()
           : myRequestStatus
             ? myRequestStatus.toString()
-            : undefined,
+            : matched ? "matched" : undefined,
         statusFrom: requestedStatus
           ? 'requestedMe'
           : myRequestStatus
             ? 'myrequests'
-            : undefined,
+            : matched ? "matched" : undefined,
       };
     });
 
