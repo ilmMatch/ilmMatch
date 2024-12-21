@@ -18,8 +18,10 @@ export default function FindPage() {
 
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
-
-    const data = await getProfiles(10, lastVisibleDoc.current, 'approved');
+    const filters = {
+      gender: "sister"  // This will match exactly "sister"
+    };
+    const data = await getProfiles(10, lastVisibleDoc.current, 'approved', filters);
     if (!data.success) {
       console.log(data.error);
       toast.error('Uh oh! Something went wrong.', {

@@ -55,10 +55,10 @@ export interface UserPrivate {
 
 export type FetchUserProfilesResult =
   | {
-      success: true;
-      data: UserProfile[];
-      lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
-    }
+    success: true;
+    data: UserProfile[];
+    lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
+  }
   | { success: false; error: string };
 
 export type FetchUserPrivatesResult =
@@ -127,7 +127,8 @@ export interface AuthContextType {
   getProfiles: (
     limitx: number,
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null,
-    aprroved: string
+    aprroved: string,
+    filters: FilterOptions,
   ) => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
   bookmarkUpdate: (
@@ -153,4 +154,34 @@ export interface AuthContextType {
   getAllAccepted: () => Promise<PairResult>;
   setMatchAdmin: (profile1: string, profile2: string) => Promise<VoidResult>;
   loading: boolean;
+}
+
+
+
+
+export interface FilterOptions {
+  name?: string;
+  countryResiding?: string;
+  countryMoving?: string;
+  gender?: string;
+  education?: string;
+  scholars?: string[];
+  ethnicity?: string;
+  languages?: string[];
+  polygamy?: string;
+  spouseAge?: string;
+  hijab?: string;
+  beard?: string;
+  born?: string;
+  sect?: string;
+  maritalStatus?: string;
+  age?: {
+    min?: number;
+    max?: number;
+  };
+  spouseAgeMin?: number;
+  spouseAgeMax?: number;
+  heightMin?: number;
+  heightMax?: number;
+  limit?: number;
 }

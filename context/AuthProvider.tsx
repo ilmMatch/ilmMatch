@@ -1,11 +1,13 @@
 'use client';
 import { auth, db } from '@/firebase';
+import { getFilterConditions } from '@/lib/filterConditions';
 import { getInitials, getObjectDiff } from '@/lib/utils';
 import { Action } from '@/types';
 import {
   AuthContextType,
   FetchUserPrivatesResult,
   FetchUserProfilesResult,
+  FilterOptions,
   PairResult,
   ProfileResult,
   RequestAction,
@@ -26,6 +28,7 @@ import {
   User,
 } from 'firebase/auth';
 import {
+  and,
   arrayRemove,
   arrayUnion,
   collection,
@@ -36,6 +39,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  or,
   orderBy,
   query,
   QueryDocumentSnapshot,
@@ -276,10 +280,60 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
+  // async function getProfiles(
+  //   limitx: number = 10,
+  //   lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null = null,
+  //   approved: string = 'approved',
+  //   filters: FilterOptions | null = null
+  // ): Promise<FetchUserProfilesResult> {
+  //   try {
+  //     // Create a reference to the usersprofile collection
+  //     if (!currentUser) throw new Error('you must be logged in');
+  //     const usersProfileRef = collection(db, 'usersprofile');
+
+  //     // Create the query to fetch only approved profiles
+  //     let q = query(
+  //       usersProfileRef,
+  //       where('approved', '==', approved), // approved | notApproved | requested
+  //       where('__name__', '!=', currentUser.uid),
+  //       orderBy('approved'),
+  //       limit(limitx)
+  //     );
+  //     if (lastVisibleDoc) {
+  //       // If we have a last visible document, start after it
+  //       q = query(q, startAfter(lastVisibleDoc));
+  //     }
+
+  //     // Execute the query to get the documents
+  //     const querySnapshot = await getDocs(q);
+
+  //     // Extract user profiles from the documents
+  //     const userProfiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
+  //       id: doc.id,
+  //       ...(doc.data() as Omit<UserProfile, 'id'>),
+  //     }));
+
+  //     const newLastVisibleDoc =
+  //       querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+  //     return {
+  //       success: true,
+  //       data: userProfiles,
+  //       lastVisibleDoc: newLastVisibleDoc,
+  //     };
+  //   } catch (error: any) {
+  //     console.error('Error fetching user profiles:', error);
+  //     return {
+  //       success: false,
+  //       error:
+  //         error instanceof Error ? error.message : 'An unknown error occurred',
+  //     };
+  //   }
+  // }
   async function getProfiles(
     limitx: number = 10,
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null = null,
-    approved: string = 'approved'
+    approved: string = 'approved',
+    filters: FilterOptions = {}
   ): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
@@ -287,13 +341,105 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const usersProfileRef = collection(db, 'usersprofile');
 
       // Create the query to fetch only approved profiles
+      const baseConditions = [
+        where('approved', '==', approved),
+        where('__name__', '!=', currentUser.uid),
+      ];
+      const filterConditions = getFilterConditions(filters);
+
+      // const filterConditions = [];
+      // if (filters) {
+      //   const exactMatchFields = [
+      //     'countryResiding',
+      //     'countryMoving',
+      //     'gender',
+      //     'ethnicity',
+      //     'polygamy',
+      //     'spouseAge',
+      //     'hijab',
+      //     'beard',
+      //     'born',
+      //     'sect',
+      //     'maritalStatus'
+      //   ];
+
+      //   exactMatchFields.forEach(field => {
+      //     if (filters[field as keyof FilterOptions]) {
+      //       filterConditions.push(where(field, '==', filters[field as keyof FilterOptions]));
+      //     }
+      //   });
+
+      //   if (filters.age) {
+      //     const now = new Date();
+      //     if (filters.age.min) {
+      //       const maxDate = new Date(now.getFullYear() - filters.age.min, now.getMonth(), now.getDate());
+      //       filterConditions.push(where('dob', '<=', maxDate));
+      //     }
+      //     if (filters.age.max) {
+      //       const minDate = new Date(now.getFullYear() - filters.age.max, now.getMonth(), now.getDate());
+      //       filterConditions.push(where('dob', '>=', minDate));
+      //     }
+      //   }
+
+      //   // Text search conditions (using array-contains or string includes)
+      //   if (filters.spouseAgeMin && filters.spouseAgeMax) {
+      //     filterConditions.push(where('spouseAge', '>=', filters.spouseAgeMin.toString()));
+      //     filterConditions.push(where('spouseAge', '<=', filters.spouseAgeMax.toString()));
+      //   }
+      //   if (filters.heightMin && filters.heightMax) {
+      //     filterConditions.push(where('height', '>=', filters.heightMin));
+      //     filterConditions.push(where('height', '<=', filters.heightMax));
+      //   }
+
+      //   if (filters.name) {
+      //     filterConditions.push(where('masjidName', '>=', filters.name));
+      //     filterConditions.push(where('masjidName', '<=', filters.name + '\uf8ff'));
+      //   }
+
+      //   if (filters.education) {
+      //     filterConditions.push(where('education', '>=', filters.education));
+      //     filterConditions.push(where('education', '<=', filters.education + '\uf8ff'));
+      //   }
+
+      //   // // Handle array fields
+      //   // if (filters.scholars && filters.scholars.length > 0) {
+      //   //   // Using array-contains-any for multiple possible matches
+      //   //   filterConditions.push(where('scholars', 'array-contains-any', filters.scholars));
+      //   // }
+
+      //   const handleCommaField = (fieldValue: string | undefined, fieldName: string) => {
+      //     if (fieldValue) {
+      //       // Convert search terms to lowercase for case-insensitive comparison
+      //       const searchTerms = fieldValue.toLowerCase().split(',').map(term => term.trim());
+
+      //       // Create conditions for each term
+      //       const termConditions = searchTerms.map(term =>
+      //         and(
+      //           where(fieldName, '>=', term),
+      //           where(fieldName, '<=', term + '\uf8ff')
+      //         )
+      //       );
+
+      //       if (termConditions.length > 0) {
+      //         filterConditions.push(or(...termConditions));
+      //       }
+      //     }
+      //   };
+
+      //   // Apply the comma-separated field handling to both languages and scholars
+      //   handleCommaField(filters.languages, 'languages');
+      //   handleCommaField(filters.scholars, 'scholars');
+      // }
+      // console.log("filterConditions", filterConditions);
       let q = query(
         usersProfileRef,
-        where('approved', '==', approved), // approved | notApproved | requested
-        where('__name__', '!=', currentUser.uid),
+        ...baseConditions,
+        ...filterConditions,
         orderBy('approved'),
         limit(limitx)
       );
+      console.log("query", q);
+
       if (lastVisibleDoc) {
         // If we have a last visible document, start after it
         q = query(q, startAfter(lastVisibleDoc));
