@@ -31,9 +31,9 @@ export default function LoginPage() {
 
     const data = await login(email, password);
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
+      });
     }
     setAuthenticating(false);
   }

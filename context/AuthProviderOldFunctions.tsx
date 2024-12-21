@@ -33,7 +33,6 @@
 //     }
 //   }
 
-
 //   const roleManager = async (userId: string, role: string): Promise<VoidResult> => {
 //     if (!userId || !role || !currentUser) {
 //       return { success: false, error: "Please provide User ID and Role." };
@@ -102,7 +101,6 @@
 //       };
 //     }
 //   }
-
 
 //   async function getProfiles(limitx: number = 10, aprroved: string = 'approved'): Promise<FetchUserProfilesResult> {
 //     try {
@@ -223,7 +221,6 @@
 //     }
 //   }
 
-
 //  async function getProfilebyUIDs(uids: string[]): Promise<FetchUserProfilesResult> {
 //     try {
 //       const usersProfileRef = collection(db, 'usersprofile');
@@ -251,8 +248,6 @@
 //     }
 //   }
 
-
-
 //   async function getProfilebyUID(uid: string): Promise<DocumentData> {
 //     try {
 //       const docRef = doc(db, 'users', uid);
@@ -271,7 +266,6 @@
 //       };
 //     }
 //   }
-
 
 //   async function getRequestedMe(uid: string): Promise<DocumentData> {
 //     try {
@@ -296,8 +290,6 @@
 //     }
 //   }
 
-
-
 //   async function getMyRequested(uid: string): Promise<DocumentData> {
 //     try {
 //       if (!currentUser) throw 'You must be logged in';
@@ -321,7 +313,6 @@
 //     }
 //   }
 
-
 //   async function getAllAccepted(): Promise<PairResult> {
 //     try {
 //       const myRequestCollection = collection(db, 'myrequested');
@@ -340,7 +331,6 @@
 //         }
 //       });
 
-
 //       return { success: true, data: result }
 //     } catch (error: any) {
 //       console.error('Error Requesting:', error.message);
@@ -352,12 +342,8 @@
 //     }
 //   }
 
-
-
-
 // async function setMatchAdmin(profile1: string, profile2: string): Promise<VoidResult> {
 //   try {
-
 
 //     const docRef1 = doc(db, 'users', profile1);
 //     const docRef2 = doc(db, 'users', profile2);

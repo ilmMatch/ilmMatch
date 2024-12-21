@@ -17,56 +17,59 @@ export default function BookmarkPage() {
     getProfilebyUIDs,
   } = useAuth();
 
-  const [bookmarkedProfiles, setBookmarkedProfiles] = useState<UserProfile[] | undefined>(
-    []
-  );
-
+  const [bookmarkedProfiles, setBookmarkedProfiles] = useState<
+    UserProfile[] | undefined
+  >([]);
 
   async function filterBookmark() {
     if (!currentUser) return 'you must be logged in';
-    if (!userDataPrivate?.bookmarks || userDataPrivate?.bookmarks?.length === 0) {
-      toast.error("Uh oh!", {
-        description: "No bookmark found",
-      })
-      return
-    };
-    const bookmarkedUID = userDataPrivate.bookmarks
+    if (
+      !userDataPrivate?.bookmarks ||
+      userDataPrivate?.bookmarks?.length === 0
+    ) {
+      toast.error('Uh oh!', {
+        description: 'No bookmark found',
+      });
+      return;
+    }
+    const bookmarkedUID = userDataPrivate.bookmarks;
 
     if (bookmarkedUID?.length === 0) {
-      toast.error("Uh oh!", {
-        description: "No bookmark found",
-      })
-      return
+      toast.error('Uh oh!', {
+        description: 'No bookmark found',
+      });
+      return;
     }
 
-    const data = await getProfilebyUIDs(bookmarkedUID)
+    const data = await getProfilebyUIDs(bookmarkedUID);
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
+      });
       return;
     }
 
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: myrequests.error,
-      })
+      });
       return;
     }
 
     const requestedMe = await getRequestedMe(currentUser.uid);
     if (!requestedMe.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: requestedMe.error,
-      })
+      });
       return;
     }
 
-
     const profilesWithStatus = data.data.map((profile) => {
-      const requestedStatus = requestedMe.data[profile.id as keyof typeof requestedMe.data];
-      const myRequestStatus = myrequests.data[profile.id as keyof typeof myrequests.data];
+      const requestedStatus =
+        requestedMe.data[profile.id as keyof typeof requestedMe.data];
+      const myRequestStatus =
+        myrequests.data[profile.id as keyof typeof myrequests.data];
 
       return {
         ...profile,
@@ -86,8 +89,6 @@ export default function BookmarkPage() {
     return profilesWithStatus;
   }
 
-
-
   useEffect(() => {
     filterBookmark();
   }, [userDataPrivate?.bookmarks]);
@@ -101,7 +102,11 @@ export default function BookmarkPage() {
         bookmarkedProfiles.map((user) => (
           <div key={user.id}>
             {/* <UserModal /> */}
-            <ProfileCard user={user} setStateUsers={setBookmarkedProfiles} stateUsers={bookmarkedProfiles} />
+            <ProfileCard
+              user={user}
+              setStateUsers={setBookmarkedProfiles}
+              stateUsers={bookmarkedProfiles}
+            />
           </div>
         ))}
     </>

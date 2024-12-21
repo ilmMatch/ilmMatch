@@ -42,9 +42,9 @@ export default function SignupPage() {
     setSubmitting(true);
     const data = await signup(email, password, userName, gender);
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
+      });
     }
     setSubmitting(false);
   }

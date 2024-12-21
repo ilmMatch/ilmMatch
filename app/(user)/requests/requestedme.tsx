@@ -14,30 +14,34 @@ export default function RequestedMe() {
     if (!currentUser) return 'you must be logged in';
     const requestedMe = await getRequestedMe(currentUser.uid);
     if (!requestedMe.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: requestedMe.error,
-      })
-      return
+      });
+      return;
     }
     const uids = Object.keys(requestedMe.data);
     if (uids.length === 0) {
-      toast.error("Uh oh! Something went wrong.", {
-        description: "No requests found",
-      })
+      toast.error('Uh oh! Something went wrong.', {
+        description: 'No requests found',
+      });
       return;
     }
     const data = await getProfilebyUIDs(uids);
 
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
+      });
       return;
     }
 
     const requestsWithStatus = data.data?.map((profile) => ({
       ...profile,
-      status: requestedMe.data[profile.id as keyof typeof requestedMe.data] ? requestedMe.data[profile.id as keyof typeof requestedMe.data]?.toString() : 'rejected',
+      status: requestedMe.data[profile.id as keyof typeof requestedMe.data]
+        ? requestedMe.data[
+            profile.id as keyof typeof requestedMe.data
+          ]?.toString()
+        : 'rejected',
       statusFrom: 'requestedMe',
     }));
 
@@ -54,12 +58,18 @@ export default function RequestedMe() {
   return (
     <>
       {requests &&
-        requests.map((user) => (
-          user.status &&
-          <div key={user.id}>
-            <ProfileCard user={user} setStateUsers={setRequests} stateUsers={requests} />
-          </div>
-        ))}
+        requests.map(
+          (user) =>
+            user.status && (
+              <div key={user.id}>
+                <ProfileCard
+                  user={user}
+                  setStateUsers={setRequests}
+                  stateUsers={requests}
+                />
+              </div>
+            )
+        )}
     </>
   );
 }

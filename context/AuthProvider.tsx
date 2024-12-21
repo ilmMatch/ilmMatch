@@ -49,9 +49,6 @@ import {
 } from 'firebase/firestore';
 import { useContext, useState, useEffect, createContext } from 'react';
 
-
-
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth() {
@@ -67,8 +64,12 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
-  const [userDataPrivate, setUserDataPrivate] = useState<DocumentData | null>(null);
-  const [userDataProfile, setUserDataProfile] = useState<DocumentData | null>(null);
+  const [userDataPrivate, setUserDataPrivate] = useState<DocumentData | null>(
+    null
+  );
+  const [userDataProfile, setUserDataProfile] = useState<DocumentData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   // AUTH HANDLERS
@@ -80,7 +81,11 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   ): Promise<VoidResult> {
     try {
       // Create a new user with Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
       const user = userCredential.user;
       const userId = user.uid;
@@ -107,19 +112,21 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       };
 
       // Write both documents in parallel for efficiency
-      await Promise.all([setDoc(userRef, userData), setDoc(userRefP, userDataP)]);
+      await Promise.all([
+        setDoc(userRef, userData),
+        setDoc(userRefP, userDataP),
+      ]);
 
       return { success: true };
     } catch (error: any) {
       console.error('Error during signup:', error.message);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
-
-
 
   async function login(email: string, password: string): Promise<VoidResult> {
     try {
@@ -127,11 +134,13 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       return { success: true };
     } catch (error: any) {
       console.error('Error during login:', error.message);
-      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
-
-
 
   async function forgetPassword(email: string): Promise<VoidResult> {
     try {
@@ -139,10 +148,13 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       return { success: true };
     } catch (error: any) {
       console.error('Error during password reset:', error.message);
-      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
-
 
   async function logout(): Promise<VoidResult> {
     try {
@@ -152,11 +164,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       return { success: true };
     } catch (error: any) {
       console.error('Error during logout:', error.message);
-      return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
     }
   }
 
-  const roleManager = async (userId: string, role: string): Promise<VoidResult> => {
+  const roleManager = async (
+    userId: string,
+    role: string
+  ): Promise<VoidResult> => {
     try {
       // Validate required inputs
       if (!userId || !role || !currentUser) {
@@ -174,13 +193,15 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   };
 
-
-  async function userPrivateUpdate(UserProfileNew: UserDataPrivateType): Promise<VoidResult> {
+  async function userPrivateUpdate(
+    UserProfileNew: UserDataPrivateType
+  ): Promise<VoidResult> {
     try {
       // Validate required data
       if (!currentUser || !userDataPrivate) {
@@ -227,13 +248,16 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
-  async function approvalUpdate(status: string, uid: string): Promise<VoidResult> {
+  async function approvalUpdate(
+    status: string,
+    uid: string
+  ): Promise<VoidResult> {
     try {
       const userRef = doc(db, 'usersprofile', uid);
 
@@ -246,23 +270,27 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
-  async function getProfiles(limitx: number = 10, lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null = null, approved: string = 'approved'): Promise<FetchUserProfilesResult> {
+  async function getProfiles(
+    limitx: number = 10,
+    lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null = null,
+    approved: string = 'approved'
+  ): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
-      if (!currentUser) throw new Error("you must be logged in")
+      if (!currentUser) throw new Error('you must be logged in');
       const usersProfileRef = collection(db, 'usersprofile');
 
       // Create the query to fetch only approved profiles
       let q = query(
         usersProfileRef,
         where('approved', '==', approved), // approved | notApproved | requested
-        where('__name__', "!=", currentUser.uid),
+        where('__name__', '!=', currentUser.uid),
         orderBy('approved'),
         limit(limitx)
       );
@@ -280,7 +308,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         ...(doc.data() as Omit<UserProfile, 'id'>),
       }));
 
-      const newLastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+      const newLastVisibleDoc =
+        querySnapshot.docs[querySnapshot.docs.length - 1] || null;
       return {
         success: true,
         data: userProfiles,
@@ -290,13 +319,16 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error fetching user profiles:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
-  async function bookmarkUpdate(bookmarkUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
+  async function bookmarkUpdate(
+    bookmarkUID: string,
+    action: 'add' | 'remove'
+  ): Promise<VoidResult> {
     try {
       // Ensure the user is logged in
       if (!currentUser) {
@@ -304,22 +336,26 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
-      const updateAction = action === 'add' ? arrayUnion(bookmarkUID) : arrayRemove(bookmarkUID);
+      const updateAction =
+        action === 'add' ? arrayUnion(bookmarkUID) : arrayRemove(bookmarkUID);
       await updateDoc(userRef, { bookmarks: updateAction });
-      const updateUserPrivateData = await getDoc(userRef)
+      const updateUserPrivateData = await getDoc(userRef);
       setUserDataPrivate(updateUserPrivateData.data() as UserDataPrivateType);
       return { success: true };
     } catch (error: any) {
       console.error('Error during bookmark update:', error.message);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
-  async function profileRequestUpdate(userUID: string, action: 'add' | 'remove'): Promise<VoidResult> {
+  async function profileRequestUpdate(
+    userUID: string,
+    action: 'add' | 'remove'
+  ): Promise<VoidResult> {
     try {
       if (!currentUser) throw 'You must be logged in';
       const userRef = doc(db, 'users', currentUser.uid);
@@ -371,7 +407,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error Requesting:', error.message);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
@@ -386,7 +423,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         matched: {
           true: arrayRemove(requestedby),
           false: arrayUnion(requestedby),
-        }
+        },
       },
       { merge: true }
     );
@@ -397,23 +434,31 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         matched: {
           true: arrayRemove(requestedof),
           false: arrayUnion(requestedof),
-
-        }
+        },
       },
       { merge: true }
     );
   }
   // Helper functions for update actions
-  async function updateRequestState(docRef: DocumentReference, key: string, state: RequestAction) {
-    await setDoc(docRef, { [key]: state, createdAt: serverTimestamp(), }, { merge: true });
+  async function updateRequestState(
+    docRef: DocumentReference,
+    key: string,
+    state: RequestAction
+  ) {
+    await setDoc(
+      docRef,
+      { [key]: state, createdAt: serverTimestamp() },
+      { merge: true }
+    );
   }
   // Helper functions for update actions
   async function removeRequestState(docRef: DocumentReference, key: string) {
     await updateDoc(docRef, { [key]: deleteField() });
   }
 
-
-  async function getProfilebyUIDs(uids: string[]): Promise<FetchUserProfilesResult> {
+  async function getProfilebyUIDs(
+    uids: string[]
+  ): Promise<FetchUserProfilesResult> {
     try {
       // Fetch profiles from 'usersprofile' collection where document name is in uids
       const usersProfileRef = collection(db, 'usersprofile');
@@ -421,29 +466,29 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const querySnapshot = await getDocs(q);
 
       // Map the query snapshot docs to the desired structure
-      const profiles: UserProfile[] = querySnapshot.docs.map(doc => ({
+      const profiles: UserProfile[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data() as Omit<UserProfile, 'id'>, // Spread the document data without the 'id'
+        ...(doc.data() as Omit<UserProfile, 'id'>), // Spread the document data without the 'id'
       }));
-
-
 
       return {
         success: true,
         data: profiles,
-        lastVisibleDoc: null
+        lastVisibleDoc: null,
       };
     } catch (error: unknown) {
       console.error('Error fetching profiles:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
-  async function getPrivatebyUIDs(uids: string[]): Promise<FetchUserPrivatesResult> {
+  async function getPrivatebyUIDs(
+    uids: string[]
+  ): Promise<FetchUserPrivatesResult> {
     try {
       // Fetch profiles from 'usersprofile' collection where document name is in uids
       const usersProfileRef = collection(db, 'users');
@@ -451,9 +496,9 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const querySnapshot = await getDocs(q);
 
       // Map the query snapshot docs to the desired structure
-      const profiles: UserPrivate[] = querySnapshot.docs.map(doc => ({
+      const profiles: UserPrivate[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data() as Omit<UserPrivate, 'id'>, // Spread the document data without the 'id'
+        ...(doc.data() as Omit<UserPrivate, 'id'>), // Spread the document data without the 'id'
       }));
 
       return {
@@ -464,11 +509,11 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error fetching profiles:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
-
 
   async function getProfilebyUID(uid: string): Promise<SingleProfileResult> {
     try {
@@ -476,15 +521,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const docSnap = await getDoc(docRef);
 
       // Return data only if the document exists
-      const firebaseData: UserProfile = { id: docSnap.id, ...docSnap.data() as Omit<UserProfile, 'id'> };
-
+      const firebaseData: UserProfile = {
+        id: docSnap.id,
+        ...(docSnap.data() as Omit<UserProfile, 'id'>),
+      };
 
       return { success: true, data: firebaseData };
     } catch (error: unknown) {
       console.error('Error fetching profile:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
@@ -495,19 +543,21 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const docSnap = await getDoc(docRef);
 
       // Return data only if the document exists
-      const firebaseData: UserPrivate = { id: docSnap.id, ...docSnap.data() as Omit<UserPrivate, 'id'> };
-
+      const firebaseData: UserPrivate = {
+        id: docSnap.id,
+        ...(docSnap.data() as Omit<UserPrivate, 'id'>),
+      };
 
       return { success: true, data: firebaseData };
     } catch (error: unknown) {
       console.error('Error fetching profile:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
-
 
   async function getRequestedMe(uid: string): Promise<RequestCollection> {
     try {
@@ -526,16 +576,18 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error fetching requested data:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
   async function getMyRequested(uid: string): Promise<RequestCollection> {
     try {
       if (!currentUser) {
-        throw new Error('Authentication Error - try logging out and logging back in');
+        throw new Error(
+          'Authentication Error - try logging out and logging back in'
+        );
       }
 
       const userRef = doc(db, 'myrequested', uid);
@@ -548,17 +600,17 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error fetching requested data:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
-
 
   async function getAllAccepted(): Promise<PairResult> {
     try {
       const myRequestCollection = collection(db, 'myrequested');
       const q = query(
-        myRequestCollection,
+        myRequestCollection
         // limit(limitx),
         // orderBy('createdAt'),
         // startAfter(skip)
@@ -581,14 +633,16 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       console.error('Error fetching accepted requests:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
 
-
-
-  async function setMatchAdmin(profile1: string, profile2: string): Promise<VoidResult> {
+  async function setMatchAdmin(
+    profile1: string,
+    profile2: string
+  ): Promise<VoidResult> {
     const updateMatchedDocs = (batch: WriteBatch) => {
       const docRef1 = doc(db, 'users', profile1);
       const docRef2 = doc(db, 'users', profile2);
@@ -641,14 +695,17 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       return { success: true };
     } catch (error: unknown) {
-      console.error('Error in setMatchAdmin:', error instanceof Error ? error.message : error);
+      console.error(
+        'Error in setMatchAdmin:',
+        error instanceof Error ? error.message : error
+      );
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
   }
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -664,14 +721,17 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
         setCurrentUser(user);
 
-
         const [privateDataSnap, profileDataSnap] = await Promise.all([
           getDoc(doc(db, 'users', user.uid)),
           getDoc(doc(db, 'usersprofile', user.uid)),
         ]);
 
-        setUserDataPrivate(privateDataSnap.exists() ? privateDataSnap.data() : {});
-        setUserDataProfile(profileDataSnap.exists() ? profileDataSnap.data() : {});
+        setUserDataPrivate(
+          privateDataSnap.exists() ? privateDataSnap.data() : {}
+        );
+        setUserDataProfile(
+          profileDataSnap.exists() ? profileDataSnap.data() : {}
+        );
 
         // // if user exists, fetch data from firestore database
         // const docRef = doc(db, 'users', user.uid);
@@ -729,4 +789,3 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 }
-

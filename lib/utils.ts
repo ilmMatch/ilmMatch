@@ -5,8 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
-
 // *********************************************************************************
 // This function calculates the difference between two objects(oldData and newData)
 // and returns a new object containing only the keys that have been added or modified.

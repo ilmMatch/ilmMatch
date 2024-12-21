@@ -12,35 +12,36 @@ export default function MyRequests() {
   const [myrequests, setMyRequests] = useState<UserProfile[] | undefined>([]);
   async function getUsers() {
     if (!currentUser) return 'you must be logged in';
-    console.log("myrequested")
+    console.log('myrequested');
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: myrequests.error,
-      })
-      return
+      });
+      return;
     }
     const uids = Object.keys(myrequests.data);
     if (uids.length === 0) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: "you haven't requested anyone.",
-      })
+      });
       return;
     }
     const data = await getProfilebyUIDs(uids);
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
+      });
       return;
     }
     const profilesWithStatus = data.data?.map((profile) => ({
       ...profile,
-      status: myrequests.data[profile.id as keyof typeof myrequests.data]?.toString(),
+      status:
+        myrequests.data[profile.id as keyof typeof myrequests.data]?.toString(),
       statusFrom: 'myrequests',
     }));
 
-    console.log(profilesWithStatus, "profilesWithStatus")
+    console.log(profilesWithStatus, 'profilesWithStatus');
     setMyRequests(profilesWithStatus);
   }
 
@@ -53,14 +54,19 @@ export default function MyRequests() {
   return (
     <>
       {myrequests &&
-        myrequests.map((user) => (
-          user.status &&
-          <div key={user.id}>
-            {/* <UserModal  /> */}
-            <ProfileCard user={user} setStateUsers={setMyRequests} stateUsers={myrequests} />
-          </div>
-
-        ))}
+        myrequests.map(
+          (user) =>
+            user.status && (
+              <div key={user.id}>
+                {/* <UserModal  /> */}
+                <ProfileCard
+                  user={user}
+                  setStateUsers={setMyRequests}
+                  stateUsers={myrequests}
+                />
+              </div>
+            )
+        )}
     </>
   );
 }

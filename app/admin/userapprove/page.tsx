@@ -13,47 +13,51 @@ export default function UserApprovePage() {
   const [unApprovedProfiles, setUnApprovedProfiles] = useState<
     UserProfile[] | undefined
   >([]);
-  const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([])
-  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([]);
+  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
+    null
+  );
 
   const [end, setEnd] = useState(false);
 
   async function getUsers() {
     const data = await getProfiles(10, lastVisibleDoc.current, 'requested');
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
-      return
+      });
+      return;
     }
-    console.log(data.data)
+    console.log(data.data);
     if (data.data.length > 0) {
-      lastVisibleDoc.current = data.lastVisibleDoc
+      lastVisibleDoc.current = data.lastVisibleDoc;
     } else {
-      setEnd(data.data?.length === 0); return
+      setEnd(data.data?.length === 0);
+      return;
     }
 
-    const uids: string[] = []
+    const uids: string[] = [];
     const profilesWithStatus = (data.data ?? []).map((profile) => {
       uids.push(profile.id);
       return {
         ...profile,
         status: 'requested',
         statusFrom: 'adminApprove',
-      }
+      };
     });
-    const result = await getPrivatebyUIDs(uids)
+    const result = await getPrivatebyUIDs(uids);
     if (!result.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: result.error,
-      })
-      return
+      });
+      return;
     }
 
-    setUnApprovedProfiles(prevProfiles => [...(prevProfiles ?? []), ...profilesWithStatus]);
-    setPrivateInfo(prevPrivateInfo => [...prevPrivateInfo, ...result.data])
-
-
+    setUnApprovedProfiles((prevProfiles) => [
+      ...(prevProfiles ?? []),
+      ...profilesWithStatus,
+    ]);
+    setPrivateInfo((prevPrivateInfo) => [...prevPrivateInfo, ...result.data]);
   }
   useEffect(() => {
     getUsers();
@@ -67,16 +71,25 @@ export default function UserApprovePage() {
           const userPrivateInfo = privateInfo.find(
             (info) => info.id === user.id
           );
-          console.log(userPrivateInfo, user)
-          return (<div key={user.id} >
-            {userPrivateInfo &&
-              <AdminApprovalCard user={user} setStateUsers={setUnApprovedProfiles} stateUsers={unApprovedProfiles} privateInfo={userPrivateInfo} />
-            }
-          </div>)
+          console.log(userPrivateInfo, user);
+          return (
+            <div key={user.id}>
+              {userPrivateInfo && (
+                <AdminApprovalCard
+                  user={user}
+                  setStateUsers={setUnApprovedProfiles}
+                  stateUsers={unApprovedProfiles}
+                  privateInfo={userPrivateInfo}
+                />
+              )}
+            </div>
+          );
         })}
-      {end ? "You have reached the end" :
+      {end ? (
+        'You have reached the end'
+      ) : (
         <Button onClick={() => getUsers()}>Load More</Button>
-      }
+      )}
     </div>
   );
 }

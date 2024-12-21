@@ -32,16 +32,16 @@ export function LogoutMobile() {
     try {
       const result = await logout();
       if (!result.success) {
-        toast.error("Uh oh! Something went wrong.", {
+        toast.error('Uh oh! Something went wrong.', {
           description: result.error,
-        })
-        return
+        });
+        return;
       }
       router.push('/');
     } catch (err: any) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: err.message,
-      })
+      });
     }
   }
   return (

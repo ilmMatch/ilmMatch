@@ -12,18 +12,17 @@ export default function AcceptedPage() {
 
   async function getMatchedProfiles() {
     if (!userDataPrivate || userDataPrivate.matched.true.length === 0) {
-
-      toast.error("Uh oh! No matches found.", {
+      toast.error('Uh oh! No matches found.', {
         description: "if you've accepted a request, wait till admin confirms",
-      })
-      return
-    };
+      });
+      return;
+    }
     const data = await getProfilebyUIDs(userDataPrivate.matched.true);
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
-      return
+      });
+      return;
     }
 
     const profilesWithStatus = data.data.map((profile) => ({
@@ -43,7 +42,11 @@ export default function AcceptedPage() {
       {users &&
         users.map((user) => (
           <div key={user.id}>
-            <ProfileCard user={user} setStateUsers={setUsers} stateUsers={users} />
+            <ProfileCard
+              user={user}
+              setStateUsers={setUsers}
+              stateUsers={users}
+            />
           </div>
         ))}
     </>

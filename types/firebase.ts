@@ -1,37 +1,36 @@
-import { User, UserCredential } from "firebase/auth";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
-import { Action } from ".";
-
+import { User, UserCredential } from 'firebase/auth';
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import { Action } from '.';
 
 export interface UserProfile {
-  id: string
-  childern: string
-  beard: string
-  born: string
-  polygamy: string
-  spouseBrief: string
-  initials: string
-  languages: string
-  maritalStatus: string
-  ethnicity: string
-  pray: string
-  height: number
-  countryResiding: string
-  build: string
-  masjidName: string
-  occupation: string
-  approved: string
-  education: string
-  scholars: string
-  briefAboutYou: string
-  sect: string
-  spouseAge: string
-  countryMoving: string
-  hijab: string
-  dob: { seconds: number; nanoseconds: number }
-  gender: string
-  nationality: string
-  islamicEducation: string
+  id: string;
+  childern: string;
+  beard: string;
+  born: string;
+  polygamy: string;
+  spouseBrief: string;
+  initials: string;
+  languages: string;
+  maritalStatus: string;
+  ethnicity: string;
+  pray: string;
+  height: number;
+  countryResiding: string;
+  build: string;
+  masjidName: string;
+  occupation: string;
+  approved: string;
+  education: string;
+  scholars: string;
+  briefAboutYou: string;
+  sect: string;
+  spouseAge: string;
+  countryMoving: string;
+  hijab: string;
+  dob: { seconds: number; nanoseconds: number };
+  gender: string;
+  nationality: string;
+  islamicEducation: string;
   status?: string;
   statusFrom?: string;
 }
@@ -55,12 +54,15 @@ export interface UserPrivate {
 // Define the return type of the function
 
 export type FetchUserProfilesResult =
-  | { success: true; data: UserProfile[]; lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null; }
+  | {
+      success: true;
+      data: UserProfile[];
+      lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
+    }
   | { success: false; error: string };
 
-
 export type FetchUserPrivatesResult =
-  | { success: true; data: UserPrivate[]; }
+  | { success: true; data: UserPrivate[] }
   | { success: false; error: string };
 
 export type SingleProfileResult =
@@ -83,14 +85,11 @@ export type RequestCollection =
   | { success: true; data: { [key: string]: RequestAction } }
   | { success: false; error: string };
 
-export type VoidResult =
-  | { success: true }
-  | { success: false; error: string };
+export type VoidResult = { success: true } | { success: false; error: string };
 
 export type ProfileResult =
-  | { success: true, data: UserProfile }
+  | { success: true; data: UserProfile }
   | { success: false; error: string };
-
 
 export interface UserDataPrivateType {
   userName: string;
@@ -101,11 +100,9 @@ export interface UserDataPrivateType {
   gender: string;
 }
 
-
 export type PairResult =
   | { success: true; data: [string, string][] }
   | { success: false; error: string };
-
 
 export interface AuthContextType {
   currentUser: User | null;
@@ -123,7 +120,9 @@ export interface AuthContextType {
   forgetPassword: (email: string) => Promise<VoidResult>;
   logout: () => Promise<VoidResult>;
   roleManager: (userId: string, role: string) => Promise<VoidResult>;
-  userPrivateUpdate: (userProfileNew: UserDataPrivateType) => Promise<VoidResult>;
+  userPrivateUpdate: (
+    userProfileNew: UserDataPrivateType
+  ) => Promise<VoidResult>;
   approvalUpdate: (data: string, uid: string) => Promise<VoidResult>;
   getProfiles: (
     limitx: number,

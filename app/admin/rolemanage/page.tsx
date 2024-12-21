@@ -11,49 +11,58 @@ import AdminApprovalCard from '@/components/cards/adminApprovalCard';
 
 export default function RoleManager() {
   const { currentUser, getProfiles, getPrivatebyUIDs } = useAuth();
-  const [profiles, setProfiles] = useState<
-    UserProfile[] | undefined
-  >([]);
-  const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([])
-  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [profiles, setProfiles] = useState<UserProfile[] | undefined>([]);
+  const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([]);
+  const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
+    null
+  );
 
   const [end, setEnd] = useState(false);
   async function getUsers() {
     const data = await getProfiles(10, lastVisibleDoc.current, 'requested');
     if (!data.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-      })
-      return
+      });
+      return;
     }
     if (data.data.length > 0) {
-      lastVisibleDoc.current = data.lastVisibleDoc
+      lastVisibleDoc.current = data.lastVisibleDoc;
     } else {
-      setEnd(data.data?.length === 0); return
+      setEnd(data.data?.length === 0);
+      return;
     }
 
-
-    const uids: string[] = data.data?.map(profile => profile.id) || [];
-    const result = await getPrivatebyUIDs(uids)
+    const uids: string[] = data.data?.map((profile) => profile.id) || [];
+    const result = await getPrivatebyUIDs(uids);
 
     if (!result.success) {
-      toast.error("Uh oh! Something went wrong.", {
+      toast.error('Uh oh! Something went wrong.', {
         description: result.error,
-      })
-      return
+      });
+      return;
     }
 
-    const profilesWithStatus: UserProfile[] = (data.data ?? []).map((profile) => {
-      const matchingProfile = result.data?.find(profileP => profileP.id === profile.id);
-      return matchingProfile ? {
-        ...profile, status: matchingProfile.role,
-        statusFrom: "adminAssign",
-      } : profile
+    const profilesWithStatus: UserProfile[] = (data.data ?? []).map(
+      (profile) => {
+        const matchingProfile = result.data?.find(
+          (profileP) => profileP.id === profile.id
+        );
+        return matchingProfile
+          ? {
+              ...profile,
+              status: matchingProfile.role,
+              statusFrom: 'adminAssign',
+            }
+          : profile;
+      }
+    );
 
-    });
-
-    setPrivateInfo(prevPrivateInfo => [...prevPrivateInfo, ...result.data]);
-    setProfiles(prevProfiles => [...(prevProfiles ?? []), ...profilesWithStatus]);
+    setPrivateInfo((prevPrivateInfo) => [...prevPrivateInfo, ...result.data]);
+    setProfiles((prevProfiles) => [
+      ...(prevProfiles ?? []),
+      ...profilesWithStatus,
+    ]);
   }
 
   useEffect(() => {
@@ -80,15 +89,24 @@ export default function RoleManager() {
           const userPrivateInfo = privateInfo.find(
             (info) => info.id === user.id
           );
-          return (<div key={user.id} >
-            {userPrivateInfo &&
-              <AdminApprovalCard user={user} setStateUsers={setProfiles} stateUsers={profiles} privateInfo={userPrivateInfo} />
-            }
-          </div>)
+          return (
+            <div key={user.id}>
+              {userPrivateInfo && (
+                <AdminApprovalCard
+                  user={user}
+                  setStateUsers={setProfiles}
+                  stateUsers={profiles}
+                  privateInfo={userPrivateInfo}
+                />
+              )}
+            </div>
+          );
         })}
-      {end ? "You have reached the end" :
+      {end ? (
+        'You have reached the end'
+      ) : (
         <Button onClick={() => getUsers()}>Load More</Button>
-      }
+      )}
     </div>
   );
 }

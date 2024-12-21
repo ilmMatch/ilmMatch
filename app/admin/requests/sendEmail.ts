@@ -1,54 +1,52 @@
-import { UserPrivate } from "@/types/firebase";
-import { toast } from "sonner";
+import { UserPrivate } from '@/types/firebase';
+import { toast } from 'sonner';
 
-export async function sendEmail(
-    brother: UserPrivate,
-    sister: UserPrivate
-) {
-    const apiKey = process.env.NEXT_PUBLIC_MAIL_API_KEY;
-    const url = process.env.NEXT_PUBLIC_MAIL_API_URL;
-    if (!apiKey || !url) return;
-    const emailData = {
-        sender: { name: 'Admin', email: 'sayyedrahat721@gmail.com' },
-        to: [
-            { name: brother.userName, email: brother.email },
-            { name: sister.userName, email: sister.email },
-        ],
-        subject: 'Ilm Match: Requested User Information',
-        htmlContent: emailcontent(brother, sister),
-    };
+export async function sendEmail(brother: UserPrivate, sister: UserPrivate) {
+  const apiKey = process.env.NEXT_PUBLIC_MAIL_API_KEY;
+  const url = process.env.NEXT_PUBLIC_MAIL_API_URL;
+  if (!apiKey || !url) return;
+  const emailData = {
+    sender: { name: 'Admin', email: 'sayyedrahat721@gmail.com' },
+    to: [
+      { name: brother.userName, email: brother.email },
+      { name: sister.userName, email: sister.email },
+    ],
+    subject: 'Ilm Match: Requested User Information',
+    htmlContent: emailcontent(brother, sister),
+  };
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'api-key': apiKey,
-            },
-            body: JSON.stringify(emailData),
-        });
-        if (response.status === 201) {
-            toast.success("Success", {
-                description: "Email Sent Successfully",
-            })
-        } else {
-            const error = await response.json();
-            console.error('Error sending email:', error);
-            toast.error("Uh oh! Email not sent.", {
-                description: error,
-            })
-        }
-    } catch (err: unknown) {
-        toast.error("Uh oh! Something went wrong.", {
-            description: err instanceof Error ? err.message : "An error occurred while sending the email.",
-        })
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': apiKey,
+      },
+      body: JSON.stringify(emailData),
+    });
+    if (response.status === 201) {
+      toast.success('Success', {
+        description: 'Email Sent Successfully',
+      });
+    } else {
+      const error = await response.json();
+      console.error('Error sending email:', error);
+      toast.error('Uh oh! Email not sent.', {
+        description: error,
+      });
     }
+  } catch (err: unknown) {
+    toast.error('Uh oh! Something went wrong.', {
+      description:
+        err instanceof Error
+          ? err.message
+          : 'An error occurred while sending the email.',
+    });
+  }
 }
 
-
-
 const emailcontent = (brother: UserPrivate, sister: UserPrivate) => {
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -93,5 +91,5 @@ const emailcontent = (brother: UserPrivate, sister: UserPrivate) => {
     </div>
 </body>
 
-</html>`
-}
+</html>`;
+};
