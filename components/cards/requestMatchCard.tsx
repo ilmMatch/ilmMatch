@@ -40,18 +40,14 @@ function ProfileCard({
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-xl font-semibold">
-              {privateInfo.userName}
-            </h2>
+            <h2 className="text-xl font-semibold">{privateInfo.userName}</h2>
             <p className="text-sm text-gray-500">{profile.occupation}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 gap-3 mb-4">
           <div className="flex items-center space-x-2">
             <CalendarDays className="h-5 w-5 text-gray-400" />
-            <span className="text-sm ">
-              age years, {profile.maritalStatus}
-            </span>
+            <span className="text-sm ">age years, {profile.maritalStatus}</span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPin className="h-5 w-5 text-gray-400" />
