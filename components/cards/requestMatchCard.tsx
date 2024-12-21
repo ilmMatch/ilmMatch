@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserPrivate, UserProfile } from '@/types/firebase';
 import UserModal from '../userModal';
+import { calculateAge } from '@/lib/utils';
 
 interface RequestCardProps {
   profile1: UserProfile;
@@ -30,6 +31,7 @@ function ProfileCard({
   privateInfo: UserPrivate;
 }) {
   const [stateUsers, setStateUsers] = useState<UserProfile[]>([]);
+  const age = calculateAge(profile.dob);
   return (
     <Card className="w-full  overflow-hidden">
       <CardContent className="p-6">
@@ -47,7 +49,9 @@ function ProfileCard({
         <div className="grid grid-cols-1 gap-3 mb-4">
           <div className="flex items-center space-x-2">
             <CalendarDays className="h-5 w-5 text-gray-400" />
-            <span className="text-sm ">age years, {profile.maritalStatus}</span>
+            <span className="text-sm ">
+              {age} years, {profile.maritalStatus}
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPin className="h-5 w-5 text-gray-400" />
@@ -87,7 +91,7 @@ export default function MatchProfilesComponent({
   handleMatchClick,
 }: RequestCardProps) {
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center relative rounded-sm border p-2 my-2">
+    <div className="flex flex-col md:flex-row justify-center items-center relative rounded-sm border p-2 my-2 gap-2">
       <ProfileCard profile={profile1} privateInfo={privateInfo1} />
       <div className="flex flex-col justify-center absolute md:left-1/3 md:top-10">
         <Button

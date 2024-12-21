@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserPrivate, UserProfile } from '@/types/firebase';
 import UserModal from '../userModal';
 import { generateRandomColor, getRandomGradientDirection } from './gradient';
+import { calculateAge } from '@/lib/utils';
 
 interface UserCardProps {
   user: UserProfile;
@@ -26,12 +27,6 @@ export default function ProfileCard({
   privateInfo,
 }: UserCardProps) {
   // const ProfileCard: React.FC<{ user: UserProfile }> = ({ user }) => {
-  const calculateAge = (dob: { seconds: number; nanoseconds: number }) => {
-    const birthDate = new Date(dob.seconds * 1000);
-    const ageDifMs = Date.now() - birthDate.getTime();
-    const ageDate = new Date(ageDifMs);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
-  };
 
   const age = calculateAge(user.dob);
 
@@ -64,32 +59,26 @@ export default function ProfileCard({
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2 max-sm:col-span-2">
                   <CalendarDays className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm ">
                     {age} years old, {user.maritalStatus}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    {user.nationality}
-                  </span>
+                  <span className="text-sm">{user.nationality}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <GraduationCap className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    {user.education}
-                  </span>
+                  <span className="text-sm">{user.education}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Briefcase className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    {user.occupation}
-                  </span>
+                  <span className="text-sm ">{user.occupation}</span>
                 </div>
               </div>
               <div className="mt-4 flex items-center space-x-2">
                 <MapPin className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-600">
+                <span className="text-sm">
                   {user.countryResiding} → {user.countryMoving}
                 </span>
               </div>

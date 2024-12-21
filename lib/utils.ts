@@ -37,3 +37,10 @@ export function getInitials(fullName: string): string {
 
   return initials;
 }
+
+export const calculateAge = (dob: { seconds: number; nanoseconds: number }) => {
+  const birthDate = new Date(dob.seconds * 1000);
+  const ageDifMs = Date.now() - birthDate.getTime();
+  const ageDate = new Date(ageDifMs);
+  return Math.abs(ageDate.getUTCFullYear() - 1970);
+};

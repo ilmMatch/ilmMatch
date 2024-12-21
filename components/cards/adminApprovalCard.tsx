@@ -21,6 +21,7 @@ import UserModal from '../userModal';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthProvider';
 import { generateRandomColor, getRandomGradientDirection } from './gradient';
+import { calculateAge } from '@/lib/utils';
 
 interface UserCardProps {
   user: UserProfile;
@@ -36,12 +37,6 @@ export default function AdminApprovalCard({
   privateInfo,
 }: UserCardProps) {
   // const AdminApprovalCard: React.FC<AdminApprovalCardProps> = ({ privateInfo, user, onApprove, onReject, onViewMore }) => {
-  const calculateAge = (dob: { seconds: number; nanoseconds: number }) => {
-    const birthDate = new Date(dob.seconds * 1000);
-    const ageDifMs = Date.now() - birthDate.getTime();
-    const ageDate = new Date(ageDifMs);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
-  };
 
   const age = calculateAge(user.dob);
 
