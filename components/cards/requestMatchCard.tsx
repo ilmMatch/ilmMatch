@@ -70,7 +70,7 @@ function ProfileCard({
           </div>
         </div>
         <div className="text-sm  mb-4">
-          <strong>Preferred spouse age:</strong> {profile.spouseAge}
+          <strong>Preferred spouse age:</strong> {profile.spouseAge.min} - {profile.spouseAge.max} yrs
         </div>
         <UserModal
           user={profile}
