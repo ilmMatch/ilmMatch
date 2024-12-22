@@ -15,6 +15,7 @@ import {
   SinglePrivateResult,
   SingleProfileResult,
   UserDataPrivateType,
+  UserDataProfileType,
   UserPrivate,
   UserProfile,
   VoidResult,
@@ -245,6 +246,37 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
         await updateDoc(userRefP, updateData);
       }
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error during profile update:', error.message);
+
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      };
+    }
+  }
+
+
+  async function userProfileUpdate(
+    UserProfileNew: UserDataProfileType
+  ): Promise<VoidResult> {
+    try {
+      // Validate required data
+      if (!currentUser) {
+        return { success: false, error: 'Please provide User Details.' };
+      }
+
+      const userId = currentUser.uid;
+      const userRefP = doc(db, 'usersprofile', userId);
+      await setDoc(
+        userRefP,
+        UserProfileNew,
+        { merge: true }
+      );
+
 
       return { success: true };
     } catch (error: any) {
@@ -920,6 +952,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     login,
     roleManager,
     userPrivateUpdate,
+    userProfileUpdate,
     approvalUpdate,
     getProfiles,
     bookmarkUpdate,

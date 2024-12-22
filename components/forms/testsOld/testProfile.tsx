@@ -23,7 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { CommaSeparatedInput } from "./fields/comma-separated-input"
+import { CommaSeparatedInput } from "../fields/comma-separated-input"
 import { userProfileSchema, UserProfileFormValues } from "@/lib/schemas/userProfileSchema"
 
 export function UserProfileForm() {

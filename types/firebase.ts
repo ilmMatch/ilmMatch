@@ -134,6 +134,9 @@ export interface AuthContextType {
   userPrivateUpdate: (
     userProfileNew: UserDataPrivateType
   ) => Promise<VoidResult>;
+  userProfileUpdate: (
+    userProfileNew: UserDataProfileType
+  ) => Promise<VoidResult>;
   approvalUpdate: (data: string, uid: string) => Promise<VoidResult>;
   getProfiles: (
     limitx: number,
@@ -198,4 +201,36 @@ export interface FilterOptions extends Record<string, any> {
     max?: number;
   };
   limit?: number;
+}
+
+
+
+export interface UserDataProfileType {
+  born: "born" | "revert";
+  briefAboutYou: string;
+  beard: "yes" | "no" | "not applicable";
+  build: string;
+  childern: number;
+  countryResiding: string;
+  countryMoving: string;
+  ethnicity: string;
+  education: string;
+  hijab: string;
+  height: number;
+  islamicEducation: string;
+  islamicEducationProof: string;
+  languages: string[];
+  maritalStatus: string;
+  masjidName: string;
+  nationality: string;
+  occupation: string;
+  pray: string;
+  polygamy: "yes" | "no" | "under certain circumstance";
+  spouseBrief: string;
+  scholars: string[];
+  sect: string;
+  spouseAge: {
+    min: number,
+    max: number
+  };
 }

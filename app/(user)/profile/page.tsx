@@ -1,7 +1,7 @@
 import React from 'react';
 import { PrivateForm } from '@/components/forms/userPrivate';
-import ProfileForm from '@/components/forms/userProfile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserProfileForm } from '@/components/forms/userProfile';
 
 export default function ProfilePage() {
   return (
@@ -14,7 +14,7 @@ export default function ProfilePage() {
         <PrivateForm />
       </TabsContent>
       <TabsContent value="public">
-        <ProfileForm />
+        <UserProfileForm />
       </TabsContent>
     </Tabs>
   );

@@ -8,9 +8,10 @@ interface CommaSeparatedInputProps {
     onChange: (value: string[]) => void
     placeholder: string
     required?: boolean
+    editing: boolean
 }
 
-export function CommaSeparatedInput({ value, onChange, placeholder, required }: CommaSeparatedInputProps) {
+export function CommaSeparatedInput({ value, onChange, placeholder, required, editing }: CommaSeparatedInputProps) {
     const [inputValue, setInputValue] = useState("")
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,13 +38,14 @@ export function CommaSeparatedInput({ value, onChange, placeholder, required }: 
                 {value.map((item, index) => (
                     <Badge key={index} variant="secondary">
                         {item}
-                        <button
-                            type="button"
-                            onClick={() => removeValue(index)}
-                            className="ml-1 hover:text-destructive"
-                        >
-                            <X size={14} />
-                        </button>
+                        {!editing &&
+                            (<button
+                                type="button"
+                                onClick={() => removeValue(index)}
+                                className="ml-1 hover:text-destructive"
+                            >
+                                <X size={14} />
+                            </button>)}
                     </Badge>
                 ))}
             </div>
@@ -54,6 +56,7 @@ export function CommaSeparatedInput({ value, onChange, placeholder, required }: 
                 onKeyDown={handleInputKeyDown}
                 placeholder={placeholder}
                 required={required && value.length === 0}
+                disabled={!editing}
             />
         </div>
     )
