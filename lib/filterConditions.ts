@@ -39,13 +39,18 @@ export function getFilterConditions(filters: FilterOptions) {
     if (filters.gender && filters.gender !== 'all') filterConditions.push(where('gender', '==', filters.gender));
     if (filters.polygamy && filters.polygamy !== 'all') filterConditions.push(where('polygamy', '==', filters.polygamy));
 
-    if (filters.spouseAgeMin && filters.spouseAgeMax) {
-        filterConditions.push(where('spouseAge', '>=', filters.spouseAgeMin.toString()));
-        filterConditions.push(where('spouseAge', '<=', filters.spouseAgeMax.toString()));
+    if (filters.spouseAge?.min !== undefined) {
+        filterConditions.push(where('spouseAge.max', '>=', filters.spouseAge.min));
     }
-    if (filters.heightMin && filters.heightMax) {
-        filterConditions.push(where('height', '>=', filters.heightMin));
-        filterConditions.push(where('height', '<=', filters.heightMax));
+    if (filters.spouseAge?.max !== undefined) {
+        filterConditions.push(where('spouseAge.min', '<=', filters.spouseAge.max));
+    }
+
+    if (filters.height?.max !== undefined) {
+        filterConditions.push(where('height', '<=', filters.height.max));
+    }
+    if (filters.height?.min !== undefined) {
+        filterConditions.push(where('height', '>=', filters.height.min));
     }
 
     if (filters.name) {

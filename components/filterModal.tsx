@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
 import { FilterOptions } from '@/types/firebase'
-import { useDisclosure } from '@nextui-org/modal'
 
 interface FilterModalProps {
     filters: FilterOptions
@@ -19,6 +17,15 @@ export function FilterModal({ filters, setFilters }: FilterModalProps) {
 
     const handleFilterChange = (name: string, value: any) => {
         setFilters(prev => ({ ...prev, [name]: value }))
+    }
+    const handleNestedFilterChange = (parent: string, child: string, value: any) => {
+        setFilters(prev => ({
+            ...prev,
+            [parent]: {
+                ...prev[parent],
+                [child]: value
+            }
+        }))
     }
 
     const handleClearAll = () => {
@@ -31,10 +38,8 @@ export function FilterModal({ filters, setFilters }: FilterModalProps) {
             languages: [],
             scholars: [],
             polygamy: 'all',
-            spouseAgeMin: 18,
-            spouseAgeMax: 80,
-            heightMin: 140,
-            heightMax: 220,
+            spouseAge: { min: undefined, max: undefined },
+            height: { min: 150, max: 200 },
         });
     };
 
@@ -157,43 +162,43 @@ export function FilterModal({ filters, setFilters }: FilterModalProps) {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label className="text-right">Spouse Age</Label>
-                            <div className="col-span-3">
-                                <Slider
-                                    min={18}
-                                    max={80}
-                                    step={1}
-                                    value={[filters.spouseAgeMin || 18, filters.spouseAgeMax || 80]}
-                                    onValueChange={(value: any[]) => {
-                                        handleFilterChange('spouseAgeMin', value[0]);
-                                        handleFilterChange('spouseAgeMax', value[1]);
-                                    }}
-                                />
-                                <div className="flex justify-between mt-2">
-                                    <span>{filters.spouseAgeMin || 18}</span>
-                                    <span>{filters.spouseAgeMax || 80}</span>
-                                </div>
-                            </div>
+                        <div className="flex items-center space-x-2">
+                            <Input
+                                type="number"
+                                value={filters.spouseAge?.min || ''}
+                                onChange={(e) => handleNestedFilterChange('spouseAge', 'min', parseInt(e.target.value) || undefined)}
+                                placeholder="Min"
+                                className="w-20"
+                            />
+                            <span>-</span>
+                            <Input
+                                type="number"
+                                value={filters.spouseAge?.max || ''}
+                                onChange={(e) => handleNestedFilterChange('spouseAge', 'max', parseInt(e.target.value) || undefined)}
+                                placeholder="Max"
+                                className="w-20"
+                            />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label className="text-right">Height (cm)</Label>
-                            <div className="col-span-3">
-                                <Slider
-                                    min={140}
-                                    max={220}
-                                    step={1}
-                                    value={[filters.heightMin || 140, filters.heightMax || 220]}
-                                    onValueChange={(value: any[]) => {
-                                        handleFilterChange('heightMin', value[0]);
-                                        handleFilterChange('heightMax', value[1]);
-                                    }}
+                            <div className="flex items-center space-x-2">
+                                <Input
+                                    type="number"
+                                    value={filters.height?.min || ''}
+                                    onChange={(e) => handleNestedFilterChange('height', 'min', parseInt(e.target.value) || undefined)}
+                                    placeholder="Min"
+                                    className="w-20"
                                 />
-                                <div className="flex justify-between mt-2">
-                                    <span>{filters.heightMin || 140}</span>
-                                    <span>{filters.heightMax || 220}</span>
-                                </div>
+                                <span>-</span>
+                                <Input
+                                    type="number"
+                                    value={filters.height?.max || ''}
+                                    onChange={(e) => handleNestedFilterChange('height', 'max', parseInt(e.target.value) || undefined)}
+                                    placeholder="Max"
+                                    className="w-20"
+                                />
                             </div>
+
                         </div>
                     </div>
                     <div className="flex justify-between mt-6">

@@ -10,7 +10,7 @@ export interface UserProfile {
   polygamy: string;
   spouseBrief: string;
   initials: string;
-  languages: string;
+  languages: string[];
   maritalStatus: string;
   ethnicity: string;
   pray: string;
@@ -21,10 +21,13 @@ export interface UserProfile {
   occupation: string;
   approved: string;
   education: string;
-  scholars: string;
+  scholars: string[];
   briefAboutYou: string;
   sect: string;
-  spouseAge: string;
+  spouseAge: {
+    min: number,
+    max: number
+  };
   countryMoving: string;
   hijab: string;
   dob: { seconds: number; nanoseconds: number };
@@ -159,7 +162,7 @@ export interface AuthContextType {
 
 
 
-export interface FilterOptions {
+export interface FilterOptions extends Record<string, any> {
   name?: string;
   countryResiding?: string;
   countryMoving?: string;
@@ -169,7 +172,6 @@ export interface FilterOptions {
   ethnicity?: string;
   languages?: string[];
   polygamy?: string;
-  spouseAge?: string;
   hijab?: string;
   beard?: string;
   born?: string;
@@ -179,9 +181,13 @@ export interface FilterOptions {
     min?: number;
     max?: number;
   };
-  spouseAgeMin?: number;
-  spouseAgeMax?: number;
-  heightMin?: number;
-  heightMax?: number;
+  spouseAge?: {
+    min?: number;
+    max?: number;
+  };
+  height?: {
+    min?: number;
+    max?: number;
+  };
   limit?: number;
 }

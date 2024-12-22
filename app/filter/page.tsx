@@ -17,10 +17,8 @@ export default function FilterPage() {
         // languages: [],
         // scholars: [],
         polygamy: '',
-        // spouseAgeMin: 18,
-        // spouseAgeMax: 60,
-        // heightMin: 150,
-        // heightMax: 200,
+        spouseAge: { min: undefined, max: undefined },
+        height: { min: 150, max: 200 },
     });
     async function getUsers() {
         if (!currentUser || !userDataPrivate) return 'you must be logged in';
