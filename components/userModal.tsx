@@ -182,13 +182,13 @@ function ProfileContent({
           label="Islamic Education"
           value={profile.islamicEducation}
         />
-        <ProfileItem label="Scholars" value={profile.scholars} />
+        <ProfileItemArray label="Scholars" value={profile.scholars} />
       </ProfileSection>
 
       <ProfileSection title="Education and Occupation">
         <ProfileItem label="Education" value={profile.education} />
         <ProfileItem label="Occupation" value={profile.occupation} />
-        <ProfileItem label="Languages" value={profile.languages} />
+        <ProfileItemArray label="Languages" value={profile.languages} />
       </ProfileSection>
 
       <ProfileSection title="Location">
@@ -201,7 +201,7 @@ function ProfileContent({
         <ProfileItem label="Marital Status" value={profile.maritalStatus} />
         <ProfileItem label="Children" value={profile.childern} />
         <ProfileItem label="Polygamy" value={profile.polygamy} />
-        <ProfileItem label="Preferred Spouse Age" value={profile.spouseAge} />
+        <ProfileItemNested label="Preferred Spouse Age" value={profile.spouseAge} />
       </ProfileSection>
 
       <ProfileSection title="About">
@@ -239,6 +239,26 @@ function ProfileItem({ label, value }: { label: string; value: string }) {
         {label}:
       </span>
       <span className="text-sm text-accent-foreground capitalize">{value}</span>
+    </div>
+  );
+}
+function ProfileItemArray({ label, value }: { label: string; value: string[] }) {
+  return (
+    <div className="flex justify-between">
+      <span className="text-sm font-medium text-muted-foreground capitalize pr-2">
+        {label}:
+      </span>
+      <span className="text-sm text-accent-foreground capitalize">{value.join(", ")}</span>
+    </div>
+  );
+}
+function ProfileItemNested({ label, value }: { label: string; value: { min: number; max: number; } }) {
+  return (
+    <div className="flex justify-between">
+      <span className="text-sm font-medium text-muted-foreground capitalize pr-2">
+        {label}:
+      </span>
+      <span className="text-sm text-accent-foreground capitalize">{value.min} - {value.max}</span>
     </div>
   );
 }
