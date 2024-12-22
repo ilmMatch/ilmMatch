@@ -96,11 +96,19 @@ export type ProfileResult =
 
 export interface UserDataPrivateType {
   userName: string;
-  mobileNumber: number | null;
-  waliName: string;
-  waliMobileNumber: number | null;
-  dob: Date;
+  dob: { seconds: number; nanoseconds: number } | Date;
   gender: string;
+  mobileNumber?: number | null;
+  waliName?: string;
+  waliMobileNumber?: number | null;
+  femaleMehramName?: string;
+  femaleMehramNumber?: number | null;
+  maleMehramName?: string;
+  maleMehramNumber?: number | null;
+  countryCode?: number | null;
+  waliCountryCode?: number | null;
+  femaleMehramCountryCode?: number | null;
+  maleMehramCountryCode?: number | null;
 }
 
 export type PairResult =
