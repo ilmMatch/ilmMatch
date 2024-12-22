@@ -71,30 +71,32 @@ export function UserProfileForm() {
     useEffect(() => {
         if (userDataProfile) {
             reset({
-                beard: userDataProfile.beard,
-                born: userDataProfile.born,
-                briefAboutYou: userDataProfile.briefAboutYou,
-                build: userDataProfile.build,
-                childern: userDataProfile.childern,
-                countryMoving: userDataProfile.countryMoving,
-                countryResiding: userDataProfile.countryResiding,
-                education: userDataProfile.education,
-                ethnicity: userDataProfile.ethnicity,
-                height: userDataProfile.height,
-                hijab: userDataProfile.hijab,
-                islamicEducation: userDataProfile.islamicEducation,
-                islamicEducationProof: userDataProfile.islamicEducationProof,
-                languages: userDataProfile.languages,
-                maritalStatus: userDataProfile?.maritalStatus,
-                masjidName: userDataProfile.masjidName,
-                nationality: userDataProfile.nationality,
-                occupation: userDataProfile.occupation,
-                pray: userDataProfile.pray,
-                polygamy: userDataProfile.polygamy,
-                sect: userDataProfile.sect,
-                scholars: userDataProfile.scholars,
-                spouseAge: { min: userDataProfile.spouseAge.min, max: userDataProfile.spouseAge.max },
-                spouseBrief: userDataProfile.spouseBrief,
+
+                ...userDataProfile,
+                // beard: userDataProfile.beard,
+                // born: userDataProfile.born,
+                // briefAboutYou: userDataProfile.briefAboutYou,
+                // build: userDataProfile.build,
+                // childern: userDataProfile.childern,
+                // countryMoving: userDataProfile.countryMoving,
+                // countryResiding: userDataProfile.countryResiding,
+                // education: userDataProfile.education,
+                // ethnicity: userDataProfile.ethnicity,
+                // height: userDataProfile.height,
+                // hijab: userDataProfile.hijab,
+                // islamicEducation: userDataProfile.islamicEducation,
+                // islamicEducationProof: userDataProfile.islamicEducationProof,
+                // languages: userDataProfile.languages,
+                // maritalStatus: userDataProfile?.maritalStatus,
+                // masjidName: userDataProfile.masjidName,
+                // nationality: userDataProfile.nationality,
+                // occupation: userDataProfile.occupation,
+                // pray: userDataProfile.pray,
+                // polygamy: userDataProfile.polygamy,
+                // sect: userDataProfile.sect,
+                // scholars: userDataProfile.scholars,
+                // spouseAge: { min: userDataProfile.spouseAge.min, max: userDataProfile.spouseAge.max },
+                // spouseBrief: userDataProfile.spouseBrief,
             });
         }
     }, [userDataProfile, reset]);
@@ -164,9 +166,10 @@ export function UserProfileForm() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Marital Status</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                <Select onValueChange={field.onChange} value={field.value}
+                                                    disabled={!editing}>
                                                     <FormControl>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className={cn(!editing && 'disabled:cursor-default')}>
                                                             <SelectValue placeholder="Select marital status" />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -188,7 +191,10 @@ export function UserProfileForm() {
                                             <FormItem>
                                                 <FormLabel>Number of Children</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)} />
+                                                    <Input type="number" {...field} onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)}
+                                                        className={cn(!editing && 'disabled:cursor-default')}
+                                                        disabled={!editing}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -206,7 +212,9 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Nationality</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field}
+                                                    className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -220,7 +228,8 @@ export function UserProfileForm() {
                                             <FormItem>
                                                 <FormLabel>Country of Residence</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                        disabled={!editing} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -234,7 +243,8 @@ export function UserProfileForm() {
                                             <FormItem>
                                                 <FormLabel>Country To Marry/Move in</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                        disabled={!editing} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -272,9 +282,9 @@ export function UserProfileForm() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Beard</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                <Select onValueChange={field.onChange} value={field.value} disabled={!editing}>
                                                     <FormControl>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className={cn(!editing && 'disabled:cursor-default')}>
                                                             <SelectValue placeholder="Select option" />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -289,50 +299,6 @@ export function UserProfileForm() {
                                         )}
                                     />
 
-
-                                    {/* <FormField
-                                control={form.control}
-                                name="hijab"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Hijab</FormLabel>
-                                        <Select
-                                            onValueChange={(value) => {
-                                                if (value === "other") {
-                                                    // When "other" is selected, clear the field value
-                                                    field.onChange(value);
-                                                } else {
-                                                    field.onChange(value);
-                                                }
-                                            }}
-                                            // Only set value if it's not empty and not "other"
-                                            value={field.value || undefined}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select option" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="yes">Yes</SelectItem>
-                                                <SelectItem value="no">No</SelectItem>
-                                                <SelectItem value="not applicable">Not Applicable</SelectItem>
-                                                <SelectItem value="other">Other</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {(field.value != "yes" && field.value != "no" && field.value != "not applicable") && (
-                                            <FormControl>
-                                                <Input
-                                                    value={field.value}
-                                                    placeholder="Please specify"
-                                                    onChange={(e) => field.onChange(e.target.value)}
-                                                />
-                                            </FormControl>
-                                        )}
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
 
                                     <FormField
                                         control={form.control}
@@ -357,9 +323,10 @@ export function UserProfileForm() {
                                                         value={
                                                             field.value
                                                         } // Show "other" when selected
+                                                        disabled={!editing}
                                                     >
                                                         <FormControl>
-                                                            <SelectTrigger>
+                                                            <SelectTrigger className={cn(!editing && 'disabled:cursor-default')}>
                                                                 <SelectValue placeholder="Select option" />
                                                             </SelectTrigger>
                                                         </FormControl>
@@ -380,6 +347,8 @@ export function UserProfileForm() {
                                                                     setOtherValue(inputValue);
                                                                     // field.onChange(inputValue); 
                                                                 }}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
                                                             />
                                                         </FormControl>
                                                     )}
@@ -398,7 +367,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Ethnicity</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -412,7 +382,8 @@ export function UserProfileForm() {
                                             <FormItem>
                                                 <FormLabel>Height (cm)</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)} />
+                                                    <Input type="number" {...field} onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)} className={cn(!editing && 'disabled:cursor-default')}
+                                                        disabled={!editing} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -425,7 +396,8 @@ export function UserProfileForm() {
                                             <FormItem>
                                                 <FormLabel>Build</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                        disabled={!editing} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -443,9 +415,9 @@ export function UserProfileForm() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Prayer Habits</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                <Select onValueChange={field.onChange} value={field.value} disabled={!editing}>
                                                     <FormControl>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className={cn(!editing && 'disabled:cursor-default')}>
                                                             <SelectValue placeholder="Select option" />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -465,9 +437,9 @@ export function UserProfileForm() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Born Muslim or Revert</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                <Select onValueChange={field.onChange} value={field.value} disabled={!editing}>
                                                     <FormControl>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className={cn(!editing && 'disabled:cursor-default')}>
                                                             <SelectValue placeholder="Select option" />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -489,7 +461,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Sect</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -503,7 +476,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Masjid Name You Go To</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -539,7 +513,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Education</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -553,7 +528,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Islamic Education</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -567,7 +543,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Islamic Education Proof</FormLabel>
                                             <FormControl>
-                                                <Input {...field} type="url" placeholder="https://example.com/proof" />
+                                                <Input {...field} type="url" placeholder="https://example.com/proof" className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormDescription>Provide a link to your Islamic education certificate or proof</FormDescription>
                                             <FormMessage />
@@ -582,7 +559,8 @@ export function UserProfileForm() {
                                         <FormItem>
                                             <FormLabel>Occupation</FormLabel>
                                             <FormControl>
-                                                <Input {...field} />
+                                                <Input {...field} className={cn(!editing && 'disabled:cursor-default')}
+                                                    disabled={!editing} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -600,9 +578,9 @@ export function UserProfileForm() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Will you consider Polygamy</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                <Select onValueChange={field.onChange} value={field.value} disabled={!editing}>
                                                     <FormControl>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger className={cn(!editing && 'disabled:cursor-default')}>
                                                             <SelectValue placeholder="Select option" />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -625,7 +603,8 @@ export function UserProfileForm() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input type="number" {...field} placeholder="Min" onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)} />
+                                                        <Input type="number" {...field} placeholder="Min" onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)} className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -638,7 +617,9 @@ export function UserProfileForm() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input type="number" {...field} placeholder="Max" onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)} />
+                                                        <Input type="number" {...field} placeholder="Max" onChange={e => field.onChange(e.target.value === "" ? undefined : +e.target.value)}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -660,7 +641,8 @@ export function UserProfileForm() {
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us about yourself"
-                                                className=""
+                                                className={cn(!editing && 'disabled:cursor-default resize-none')}
+                                                disabled={!editing}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -678,7 +660,8 @@ export function UserProfileForm() {
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Describe your ideal spouse"
-                                                className=""
+                                                className={cn(!editing && 'disabled:cursor-default resize-none')}
+                                                disabled={!editing}
                                                 {...field}
                                             />
                                         </FormControl>

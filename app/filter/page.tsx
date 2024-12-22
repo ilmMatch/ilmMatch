@@ -54,8 +54,6 @@ export default function FilterPage() {
                 );
             })}
 
-            <UserProfileForm />
-            <div className='w-ful border'>........</div>
             <PrivateForm />
         </div>
     )

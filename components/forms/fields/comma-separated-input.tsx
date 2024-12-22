@@ -38,7 +38,7 @@ export function CommaSeparatedInput({ value, onChange, placeholder, required, ed
                 {value.map((item, index) => (
                     <Badge key={index} variant="secondary">
                         {item}
-                        {!editing &&
+                        {editing &&
                             (<button
                                 type="button"
                                 onClick={() => removeValue(index)}
