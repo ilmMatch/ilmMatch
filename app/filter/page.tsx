@@ -1,6 +1,5 @@
 "use client"
 import { FilterModal } from '@/components/filterModal';
-import { PrivateForm } from '@/components/forms/testPrivate';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthProvider';
 import { FilterOptions, UserProfile } from '@/types/firebase';
@@ -53,7 +52,6 @@ export default function FilterPage() {
                 );
             })}
 
-            <PrivateForm />
         </div>
     )
 }
