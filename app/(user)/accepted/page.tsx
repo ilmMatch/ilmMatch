@@ -11,13 +11,13 @@ export default function AcceptedPage() {
   const [users, setUsers] = useState<UserProfile[] | undefined>(undefined);
 
   async function getMatchedProfiles() {
-    if (!userDataProfile || userDataProfile.matched.true.length === 0) {
+    if (!userDataProfile || userDataProfile.matched.length === 0) {
       toast.error('Uh oh! No matches found.', {
         description: "if you've accepted a request, wait till admin confirms",
       });
       return;
     }
-    const data = await getProfilebyUIDs(userDataProfile.matched.true);
+    const data = await getProfilebyUIDs(userDataProfile.matched);
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,
