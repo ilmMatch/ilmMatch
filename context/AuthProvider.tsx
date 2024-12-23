@@ -116,11 +116,15 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         approved: 'notApproved',
       };
 
-      // Write both documents in parallel for efficiency
-      await Promise.all([
-        setDoc(userRef, userData),
-        setDoc(userRefP, userDataP),
-      ]);
+      // Initialize Firestore batch
+      const batch = writeBatch(db);
+
+      // Add operations to the batch
+      batch.set(userRef, userData);
+      batch.set(userRefP, userDataP);
+
+      // Commit the batch
+      await batch.commit();
 
       return { success: true };
     } catch (error: any) {
@@ -132,6 +136,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       };
     }
   }
+
 
   async function login(email: string, password: string): Promise<VoidResult> {
     try {
@@ -204,6 +209,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   };
 
+
   async function userPrivateUpdate(
     UserProfileNew: UserDataPrivateType
   ): Promise<VoidResult> {
@@ -218,7 +224,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const userRefP = doc(db, 'usersprofile', userId);
 
       // Convert date of birth to JavaScript Date if necessary
-      const UserProfileInfo = userDataPrivate as UserDataPrivateType;
+      const UserProfileInfo = { ...userDataPrivate } as UserDataPrivateType;
       if (userDataPrivate.dob?.seconds) {
         UserProfileInfo.dob = new Date(userDataPrivate.dob.seconds * 1000);
       }
@@ -230,9 +236,14 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         return { success: false, error: 'No changes to apply.' };
       }
 
-      // Apply updates to the main user document
-      await updateDoc(userRef, updates);
-      await updateDoc(userRefP, { approved: 'notApproved' });
+      // Initialize Firestore batch
+      const batch = writeBatch(db);
+
+      // Update the main user document
+      batch.update(userRef, updates);
+
+      // Mark the user profile as not approved
+      batch.update(userRefP, { approved: 'notApproved' });
 
       // Update additional profile fields if necessary
       if (updates.userName || updates.dob) {
@@ -245,8 +256,11 @@ export function AuthProvider(props: { children: React.ReactNode }) {
           updateData.dob = updates.dob;
         }
 
-        await updateDoc(userRefP, updateData);
+        batch.update(userRefP, updateData);
       }
+
+      // Commit the batch
+      await batch.commit();
 
       return { success: true };
     } catch (error: any) {
@@ -259,7 +273,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       };
     }
   }
-
 
   async function userProfileUpdate(
     UserProfileNew: UserDataProfileType
@@ -380,90 +393,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       ];
       const filterConditions = getFilterConditions(filters);
 
-      // const filterConditions = [];
-      // if (filters) {
-      //   const exactMatchFields = [
-      //     'countryResiding',
-      //     'countryMoving',
-      //     'gender',
-      //     'ethnicity',
-      //     'polygamy',
-      //     'spouseAge',
-      //     'hijab',
-      //     'beard',
-      //     'born',
-      //     'sect',
-      //     'maritalStatus'
-      //   ];
-
-      //   exactMatchFields.forEach(field => {
-      //     if (filters[field as keyof FilterOptions]) {
-      //       filterConditions.push(where(field, '==', filters[field as keyof FilterOptions]));
-      //     }
-      //   });
-
-      //   if (filters.age) {
-      //     const now = new Date();
-      //     if (filters.age.min) {
-      //       const maxDate = new Date(now.getFullYear() - filters.age.min, now.getMonth(), now.getDate());
-      //       filterConditions.push(where('dob', '<=', maxDate));
-      //     }
-      //     if (filters.age.max) {
-      //       const minDate = new Date(now.getFullYear() - filters.age.max, now.getMonth(), now.getDate());
-      //       filterConditions.push(where('dob', '>=', minDate));
-      //     }
-      //   }
-
-      //   // Text search conditions (using array-contains or string includes)
-      //   if (filters.spouseAgeMin && filters.spouseAgeMax) {
-      //     filterConditions.push(where('spouseAge', '>=', filters.spouseAgeMin.toString()));
-      //     filterConditions.push(where('spouseAge', '<=', filters.spouseAgeMax.toString()));
-      //   }
-      //   if (filters.heightMin && filters.heightMax) {
-      //     filterConditions.push(where('height', '>=', filters.heightMin));
-      //     filterConditions.push(where('height', '<=', filters.heightMax));
-      //   }
-
-      //   if (filters.name) {
-      //     filterConditions.push(where('masjidName', '>=', filters.name));
-      //     filterConditions.push(where('masjidName', '<=', filters.name + '\uf8ff'));
-      //   }
-
-      //   if (filters.education) {
-      //     filterConditions.push(where('education', '>=', filters.education));
-      //     filterConditions.push(where('education', '<=', filters.education + '\uf8ff'));
-      //   }
-
-      //   // // Handle array fields
-      //   // if (filters.scholars && filters.scholars.length > 0) {
-      //   //   // Using array-contains-any for multiple possible matches
-      //   //   filterConditions.push(where('scholars', 'array-contains-any', filters.scholars));
-      //   // }
-
-      //   const handleCommaField = (fieldValue: string | undefined, fieldName: string) => {
-      //     if (fieldValue) {
-      //       // Convert search terms to lowercase for case-insensitive comparison
-      //       const searchTerms = fieldValue.toLowerCase().split(',').map(term => term.trim());
-
-      //       // Create conditions for each term
-      //       const termConditions = searchTerms.map(term =>
-      //         and(
-      //           where(fieldName, '>=', term),
-      //           where(fieldName, '<=', term + '\uf8ff')
-      //         )
-      //       );
-
-      //       if (termConditions.length > 0) {
-      //         filterConditions.push(or(...termConditions));
-      //       }
-      //     }
-      //   };
-
-      //   // Apply the comma-separated field handling to both languages and scholars
-      //   handleCommaField(filters.languages, 'languages');
-      //   handleCommaField(filters.scholars, 'scholars');
-      // }
-      // console.log("filterConditions", filterConditions);
       let q = query(
         usersProfileRef,
         ...baseConditions,
@@ -564,22 +493,58 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       // Ensure the user is logged in
       if (!currentUser) throw new Error('You must be logged in');
 
+      // Initialize Firestore batch
+      const batch = writeBatch(db);
+
       // References to the Firestore documents
       const requestedme = doc(db, 'requestedme', requestedof);
       const myrequested = doc(db, 'myrequested', requestedby);
+      const docRef1 = doc(db, 'users', requestedof);
+      const docRef2 = doc(db, 'users', requestedby);
 
       if (state === 'unmatched') {
         // Handle unmatched state by updating 'unmatched' and 'matched' arrays
-        await updateMatchStatus(requestedof, requestedby);
+        batch.set(
+          docRef1,
+          {
+            matched: {
+              true: arrayRemove(requestedby),
+              false: arrayUnion(requestedby),
+            },
+          },
+          { merge: true }
+        );
+
+        batch.set(
+          docRef2,
+          {
+            matched: {
+              true: arrayRemove(requestedof),
+              false: arrayUnion(requestedof),
+            },
+          },
+          { merge: true }
+        );
       } else if (action === 'add') {
         // Add state to 'requestedme' and 'myrequested'
-        await updateRequestState(requestedme, requestedby, state);
-        await updateRequestState(myrequested, requestedof, state);
+        batch.set(
+          requestedme,
+          { [requestedby]: state, createdAt: serverTimestamp() },
+          { merge: true }
+        );
+        batch.set(
+          myrequested,
+          { [requestedof]: state, createdAt: serverTimestamp() },
+          { merge: true }
+        );
       } else if (action === 'remove') {
         // Remove state from 'requestedme' and 'myrequested'
-        await removeRequestState(requestedme, requestedby);
-        await removeRequestState(myrequested, requestedof);
+        batch.update(requestedme, { [requestedby]: deleteField() });
+        batch.update(myrequested, { [requestedof]: deleteField() });
       }
+
+      // Commit the batch
+      await batch.commit();
 
       return { success: true };
     } catch (error: any) {
@@ -590,49 +555,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
           error instanceof Error ? error.message : 'An unknown error occurred',
       };
     }
-  }
-  // Helper functions for update actions
-  async function updateMatchStatus(requestedof: string, requestedby: string) {
-    const docRef1 = doc(db, 'users', requestedof);
-    const docRef2 = doc(db, 'users', requestedby);
-
-    await setDoc(
-      docRef1,
-      {
-        matched: {
-          true: arrayRemove(requestedby),
-          false: arrayUnion(requestedby),
-        },
-      },
-      { merge: true }
-    );
-
-    await setDoc(
-      docRef2,
-      {
-        matched: {
-          true: arrayRemove(requestedof),
-          false: arrayUnion(requestedof),
-        },
-      },
-      { merge: true }
-    );
-  }
-  // Helper functions for update actions
-  async function updateRequestState(
-    docRef: DocumentReference,
-    key: string,
-    state: RequestAction
-  ) {
-    await setDoc(
-      docRef,
-      { [key]: state, createdAt: serverTimestamp() },
-      { merge: true }
-    );
-  }
-  // Helper functions for update actions
-  async function removeRequestState(docRef: DocumentReference, key: string) {
-    await updateDoc(docRef, { [key]: deleteField() });
   }
 
   async function getProfilebyUIDs(
