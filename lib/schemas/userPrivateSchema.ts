@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+const phoneNumberSchema = z.string()
+    .refine((val) => val === '' || (!isNaN(Number(val)) && val.length === 10), {
+        message: 'Must be 10 digits.',
+    })
+    .transform((val) => val === '' ? undefined : Number(val))
+    .optional();
+
+
 const baseSchema = z.object({
     userName: z.string().min(3, { message: 'Name must be at least 3 characters.' }).max(100),
     dob: z.date({ required_error: 'A date of birth is required.' }),
@@ -12,12 +20,9 @@ const brotherSchema = baseSchema.extend({
         .refine((val) => !isNaN(Number(val)), { message: 'Mobile number must be a valid number' })
         .transform(Number)
         .refine((val) => val >= 1000000000 && val <= 9999999999, { message: 'Mobile number must be 10 digits.' }),
-    femaleMehramName: z.string().min(3, { message: 'Mehram name must be at least 3 characters.' }).max(100),
-    femaleMehramCountryCode: z.number().nullable(),
-    femaleMehramNumber: z.string()
-        .refine((val) => !isNaN(Number(val)), { message: 'Mehram number must be a valid number' })
-        .transform(Number)
-        .refine((val) => val >= 1000000000 && val <= 9999999999, { message: 'Mehram number must be 10 digits.' }),
+    femaleMehramName: z.string().optional(),
+    femaleMehramCountryCode: z.number().nullable().optional(),
+    femaleMehramNumber: phoneNumberSchema,
     gender: z.literal('brother'),
 });
 
@@ -28,12 +33,9 @@ const sisterSchema = baseSchema.extend({
         .refine((val) => !isNaN(Number(val)), { message: 'Wali mobile number must be a valid number' })
         .transform(Number)
         .refine((val) => val >= 1000000000 && val <= 9999999999, { message: 'Wali mobile number must be 10 digits.' }),
-    maleMehramName: z.string().min(3, { message: 'Mehram name must be at least 3 characters.' }).max(100),
-    maleMehramCountryCode: z.number().nullable(),
-    maleMehramNumber: z.string()
-        .refine((val) => !isNaN(Number(val)), { message: 'Mehram number must be a valid number' })
-        .transform(Number)
-        .refine((val) => val >= 1000000000 && val <= 9999999999, { message: 'Mehram number must be 10 digits.' }),
+    maleMehramName: z.string().optional(),
+    maleMehramCountryCode: z.number().nullable().optional(),
+    maleMehramNumber: phoneNumberSchema,
     gender: z.literal('sister'),
 });
 
@@ -43,4 +45,5 @@ export const userPrivateSchema = z.discriminatedUnion('gender', [
 ]);
 
 export type UserPrivateFormValues = z.infer<typeof userPrivateSchema>;
+
 

@@ -32,103 +32,39 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthProvider';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { CountryCodeSelector } from './fields/CountryCode';
+import { userPrivateSchema, UserPrivateFormValues } from '@/lib/schemas/userPrivateSchema';
+import { toast } from 'sonner';
+import { badgeVariants } from '../ui/badge';
 
-const formSchema = z
-  .object({
-    userName: z
-      .string()
-      .min(3, {
-        message: 'Name must be at least 3 characters.',
-      })
-      .max(100),
-    countryCode: z.number().nullable(),
-    mobileNumber: z
-      .string()
-      .refine((val) => !isNaN(Number(val)), {
-        message: 'Mobile number must be a valid number',
-      })
-      .transform(Number)
-      .refine((val) => val >= 1000000000 && val <= 9999999999, {
-        message: 'Mobile number must be 10 digits.',
-      })
-      .nullable(),
-    waliName: z
-      .string()
-      .min(3, {
-        message: 'Name must be at least 3 characters.',
-      })
-      .max(100),
-    waliCountryCode: z.number().nullable(),
-    waliMobileNumber: z
-      .string()
-      .refine((val) => !isNaN(Number(val)), {
-        message: 'Mobile number must be a valid number',
-      })
-      .transform(Number)
-      .refine((val) => val >= 1000000000 && val <= 9999999999, {
-        message: 'Mobile number must be 10 digits.',
-      })
-      .nullable(),
-    dob: z.date({
-      required_error: 'A date of birth is required.',
-    }),
-    gender: z.enum(['brother', 'sister']),
-  })
-  .refine((data) => data.mobileNumber !== data.waliMobileNumber, {
-    message: 'Mobile number and Wali Mobile number must be different.',
-    path: ['waliMobileNumber'],
-  })
-  .refine(
-    (data) => {
-      if (data.gender === 'brother') {
-        // If gender is brother, mobileNumber is required and waliMobileNumber is optional
-        return data.mobileNumber !== null;
-      }
-      if (data.gender === 'sister') {
-        // If gender is sister, waliMobileNumber is required and mobileNumber is optional
-        return data.waliMobileNumber !== null;
-      }
-      return true;
-    },
-    {
-      message: 'Mobile number and Wali Mobile number validation failed.',
-    }
-  );
-// z.string().max(5);
-// z.string().min(5);
-// z.string().length(5);
-// z.string().email();
-// z.string().url();
-// z.string().date();
-// z.string({
-//   required_error: "Name is required",
-//   invalid_type_error: "Name must be a string",
-// });
-// z.date().min(new Date("1900-01-01"), { message: "Too old" });
-// z.date().max(new Date(), { message: "Too young!" });
-// z.enum(["Admin", "User", "Trout"]);
 
 export function PrivateForm() {
-  const { userPrivateUpdate, userDataPrivate, loading } = useAuth();
+  const { userPrivateUpdate, userDataPrivate, loading, userDataProfile } = useAuth();
   const [editing, setEditing] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UserPrivateFormValues>({
+    resolver: zodResolver(userPrivateSchema),
     defaultValues: {
-      userName: userDataPrivate?.userName || 'Not Available',
-      countryCode: userDataPrivate?.countryCode || null,
-      mobileNumber:
-        userDataPrivate?.mobileNumber?.toString() || 'Not Available',
-      waliName: userDataPrivate?.waliName || 'Not Available',
-      waliCountryCode: userDataPrivate?.waliCountryCode || null,
-      waliMobileNumber:
-        userDataPrivate?.waliMobileNumber?.toString() || 'Not Available',
+      userName: userDataPrivate?.userName || 'Not Provided',
       dob: userDataPrivate?.dob
         ? new Date(userDataPrivate.dob.seconds * 1000)
         : undefined,
-      gender: userDataPrivate?.gender || 'brother',
+      gender: userDataPrivate?.gender || 'sister',
+      ...(userDataPrivate?.gender === 'brother' ? {
+        countryCode: userDataPrivate?.countryCode || undefined,
+        mobileNumber: userDataPrivate?.mobileNumber?.toString() || 'Not Provided',
+        femaleMehramName: userDataPrivate?.femaleMehramName || '',
+        femaleMehramNumber: userDataPrivate?.femaleMehramNumber?.toString() || '',
+        femaleMehramCountryCode: userDataPrivate?.femaleMehramCountryCode || undefined,
+      } : {
+        waliName: userDataPrivate?.waliName || 'Not Provided',
+        waliCountryCode: userDataPrivate?.waliCountryCode || undefined,
+        waliMobileNumber: userDataPrivate?.waliMobileNumber?.toString() || 'Not Provided',
+        maleMehramName: userDataPrivate?.maleMehramName || 'Not Provided',
+        maleMehramNumber: userDataPrivate?.maleMehramNumber?.toString() || '',
+        maleMehramCountryCode: userDataPrivate?.maleMehramCountryCode || undefined,
+      }),
     },
   });
   const { reset } = form;
@@ -137,23 +73,45 @@ export function PrivateForm() {
     if (userDataPrivate) {
       reset({
         userName: userDataPrivate?.userName || 'Not Available',
-        countryCode: userDataPrivate?.countryCode || null,
-        mobileNumber:
-          userDataPrivate?.mobileNumber?.toString() || 'Not Available',
-        waliName: userDataPrivate?.waliName || 'Not Available',
-        waliCountryCode: userDataPrivate?.waliCountryCode || null,
-        waliMobileNumber:
-          userDataPrivate?.waliMobileNumber?.toString() || 'Not Available',
         dob: userDataPrivate?.dob
           ? new Date(userDataPrivate.dob.seconds * 1000)
           : undefined,
-        gender: userDataPrivate?.gender || 'brother',
-      });
+        gender: userDataPrivate?.gender || 'sister',
+        ...(userDataPrivate?.gender === 'brother' ? {
+          countryCode: userDataPrivate?.countryCode || undefined,
+          mobileNumber: userDataPrivate?.mobileNumber?.toString() || 'Not Provided',
+          femaleMehramName: userDataPrivate?.femaleMehramName || '',
+          femaleMehramNumber: userDataPrivate?.femaleMehramNumber?.toString() || '',
+          femaleMehramCountryCode: userDataPrivate?.femaleMehramCountryCode || undefined,
+        } : {
+          waliName: userDataPrivate?.waliName || 'Not Provided',
+          waliCountryCode: userDataPrivate?.waliCountryCode || undefined,
+          waliMobileNumber: userDataPrivate?.waliMobileNumber?.toString() || 'Not Provided',
+          maleMehramName: userDataPrivate?.maleMehramName || 'Not Provided',
+          maleMehramNumber: userDataPrivate?.maleMehramNumber?.toString() || '',
+          maleMehramCountryCode: userDataPrivate?.maleMehramCountryCode || undefined,
+        }),
+      },);
     }
   }, [userDataPrivate, reset]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    await userPrivateUpdate(values);
+  async function onSubmit(values: UserPrivateFormValues) {
+    const sanitizedValues = Object.fromEntries(
+      Object.entries(values).map(([key, value]) => [key, value ?? ""])
+    ) as UserPrivateFormValues;
+
+    const result = await userPrivateUpdate(sanitizedValues);
+    if (!result.success) {
+      toast.error('Uh oh! Something went wrong.', {
+        description: result.error,
+      });
+      setEditing(false);
+      return
+    }
+
+    toast.success('Success', {
+      description: 'Your profile has been updated',
+    })
     setEditing(false);
   }
   if (loading) {
@@ -165,15 +123,28 @@ export function PrivateForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
-            <CardHeader>
+            <CardHeader className='relative'>
               <CardTitle>Contact Info</CardTitle>
               <CardDescription>
                 This information is private and not shown to anyone. Click save
                 when you're done.
               </CardDescription>
+              <span
+                className={cn(
+                  'absolute top-2 right-2 capitalize',
+                  userDataProfile?.approved === 'requested' &&
+                  badgeVariants({ variant: 'requested' }),
+                  userDataProfile?.approved === 'approved' &&
+                  badgeVariants({ variant: 'approved' }),
+                  userDataProfile?.approved === 'notApproved' &&
+                  badgeVariants({ variant: 'notApproved' })
+                )}
+              >
+                {userDataProfile?.approved}
+              </span>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="md:flex md:gap-2">
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name="userName"
@@ -198,46 +169,76 @@ export function PrivateForm() {
                     </FormItem>
                   )}
                 />
-                <div className="flex">
+                {userDataPrivate?.gender === 'brother' && (
+
+                  <div className="flex">
+                    <FormField
+                      control={form.control}
+                      name="countryCode"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormLabel className="min-w-32 ">Contact:</FormLabel>
+                            <FormControl>
+                              <CountryCodeSelector
+                                // onChange={handleUserPhoneChange}
+                                onChange={(e) => field.onChange(e)}
+                                defaultCode={field.value}
+                                editing={editing}
+                                className={cn(
+                                  !editing &&
+                                  'pointer-events-none opacity-50 cursor-default'
+                                )}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="mobileNumber"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormControl>
+                              <Input
+                                placeholder="Mobile Number"
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                value={field.value ?? ''}
+                                className={cn(
+                                  'flex-grow',
+                                  !editing &&
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                )}
+                                disabled={!editing}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+                {userDataPrivate?.gender === 'sister' && (
+
                   <FormField
                     control={form.control}
-                    name="countryCode"
+                    name="waliName"
                     render={({ field }) => (
-                      <FormItem className="">
-                        <div className="flex items-center">
-                          <FormLabel className="min-w-32 ">Contact:</FormLabel>
-                          <FormControl>
-                            <CountryCodeSelector
-                              // onChange={handleUserPhoneChange}
-                              onChange={(e) => field.onChange(e)}
-                              defaultCode={field.value}
-                              editing={editing}
-                              className={cn(
-                                !editing &&
-                                'pointer-events-none opacity-50 cursor-default'
-                              )}
-                            />
-                          </FormControl>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="mobileNumber"
-                    render={({ field }) => (
-                      <FormItem className="">
-                        <div className="flex items-center">
+                      <FormItem className="flex items-center space-x-4 flex-1">
+                        <div className="flex items-center flex-grow">
+                          <FormLabel className="min-w-32 ">Wali Name</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Mobile Number"
-                              type="number"
+                              placeholder="Wali Name"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value)}
-                              value={field.value ?? ''}
                               className={cn(
-                                'flex-grow',
+                                'flex-grow w-full',
                                 !editing &&
                                 'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                               )}
@@ -249,96 +250,230 @@ export function PrivateForm() {
                       </FormItem>
                     )}
                   />
-                </div>
-              </div>
+                )}
+                {userDataPrivate?.gender === 'sister' && (
 
-              <div className="md:flex md:gap-2">
-                <FormField
-                  control={form.control}
-                  name="waliName"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-4 flex-1">
-                      <div className="flex items-center flex-grow">
-                        <FormLabel className="min-w-32 ">Wali</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Name"
-                            {...field}
-                            className={cn(
-                              'flex-grow w-full',
-                              !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                            )}
-                            disabled={!editing}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex">
-                  <FormField
-                    control={form.control}
-                    name="waliCountryCode"
-                    render={({ field }) => (
-                      <FormItem className="">
-                        <div className="flex items-center">
-                          <FormLabel className="min-w-32 ">Contact:</FormLabel>
-                          <FormControl>
-                            <CountryCodeSelector
-                              // onChange={handleUserPhoneChange}
-                              onChange={(e) => field.onChange(e)}
-                              defaultCode={field.value}
-                              editing={editing}
-                              className={cn(
-                                !editing &&
-                                'pointer-events-none opacity-50 cursor-default'
-                              )}
-                            />
-                          </FormControl>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="waliMobileNumber"
-                    render={({ field }) => (
-                      <FormItem className="">
-                        <div className="flex items-center">
-                          <FormControl>
-                            <Input
-                              placeholder="Mobile Number"
-                              type="number"
-                              {...field}
-                              onChange={(e) => field.onChange(e.target.value)}
-                              value={field.value ?? ''}
-                              className={cn(
-                                'flex-grow',
-                                !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
-                              )}
-                              disabled={!editing}
-                            />
-                            {/* <CountryCodeSelector
+                  <div className="flex">
+                    <FormField
+                      control={form.control}
+                      name="waliCountryCode"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormLabel className="min-w-32 "> Wali Contact:</FormLabel>
+                            <FormControl>
+                              <CountryCodeSelector
+                                // onChange={handleUserPhoneChange}
+                                onChange={(e) => field.onChange(e)}
+                                defaultCode={field.value}
+                                editing={editing}
+                                className={cn(
+                                  !editing &&
+                                  'pointer-events-none opacity-50 cursor-default'
+                                )}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="waliMobileNumber"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormControl>
+                              <Input
+                                placeholder="Wali Mobile Number"
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                value={field.value ?? ''}
+                                className={cn(
+                                  'flex-grow',
+                                  !editing &&
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                )}
+                                disabled={!editing}
+                              />
+                              {/* <CountryCodeSelector
                             onChange={handleUserPhoneChange}
                             className={cn(
                               !editing &&
                               'pointer-events-none opacity-50 cursor-default'
                             )}
                           /> */}
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                {userDataPrivate?.gender === 'brother' && (
+                  <FormField
+                    control={form.control}
+                    name="femaleMehramName"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-4 flex-1">
+                        <div className="flex items-center flex-grow">
+                          <FormLabel className="min-w-32 ">Female Mehram</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className={cn(
+                                'flex-grow w-full',
+                                !editing &&
+                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              )}
+                              disabled={!editing}
+                            />
                           </FormControl>
                         </div>
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-                </div>
-              </div>
-              <div className="md:flex md:gap-2 ">
+                  />)}
+                {userDataPrivate?.gender === 'brother' && (
+                  <div className="flex">
+                    <FormField
+                      control={form.control}
+                      name="femaleMehramCountryCode"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormLabel className="min-w-32 ">Mehram Contact:</FormLabel>
+                            <FormControl>
+                              <CountryCodeSelector
+                                // onChange={handleUserPhoneChange}
+                                onChange={(e) => field.onChange(e)}
+                                defaultCode={field.value}
+                                editing={editing}
+                                className={cn(
+                                  !editing &&
+                                  'pointer-events-none opacity-50 cursor-default'
+                                )}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="femaleMehramNumber"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormControl>
+                              <Input
+                                placeholder="Female Mehram Number"
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                value={field.value ?? ''}
+                                className={cn(
+                                  'flex-grow',
+                                  !editing &&
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                )}
+                                disabled={!editing}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                {userDataPrivate?.gender === 'sister' && (
+                  <FormField
+                    control={form.control}
+                    name="maleMehramName"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-4 flex-1">
+                        <div className="flex items-center flex-grow">
+                          <FormLabel className="min-w-32 ">Male Mehram</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className={cn(
+                                'flex-grow w-full',
+                                !editing &&
+                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                              )}
+                              disabled={!editing}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />)}
+                {userDataPrivate?.gender === 'sister' && (
+                  <div className="flex">
+                    <FormField
+                      control={form.control}
+                      name="maleMehramCountryCode"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormLabel className="min-w-32 ">Mehram Contact:</FormLabel>
+                            <FormControl>
+                              <CountryCodeSelector
+                                // onChange={handleUserPhoneChange}
+                                onChange={(e) => field.onChange(e)}
+                                defaultCode={field.value}
+                                editing={editing}
+                                className={cn(
+                                  !editing &&
+                                  'pointer-events-none opacity-50 cursor-default'
+                                )}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="maleMehramNumber"
+                      render={({ field }) => (
+                        <FormItem className="">
+                          <div className="flex items-center">
+                            <FormControl>
+                              <Input
+                                placeholder="Male Mehram Number"
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                value={field.value ?? ''}
+                                className={cn(
+                                  'flex-grow',
+                                  !editing &&
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                )}
+                                disabled={!editing}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+
+
                 <FormField
                   control={form.control}
                   name="dob"

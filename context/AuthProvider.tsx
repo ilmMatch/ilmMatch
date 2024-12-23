@@ -232,6 +232,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       // Apply updates to the main user document
       await updateDoc(userRef, updates);
+      await updateDoc(userRefP, { approved: 'notApproved' });
 
       // Update additional profile fields if necessary
       if (updates.userName || updates.dob) {
@@ -273,7 +274,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const userRefP = doc(db, 'usersprofile', userId);
       await setDoc(
         userRefP,
-        UserProfileNew,
+        { ...UserProfileNew, approved: 'notApproved' },
         { merge: true }
       );
 

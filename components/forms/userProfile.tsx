@@ -121,14 +121,7 @@ export function UserProfileForm() {
         setEditing(false);
     }
 
-    async function requestReview() {
-        if (!currentUser) throw 'you must be logged in';
-        const data = await approvalUpdate('requested', currentUser.uid);
-        if (!data.success) {
-            console.log(data.error);
-            // add toast
-        }
-    }
+
 
     return (
         <Form {...form}>
@@ -150,7 +143,6 @@ export function UserProfileForm() {
                                 userDataProfile?.approved === 'notApproved' &&
                                 badgeVariants({ variant: 'notApproved' })
                             )}
-                            onClick={requestReview}
                         >
                             {userDataProfile?.approved}
                         </span>
@@ -698,11 +690,7 @@ export function UserProfileForm() {
                                 Edit
                             </Button>
                         )}
-                        {userDataProfile?.approved === 'not approved' && (
-                            <Button type="button" variant="outline" onClick={requestReview}>
-                                Request Review
-                            </Button>
-                        )}
+
                     </CardFooter>
                 </Card>
 

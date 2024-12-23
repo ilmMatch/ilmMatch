@@ -1,7 +1,6 @@
 "use client"
 import { FilterModal } from '@/components/filterModal';
 import { PrivateForm } from '@/components/forms/testPrivate';
-import { UserProfileForm } from '@/components/forms/userProfile';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthProvider';
 import { FilterOptions, UserProfile } from '@/types/firebase';

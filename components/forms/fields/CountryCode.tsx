@@ -25,7 +25,7 @@ import { useState } from 'react';
 
 interface CustomPhoneInputProps {
   onChange: (countryCode: number) => void;
-  defaultCode: number | null;
+  defaultCode: number | null | undefined;
   editing: boolean;
   className?: string;
 }
@@ -63,11 +63,13 @@ export function CountryCodeSelector({
               disabled={false}
             >
               <>
-                {selectedCountry
+
+                {/* {selectedCountry
                   ? '+ ' + selectedCountry.code
                   : defaultCode
                     ? '+ ' + defaultCode
-                    : ''}
+                    : ''} */}
+                {(defaultCode != undefined || defaultCode != null) ? '+ ' + defaultCode : ""}
               </>
 
               <ChevronsUpDown
