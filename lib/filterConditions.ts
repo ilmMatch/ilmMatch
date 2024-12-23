@@ -13,7 +13,7 @@ export function getFilterConditions(filters: FilterOptions) {
     'sect',
     'maritalStatus',
     'approved',
-    'matched'
+    'matched',
   ];
 
   exactMatchFields.forEach((field) => {
@@ -62,7 +62,6 @@ export function getFilterConditions(filters: FilterOptions) {
   if (filters.height?.min !== undefined) {
     filterConditions.push(where('height', '>=', filters.height.min));
   }
-
 
   if (filters.education) {
     filterConditions.push(where('education', '>=', filters.education));
