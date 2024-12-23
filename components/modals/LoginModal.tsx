@@ -13,7 +13,7 @@ import Link from 'next/link';
 import ForgotPassword from '@/app/(auth)/login/forgotPassword';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Eye, Mail } from 'lucide-react';
+import { Eye, EyeOff, Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
@@ -22,8 +22,14 @@ export default function LoginModal() {
   const [password, setPassword] = useState('');
   const [authenticating, setAuthenticating] = useState(false);
   const { login, loading, currentUser } = useAuth();
+  const [passwordVisiblity, setpasswordVisiblity] = useState(false);
   const router = useRouter();
 
+
+
+  function togglePasswordVisiblity() {
+    setpasswordVisiblity(!passwordVisiblity);
+  }
   async function handleSubmit() {
     if (!email || !password || password.length < 6) {
       return;
@@ -82,7 +88,7 @@ export default function LoginModal() {
                           <div className="relative flex items-center">
                             <Input
                               name="password"
-                              type="password"
+                              type={passwordVisiblity ? "text" : "password"}
                               placeholder="Password"
                               required
                               value={password}
@@ -90,7 +96,13 @@ export default function LoginModal() {
                                 setPassword(e.target.value);
                               }}
                             />
-                            <Eye className="w-4 h-4 absolute right-4 cursor-pointer" />
+                            <Button variant={"ghost"} size={"sm"} className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={togglePasswordVisiblity}>
+                              {passwordVisiblity ?
+                                <EyeOff className="w-4 h-4 " />
+                                :
+                                <Eye className="w-4 h-4 " />
+                              }
+                            </Button>
                           </div>
                         </div>
 

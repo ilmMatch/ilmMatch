@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { Action } from '@/types';
-import { badgeVariants } from './ui/badge';
+import { badgeVariants } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -35,7 +35,7 @@ export default function UserModal({
   privateInfo,
 }: UserModalProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { currentUser, bookmarkUpdate, userDataPrivate, setUserDataPrivate } =
+  const { currentUser, bookmarkUpdate, userDataPrivate, userDataProfile } =
     useAuth();
   const [matched, setMatched] = useState<string | undefined>();
   const [bookmarking, setBookmarking] = useState<boolean>(false);
@@ -49,16 +49,18 @@ export default function UserModal({
       });
       return;
     }
-    console.log('error', result.error);
+
     setBookmarking(false);
-    // add toast
+    toast.error('Error Occured', {
+      description: result.error,
+    });
   }
 
   useEffect(() => {
-    if (userDataPrivate?.matched?.includes(user.id)) {
+    if (userDataProfile?.matched?.includes(user.id)) {
       setMatched('Matched');
       return;
-    } else if (userDataPrivate?.unmatched?.includes(user.id)) {
+    } else if (userDataProfile?.unmatched?.includes(user.id)) {
       setMatched('Matched before');
     }
   });
@@ -110,9 +112,9 @@ export default function UserModal({
                     className={cn(
                       'absolute top-5 right-8 capitalize',
                       matched === 'Matched' &&
-                      badgeVariants({ variant: 'approved' }),
+                        badgeVariants({ variant: 'approved' }),
                       matched === 'Matched before' &&
-                      badgeVariants({ variant: 'notApproved' })
+                        badgeVariants({ variant: 'notApproved' })
                     )}
                   >
                     {matched}
@@ -132,7 +134,7 @@ export default function UserModal({
                   user={user}
                   setStateUsers={setStateUsers}
                   stateUsers={stateUsers}
-                // handleAction={handleProfileMatchRequest}
+                  // handleAction={handleProfileMatchRequest}
                 />
               </ModalFooter>
             </>
@@ -318,12 +320,12 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     const updatedUsers = stateUsers.map((stateUser) =>
       stateUser.id === user.id
         ? {
-          ...stateUser,
-          status: state,
-          ...(state === undefined
-            ? { statusFrom: undefined }
-            : { statusFrom }),
-        }
+            ...stateUser,
+            status: state,
+            ...(state === undefined
+              ? { statusFrom: undefined }
+              : { statusFrom }),
+          }
         : stateUser
     );
     setStateUsers(updatedUsers);

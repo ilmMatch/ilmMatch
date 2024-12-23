@@ -114,6 +114,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         gender,
         timestamp,
         approved: 'notApproved',
+        matched: [],
+        unmatched: [],
       };
 
       // Initialize Firestore batch
@@ -383,11 +385,9 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       const usersProfileRef = collection(db, 'usersprofile');
 
       // Create the query to fetch only approved profiles
-      const baseConditions = [
-        where('__name__', '!=', currentUser.uid),
-      ];
+      const baseConditions = [where('__name__', '!=', currentUser.uid)];
       const filterConditions = getFilterConditions(filters);
-
+      console.log(filterConditions);
       let q = query(
         usersProfileRef,
         ...baseConditions,
@@ -395,7 +395,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         orderBy('approved'),
         limit(limitx)
       );
-
+      console.log('query', q);
       if (lastVisibleDoc) {
         // If we have a last visible document, start after it
         q = query(q, startAfter(lastVisibleDoc));
@@ -502,7 +502,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
           docRef1,
           {
             matched: arrayRemove(requestedby),
-            unmatched: arrayUnion(requestedby)
+            unmatched: arrayUnion(requestedby),
           },
           { merge: true }
         );
@@ -751,7 +751,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         {
           matched: arrayUnion(profile1),
           unmatched: arrayRemove(profile1),
-
         },
         { merge: true }
       );

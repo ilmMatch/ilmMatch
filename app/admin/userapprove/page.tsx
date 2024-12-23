@@ -1,8 +1,8 @@
 'use client';
 import AdminApprovalCard from '@/components/cards/adminApprovalCard';
-import { FilterModal } from '@/components/filterModal';
+import { FilterModal } from '@/components/modals/filterModal';
 import { Button } from '@/components/ui/button';
-import UserModal from '@/components/userModal';
+import UserModal from '@/components/modals/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { FilterOptions, UserPrivate, UserProfile } from '@/types/firebase';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
@@ -14,7 +14,9 @@ export default function UserApprovePage() {
   const [unApprovedProfiles, setUnApprovedProfiles] = useState<
     UserProfile[] | undefined
   >([]);
-  const [filters, setFilters] = useState<FilterOptions>({ approved: 'requested' });
+  const [filters, setFilters] = useState<FilterOptions>({
+    approved: 'requested',
+  });
   const [limit, setLimit] = useState<number>(10);
   const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([]);
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
@@ -24,11 +26,7 @@ export default function UserApprovePage() {
   const [end, setEnd] = useState(false);
 
   async function getUsers() {
-    const data = await getProfiles(
-      limit,
-      lastVisibleDoc.current,
-      filters
-    );
+    const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,

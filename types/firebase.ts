@@ -58,10 +58,10 @@ export interface UserPrivate {
 
 export type FetchUserProfilesResult =
   | {
-    success: true;
-    data: UserProfile[];
-    lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
-  }
+      success: true;
+      data: UserProfile[];
+      lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
+    }
   | { success: false; error: string };
 
 export type FetchUserPrivatesResult =
@@ -195,9 +195,9 @@ export interface FilterOptions extends Record<string, any> {
     min?: number;
     max?: number;
   };
-  // visible to admin 
+  // visible to admin
   matched?: string[];
-  approved?: "approved" | "notApproved" | "requested",
+  approved?: 'approved' | 'notApproved' | 'requested';
 }
 
 export interface UserDataProfileType {

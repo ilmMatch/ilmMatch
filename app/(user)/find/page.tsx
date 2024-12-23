@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { DocumentData, limit, QueryDocumentSnapshot } from 'firebase/firestore';
 import ProfileCard from '@/components/cards/profileCard';
-import { FilterModal } from '@/components/filterModal';
+import { FilterModal } from '@/components/modals/filterModal';
 export default function FindPage() {
   const {
     getProfiles,
@@ -28,11 +28,7 @@ export default function FindPage() {
 
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
-    const data = await getProfiles(
-      limit,
-      lastVisibleDoc.current,
-      filters
-    );
+    const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
       console.log(data.error);
       toast.error('Uh oh! Something went wrong.', {

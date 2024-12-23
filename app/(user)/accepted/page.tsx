@@ -1,6 +1,6 @@
 'use client';
 import ProfileCard from '@/components/cards/profileCard';
-import UserModal from '@/components/userModal';
+import UserModal from '@/components/modals/userModal';
 import { useAuth } from '@/context/AuthProvider';
 import { UserProfile } from '@/types/firebase';
 import React, { use, useEffect, useState } from 'react';

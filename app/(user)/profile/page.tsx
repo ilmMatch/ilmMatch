@@ -41,10 +41,12 @@ export default function ProfilePage() {
           <UserProfileForm />
         </TabsContent>
         <div className="w-full mt-2 flex justify-end">
-          {userDataProfile?.approvalStatus === 'notApproved' && <Button onClick={requestReview} disabled={submiting}>
-            {' '}
-            Request review
-          </Button>}
+          {userDataProfile?.approvalStatus === 'notApproved' && (
+            <Button onClick={requestReview} disabled={submiting}>
+              {' '}
+              Request review
+            </Button>
+          )}
         </div>
       </Tabs>
     </>

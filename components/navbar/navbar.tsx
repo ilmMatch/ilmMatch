@@ -10,10 +10,12 @@ import Link from 'next/link';
 import { Logo } from '../icons';
 
 export const Navbar = () => {
-
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" shouldHideOnScroll >
-      <NavbarContent className="basis-1/5 sm:basis-full sm:hidden" justify="start">
+    <NextUINavbar maxWidth="xl" position="sticky" shouldHideOnScroll>
+      <NavbarContent
+        className="basis-1/5 sm:basis-full sm:hidden"
+        justify="start"
+      >
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <Link className="flex justify-start items-center gap-1" href="/">
             <Logo />
@@ -27,7 +29,6 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-
         <NavbarItem className="hidden lg:flex">
           <ThemeSwitch />
         </NavbarItem>

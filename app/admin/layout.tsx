@@ -1,6 +1,6 @@
 'use client';
 
-import LoginModal from '@/components/LoginModal';
+import LoginModal from '@/components/modals/LoginModal';
 import { useAuth } from '@/context/AuthProvider';
 
 export default function RootLayout({

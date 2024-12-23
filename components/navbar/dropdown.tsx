@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
   DropdownMenu,
@@ -8,12 +8,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import AvatarButton from "./avatar"
-import { siteConfig } from "@/config/site"
-import Link from "next/link"
-import { LogoutMobile } from "../Logout"
-import { useAuth } from "@/context/AuthProvider"
+} from '@/components/ui/dropdown-menu';
+import AvatarButton from './avatar';
+import { siteConfig } from '@/config/site';
+import Link from 'next/link';
+import { LogoutMobile } from '../Logout';
+import { useAuth } from '@/context/AuthProvider';
 
 export function DropdownMenuComp({ isAdmin }: { isAdmin?: boolean }) {
   return (
@@ -28,7 +28,7 @@ export function DropdownMenuComp({ isAdmin }: { isAdmin?: boolean }) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {siteConfig.sideMenuItems.map((item) => (
-            <DropdownMenuItem key={item.label} >
+            <DropdownMenuItem key={item.label}>
               <Link href={item.href} className="flex items-center gap-2">
                 <item.icon />
                 <span>{item.label}</span>
@@ -37,7 +37,7 @@ export function DropdownMenuComp({ isAdmin }: { isAdmin?: boolean }) {
           ))}
         </DropdownMenuGroup>
 
-        {isAdmin &&
+        {isAdmin && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Admin</DropdownMenuLabel>
@@ -52,8 +52,7 @@ export function DropdownMenuComp({ isAdmin }: { isAdmin?: boolean }) {
               ))}
             </DropdownMenuGroup>
           </>
-        }
-
+        )}
 
         <DropdownMenuSeparator />
         {siteConfig.supportMenuItems.map((item) => (
@@ -70,13 +69,10 @@ export function DropdownMenuComp({ isAdmin }: { isAdmin?: boolean }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
 
-
 export function DropdownMenuComponent({ isAdmin }: { isAdmin?: boolean }) {
-  const { userDataPrivate } = useAuth()
-  return (
-    <DropdownMenuComp isAdmin={userDataPrivate?.role === 'admin'} />
-  )
+  const { userDataPrivate } = useAuth();
+  return <DropdownMenuComp isAdmin={userDataPrivate?.role === 'admin'} />;
 }

@@ -50,12 +50,12 @@ export function LogoutMobile({ withText }: { withText?: boolean }) {
       variant={'ghost'}
       onClick={handleSubmit}
       className={cn(
-        "w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md",
-        withText && "w-full text-left justify-start p-0"
+        'w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md',
+        withText && 'w-full text-left justify-start p-0'
       )}
     >
       <LogOut className="size-5" />
-      {withText && "Logout"}
+      {withText && 'Logout'}
     </Button>
   );
 }

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthProvider';
 import { set } from 'date-fns';
-import { Eye, Loader, Mail } from 'lucide-react';
+import { Eye, EyeOff, Loader, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,7 +25,8 @@ export default function SignupPage() {
   const [gender, setGender] = useState('');
   const [confirmPassword, setconfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
+  const [passwordVisiblity, setpasswordVisiblity] = useState(false);
+  const [confirmPasswordVisiblity, setConfirmPasswordVisiblity] = useState(false);
   const { signup, loading, currentUser } = useAuth();
 
   useEffect(() => {
@@ -33,6 +34,13 @@ export default function SignupPage() {
       router.push('/');
     }
   }, [currentUser]);
+
+  function togglePasswordVisiblity() {
+    setpasswordVisiblity(!passwordVisiblity);
+  }
+  function toggleConfirmPasswordVisiblity() {
+    setConfirmPasswordVisiblity(!confirmPasswordVisiblity);
+  }
 
   async function handleSubmit() {
     if (!email || !password || password.length < 8 || !userName || !gender) {
@@ -111,7 +119,7 @@ export default function SignupPage() {
                   <Label htmlFor="Password">Password</Label>
                   <div className="relative flex items-center">
                     <Input
-                      type="password"
+                      type={passwordVisiblity ? 'text' : "password"}
                       id="Password"
                       name="password"
                       placeholder="Password"
@@ -120,7 +128,14 @@ export default function SignupPage() {
                         setPassword(e.target.value);
                       }}
                     />
-                    <Eye className="w-4 h-4 absolute right-4 cursor-pointer" />
+
+                    <Button variant={"ghost"} size={"sm"} className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={togglePasswordVisiblity}>
+                      {passwordVisiblity ?
+                        <EyeOff className="w-4 h-4 " />
+                        :
+                        <Eye className="w-4 h-4 " />
+                      }
+                    </Button>
                   </div>
                 </div>
 
@@ -128,7 +143,7 @@ export default function SignupPage() {
                   <Label htmlFor="PasswordConfirmation">Confirm Password</Label>
                   <div className="relative flex items-center">
                     <Input
-                      type="password"
+                      type={confirmPasswordVisiblity ? 'text' : "password"}
                       id="PasswordConfirmation"
                       name="password_confirmation"
                       placeholder="Confirm Password"
@@ -137,7 +152,13 @@ export default function SignupPage() {
                         setconfirmPassword(e.target.value);
                       }}
                     />
-                    <Eye className="w-4 h-4 absolute right-4 cursor-pointer" />
+                    <Button variant={"ghost"} size={"sm"} className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={toggleConfirmPasswordVisiblity}>
+                      {confirmPasswordVisiblity ?
+                        <EyeOff className="w-4 h-4 " />
+                        :
+                        <Eye className="w-4 h-4 " />
+                      }
+                    </Button>
                   </div>
                 </div>
               </div>

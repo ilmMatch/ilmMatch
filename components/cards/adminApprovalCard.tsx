@@ -17,7 +17,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { UserPrivate, UserProfile } from '@/types/firebase';
-import UserModal from '../userModal';
+import UserModal from '../modals/userModal';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthProvider';
 import { generateRandomColor, getRandomGradientDirection } from './gradient';
