@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 export default function BookmarkPage() {
   const {
     userDataPrivate,
-    loading,
     currentUser,
     getRequestedMe,
     getMyRequested,
@@ -93,9 +92,7 @@ export default function BookmarkPage() {
     filterBookmark();
   }, [userDataPrivate?.bookmarks]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+
   return (
     <>
       {bookmarkedProfiles &&

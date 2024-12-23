@@ -8,27 +8,16 @@ import UserModal from '@/components/userModal';
 import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import AdminApprovalCard from '@/components/cards/adminApprovalCard';
+import { FilterModal } from '@/components/filterModal';
 
 export default function RoleManager() {
-  const { currentUser, getProfiles, getPrivatebyUIDs } = useAuth();
+  const { getProfiles, getPrivatebyUIDs } = useAuth();
   const [profiles, setProfiles] = useState<UserProfile[] | undefined>([]);
   const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([]);
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
   );
-  const [filters, setFilters] = useState<FilterOptions>({
-    name: '',
-    gender: '',
-    education: '',
-    ethnicity: '',
-    // languages: [],
-    // scholars: [],
-    polygamy: '',
-    // spouseAgeMin: 18,
-    // spouseAgeMax: 60,
-    // heightMin: 150,
-    // heightMax: 200,
-  });
+  const [filters, setFilters] = useState<FilterOptions>({});
 
   const [end, setEnd] = useState(false);
   async function getUsers() {
@@ -81,22 +70,13 @@ export default function RoleManager() {
   useEffect(() => {
     getUsers();
   }, []);
-  // const handleAssignRole = async () => {
-  //   setLoading(true);
-  //   try {
-  //     await roleManager(userId, role);
-  //   } catch (err: any) {
-  //     console.log(err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
-  if (!currentUser) {
-    return <LoginModal />;
-  }
+
   return (
     <div>
+      <FilterModal
+        filters={filters}
+        setFilters={setFilters} />
       {profiles &&
         profiles.map((user) => {
           const userPrivateInfo = privateInfo.find(

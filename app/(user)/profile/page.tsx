@@ -43,7 +43,7 @@ export default function ProfilePage() {
           <UserProfileForm />
         </TabsContent>
         <div className='w-full mt-2 flex justify-end'>
-          <Button onClick={requestReview}>Request review</Button>
+          <Button onClick={requestReview} disabled={submiting}> Request review</Button>
         </div>
       </Tabs>
     </>

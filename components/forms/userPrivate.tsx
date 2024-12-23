@@ -114,9 +114,6 @@ export function PrivateForm() {
     })
     setEditing(false);
   }
-  if (loading) {
-    return <>loading</>;
-  }
 
   return (
     <>

@@ -159,9 +159,6 @@ export function SidebarComponent() {
   return currentUser && userDataPrivate ? (
     <>
       <AppSidebar isAdmin={userDataPrivate?.role === 'admin'} />
-      <span className="block sm:hidden fixed top-20 left-4 z-10">
-        <SidebarTrigger />
-      </span>
     </>
   ) : (
     ''

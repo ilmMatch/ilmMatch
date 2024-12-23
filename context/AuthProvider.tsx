@@ -400,7 +400,7 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         orderBy('approved'),
         limit(limitx)
       );
-      console.log("query", q);
+
 
       if (lastVisibleDoc) {
         // If we have a last visible document, start after it

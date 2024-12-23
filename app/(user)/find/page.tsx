@@ -1,26 +1,33 @@
 'use client';
 import { useAuth } from '@/context/AuthProvider';
-import { UserProfile } from '@/types/firebase';
+import { FilterOptions, UserProfile } from '@/types/firebase';
 import React, { useEffect, useRef, useState } from 'react';
-import UserModal from '@/components/userModal';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import ProfileCard from '@/components/cards/profileCard';
+import { FilterModal } from '@/components/filterModal';
 export default function FindPage() {
   const { getProfiles, currentUser, getRequestedMe, getMyRequested, userDataPrivate } =
     useAuth();
   const [users, setUsers] = useState<UserProfile[] | undefined>([]);
   const [end, setEnd] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({
+    name: '',
+    gender: '',
+    education: '',
+    ethnicity: '',
+    // languages: [],
+    // scholars: [],
+    polygamy: '',
+    height: { min: 150, max: 200 },
+  });
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
   );
 
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
-    const filters = {
-      gender: "sister"  // This will match exactly "sister"
-    };
     const data = await getProfiles(10, lastVisibleDoc.current, 'approved', filters);
     if (!data.success) {
       console.log(data.error);
@@ -92,6 +99,9 @@ export default function FindPage() {
 
   return (
     <div>
+      <FilterModal
+        filters={filters}
+        setFilters={setFilters} />
       {users &&
         users.map((user) => (
           <div key={user.id}>

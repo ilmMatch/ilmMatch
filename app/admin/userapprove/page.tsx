@@ -1,5 +1,6 @@
 'use client';
 import AdminApprovalCard from '@/components/cards/adminApprovalCard';
+import { FilterModal } from '@/components/filterModal';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/userModal';
 import { useAuth } from '@/context/AuthProvider';
@@ -13,23 +14,12 @@ export default function UserApprovePage() {
   const [unApprovedProfiles, setUnApprovedProfiles] = useState<
     UserProfile[] | undefined
   >([]);
+  const [filters, setFilters] = useState<FilterOptions>({});
   const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([]);
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
   );
-  const [filters, setFilters] = useState<FilterOptions>({
-    name: '',
-    gender: '',
-    education: '',
-    ethnicity: '',
-    // languages: [],
-    // scholars: [],
-    polygamy: '',
-    // spouseAgeMin: 18,
-    // spouseAgeMax: 60,
-    // heightMin: 150,
-    // heightMax: 200,
-  });
+
 
   const [end, setEnd] = useState(false);
 
@@ -41,7 +31,6 @@ export default function UserApprovePage() {
       });
       return;
     }
-    console.log(data.data);
     if (data.data.length > 0) {
       lastVisibleDoc.current = data.lastVisibleDoc;
     } else {
@@ -79,6 +68,9 @@ export default function UserApprovePage() {
   return (
     <div>
       UserApprovePage
+      <FilterModal
+        filters={filters}
+        setFilters={setFilters} />
       {unApprovedProfiles &&
         unApprovedProfiles.map((user) => {
           const userPrivateInfo = privateInfo.find(
