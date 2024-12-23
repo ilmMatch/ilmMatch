@@ -2,8 +2,9 @@ import {
   BadgeCheck,
   Bookmark,
   Heart,
-  Home,
+  LifeBuoy,
   Send,
+  User,
   UserPlus,
   UserRoundCheck,
 } from 'lucide-react';
@@ -35,11 +36,45 @@ export const siteConfig = {
       href: '/about',
     },
   ],
+  navMenuItems: [
+    {
+      label: 'Profile',
+      href: '/profile',
+    },
+    {
+      label: 'Find',
+      href: '/find',
+    },
+    {
+      label: 'Projects',
+      href: '/projects',
+    },
+    {
+      label: 'Team',
+      href: '/team',
+    },
+    {
+      label: 'Calendar',
+      href: '/calendar',
+    },
+    {
+      label: 'Settings',
+      href: '/settings',
+    },
+    {
+      label: 'Help & Feedback',
+      href: '/help-feedback',
+    },
+    {
+      label: 'Logout',
+      href: '/logout',
+    },
+  ],
   sideMenuItems: [
     {
-      label: 'Home',
+      label: 'Profile',
       href: '/profile',
-      icon: Home,
+      icon: User,
     },
     {
       label: 'Approved Users',
@@ -79,45 +114,24 @@ export const siteConfig = {
       icon: Heart,
     },
   ],
-  navMenuItems: [
+  supportMenuItems: [
     {
-      label: 'Profile',
-      href: '/profile',
+      label: 'Support',
+      href: '#',
+      icon: LifeBuoy,
     },
     {
-      label: 'Find',
-      href: '/find',
-    },
-    {
-      label: 'Projects',
-      href: '/projects',
-    },
-    {
-      label: 'Team',
-      href: '/team',
-    },
-    {
-      label: 'Calendar',
-      href: '/calendar',
-    },
-    {
-      label: 'Settings',
-      href: '/settings',
-    },
-    {
-      label: 'Help & Feedback',
-      href: '/help-feedback',
-    },
-    {
-      label: 'Logout',
-      href: '/logout',
+      label: 'Feedback',
+      href: '#',
+      icon: Send,
     },
   ],
+
   links: {
-    github: 'https://github.com/nextui-org/nextui',
-    twitter: 'https://twitter.com/getnextui',
-    docs: 'https://nextui.org',
-    discord: 'https://discord.gg/9b6yyZKmH4',
-    sponsor: 'https://patreon.com/jrgarciadev',
+    github: '#',
+    twitter: '#',
+    docs: '#',
+    discord: '#',
+    sponsor: '#',
   },
 };

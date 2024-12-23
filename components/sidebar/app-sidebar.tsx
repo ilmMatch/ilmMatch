@@ -133,12 +133,12 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <SidebarMenu>
-              {navSecondary.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild size="sm" tooltip={item.title}>
-                    <a href={item.url}>
+              {siteConfig.supportMenuItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton asChild size="sm" tooltip={item.label}>
+                    <a href={item.href}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span>{item.label}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

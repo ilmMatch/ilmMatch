@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 export function LogoutButton() {
   const { logout } = useAuth();
@@ -25,7 +26,7 @@ export function LogoutButton() {
   );
 }
 
-export function LogoutMobile() {
+export function LogoutMobile({ withText }: { withText?: boolean }) {
   const { logout } = useAuth();
   const router = useRouter();
   async function handleSubmit() {
@@ -48,9 +49,13 @@ export function LogoutMobile() {
     <Button
       variant={'ghost'}
       onClick={handleSubmit}
-      className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md"
+      className={cn(
+        "w-8 h-8 flex items-center justify-center hover:bg-muted rounded-md",
+        withText && "w-full text-left justify-start p-0"
+      )}
     >
       <LogOut className="size-5" />
+      {withText && "Logout"}
     </Button>
   );
 }

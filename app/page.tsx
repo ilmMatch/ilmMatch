@@ -6,6 +6,7 @@ import { button as buttonStyles } from '@nextui-org/theme';
 import { siteConfig } from '@/config/site';
 import { title, subtitle } from '@/components/primitives';
 import { GithubIcon } from '@/components/icons';
+import { DropdownMenuComponent } from '@/components/navbar/dropdown';
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
           Beautiful, fast and modern React UI library.
         </div>
       </div>
-
+      <DropdownMenuComponent />
       <div className="flex gap-3">
         <Link
           isExternal
