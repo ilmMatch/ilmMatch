@@ -18,6 +18,6 @@ export default function RootLayout({
         <>Loading</>
     )
     return (
-        { children }
+        children
     );
 }
