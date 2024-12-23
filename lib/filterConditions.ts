@@ -7,13 +7,13 @@ export function getFilterConditions(filters: FilterOptions) {
     'countryResiding',
     'countryMoving',
     'ethnicity',
-    'polygamy',
-    'spouseAge',
     'hijab',
     'beard',
     'born',
     'sect',
     'maritalStatus',
+    'approved',
+    'matched'
   ];
 
   exactMatchFields.forEach((field) => {
@@ -63,10 +63,6 @@ export function getFilterConditions(filters: FilterOptions) {
     filterConditions.push(where('height', '>=', filters.height.min));
   }
 
-  if (filters.name) {
-    filterConditions.push(where('masjidName', '>=', filters.name));
-    filterConditions.push(where('masjidName', '<=', filters.name + '\uf8ff'));
-  }
 
   if (filters.education) {
     filterConditions.push(where('education', '>=', filters.education));

@@ -375,7 +375,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   async function getProfiles(
     limitx: number = 10,
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null = null,
-    approved: string = 'approved',
     filters: FilterOptions = {}
   ): Promise<FetchUserProfilesResult> {
     try {
@@ -385,7 +384,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       // Create the query to fetch only approved profiles
       const baseConditions = [
-        where('approved', '==', approved),
         where('__name__', '!=', currentUser.uid),
       ];
       const filterConditions = getFilterConditions(filters);
@@ -495,18 +493,16 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       // References to the Firestore documents
       const requestedme = doc(db, 'requestedme', requestedof);
       const myrequested = doc(db, 'myrequested', requestedby);
-      const docRef1 = doc(db, 'users', requestedof);
-      const docRef2 = doc(db, 'users', requestedby);
+      const docRef1 = doc(db, 'usersprofile', requestedof);
+      const docRef2 = doc(db, 'usersprofile', requestedby);
 
       if (state === 'unmatched') {
         // Handle unmatched state by updating 'unmatched' and 'matched' arrays
         batch.set(
           docRef1,
           {
-            matched: {
-              true: arrayRemove(requestedby),
-              false: arrayUnion(requestedby),
-            },
+            matched: arrayRemove(requestedby),
+            unmatched: arrayUnion(requestedby)
           },
           { merge: true }
         );
@@ -514,10 +510,8 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         batch.set(
           docRef2,
           {
-            matched: {
-              true: arrayRemove(requestedof),
-              false: arrayUnion(requestedof),
-            },
+            matched: arrayRemove(requestedof),
+            unmatched: arrayUnion(requestedof),
           },
           { merge: true }
         );
@@ -741,26 +735,23 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     profile2: string
   ): Promise<VoidResult> {
     const updateMatchedDocs = (batch: WriteBatch) => {
-      const docRef1 = doc(db, 'users', profile1);
-      const docRef2 = doc(db, 'users', profile2);
+      const docRef1 = doc(db, 'usersprofile', profile1);
+      const docRef2 = doc(db, 'usersprofile', profile2);
 
       batch.set(
         docRef1,
         {
-          matched: {
-            true: arrayUnion(profile2),
-            false: arrayRemove(profile2),
-          },
+          matched: arrayUnion(profile2),
+          unmatched: arrayRemove(profile2),
         },
         { merge: true }
       );
       batch.set(
         docRef2,
         {
-          matched: {
-            true: arrayUnion(profile1),
-            false: arrayRemove(profile1),
-          },
+          matched: arrayUnion(profile1),
+          unmatched: arrayRemove(profile1),
+
         },
         { merge: true }
       );

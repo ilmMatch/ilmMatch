@@ -14,7 +14,8 @@ export default function UserApprovePage() {
   const [unApprovedProfiles, setUnApprovedProfiles] = useState<
     UserProfile[] | undefined
   >([]);
-  const [filters, setFilters] = useState<FilterOptions>({});
+  const [filters, setFilters] = useState<FilterOptions>({ approved: 'requested' });
+  const [limit, setLimit] = useState<number>(10);
   const [privateInfo, setPrivateInfo] = useState<UserPrivate[]>([]);
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
@@ -24,9 +25,8 @@ export default function UserApprovePage() {
 
   async function getUsers() {
     const data = await getProfiles(
-      10,
+      limit,
       lastVisibleDoc.current,
-      'requested',
       filters
     );
     if (!data.success) {

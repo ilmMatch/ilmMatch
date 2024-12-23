@@ -7,17 +7,17 @@ import React, { use, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function AcceptedPage() {
-  const { userDataPrivate, getProfilebyUIDs } = useAuth();
+  const { userDataProfile, getProfilebyUIDs } = useAuth();
   const [users, setUsers] = useState<UserProfile[] | undefined>(undefined);
 
   async function getMatchedProfiles() {
-    if (!userDataPrivate || userDataPrivate.matched.true.length === 0) {
+    if (!userDataProfile || userDataProfile.matched.true.length === 0) {
       toast.error('Uh oh! No matches found.', {
         description: "if you've accepted a request, wait till admin confirms",
       });
       return;
     }
-    const data = await getProfilebyUIDs(userDataPrivate.matched.true);
+    const data = await getProfilebyUIDs(userDataProfile.matched.true);
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,
@@ -33,10 +33,10 @@ export default function AcceptedPage() {
     setUsers(profilesWithStatus);
   }
   useEffect(() => {
-    if (userDataPrivate) {
+    if (userDataProfile) {
       getMatchedProfiles();
     }
-  }, [userDataPrivate]);
+  }, [userDataProfile]);
   return (
     <>
       {users &&

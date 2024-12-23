@@ -4,7 +4,7 @@ import { FilterOptions, UserProfile } from '@/types/firebase';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import { DocumentData, limit, QueryDocumentSnapshot } from 'firebase/firestore';
 import ProfileCard from '@/components/cards/profileCard';
 import { FilterModal } from '@/components/filterModal';
 export default function FindPage() {
@@ -17,15 +17,10 @@ export default function FindPage() {
   } = useAuth();
   const [users, setUsers] = useState<UserProfile[] | undefined>([]);
   const [end, setEnd] = useState(false);
+  const [limit, setLimit] = useState<number>(10);
   const [filters, setFilters] = useState<FilterOptions>({
-    name: '',
-    gender: '',
-    education: '',
-    ethnicity: '',
-    // languages: [],
-    // scholars: [],
-    polygamy: '',
-    height: { min: 150, max: 200 },
+    approved: 'approved',
+    matched: [],
   });
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
@@ -34,9 +29,8 @@ export default function FindPage() {
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
     const data = await getProfiles(
-      10,
+      limit,
       lastVisibleDoc.current,
-      'approved',
       filters
     );
     if (!data.success) {

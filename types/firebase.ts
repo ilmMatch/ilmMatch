@@ -58,10 +58,10 @@ export interface UserPrivate {
 
 export type FetchUserProfilesResult =
   | {
-      success: true;
-      data: UserProfile[];
-      lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
-    }
+    success: true;
+    data: UserProfile[];
+    lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
+  }
   | { success: false; error: string };
 
 export type FetchUserPrivatesResult =
@@ -141,7 +141,6 @@ export interface AuthContextType {
   getProfiles: (
     limitx: number,
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null,
-    aprroved: string,
     filters: FilterOptions
   ) => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
@@ -171,7 +170,6 @@ export interface AuthContextType {
 }
 
 export interface FilterOptions extends Record<string, any> {
-  name?: string;
   countryResiding?: string;
   countryMoving?: string;
   gender?: string;
@@ -197,7 +195,9 @@ export interface FilterOptions extends Record<string, any> {
     min?: number;
     max?: number;
   };
-  limit?: number;
+  // visible to admin 
+  matched?: string[];
+  approved?: "approved" | "notApproved" | "requested",
 }
 
 export interface UserDataProfileType {

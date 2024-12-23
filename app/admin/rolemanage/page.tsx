@@ -18,13 +18,14 @@ export default function RoleManager() {
     null
   );
   const [filters, setFilters] = useState<FilterOptions>({});
+  const [limit, setLimit] = useState<number>(10);
+
 
   const [end, setEnd] = useState(false);
   async function getUsers() {
     const data = await getProfiles(
-      10,
+      limit,
       lastVisibleDoc.current,
-      'requested',
       filters
     );
     if (!data.success) {
@@ -57,10 +58,10 @@ export default function RoleManager() {
         );
         return matchingProfile
           ? {
-              ...profile,
-              status: matchingProfile.role,
-              statusFrom: 'adminAssign',
-            }
+            ...profile,
+            status: matchingProfile.role,
+            statusFrom: 'adminAssign',
+          }
           : profile;
       }
     );
