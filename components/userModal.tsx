@@ -110,9 +110,9 @@ export default function UserModal({
                     className={cn(
                       'absolute top-5 right-8 capitalize',
                       matched === 'Matched' &&
-                      badgeVariants({ variant: 'approved' }),
+                        badgeVariants({ variant: 'approved' }),
                       matched === 'Matched before' &&
-                      badgeVariants({ variant: 'notApproved' })
+                        badgeVariants({ variant: 'notApproved' })
                     )}
                   >
                     {matched}
@@ -132,7 +132,7 @@ export default function UserModal({
                   user={user}
                   setStateUsers={setStateUsers}
                   stateUsers={stateUsers}
-                // handleAction={handleProfileMatchRequest}
+                  // handleAction={handleProfileMatchRequest}
                 />
               </ModalFooter>
             </>
@@ -201,7 +201,10 @@ function ProfileContent({
         <ProfileItem label="Marital Status" value={profile.maritalStatus} />
         <ProfileItem label="Children" value={profile.childern} />
         <ProfileItem label="Polygamy" value={profile.polygamy} />
-        <ProfileItemNested label="Preferred Spouse Age" value={profile.spouseAge} />
+        <ProfileItemNested
+          label="Preferred Spouse Age"
+          value={profile.spouseAge}
+        />
       </ProfileSection>
 
       <ProfileSection title="About">
@@ -242,23 +245,39 @@ function ProfileItem({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-function ProfileItemArray({ label, value }: { label: string; value: string[] }) {
+function ProfileItemArray({
+  label,
+  value,
+}: {
+  label: string;
+  value: string[];
+}) {
   return (
     <div className="flex justify-between">
       <span className="text-sm font-medium text-muted-foreground capitalize pr-2">
         {label}:
       </span>
-      <span className="text-sm text-accent-foreground capitalize">{value.join(", ")}</span>
+      <span className="text-sm text-accent-foreground capitalize">
+        {value.join(', ')}
+      </span>
     </div>
   );
 }
-function ProfileItemNested({ label, value }: { label: string; value: { min: number; max: number; } }) {
+function ProfileItemNested({
+  label,
+  value,
+}: {
+  label: string;
+  value: { min: number; max: number };
+}) {
   return (
     <div className="flex justify-between">
       <span className="text-sm font-medium text-muted-foreground capitalize pr-2">
         {label}:
       </span>
-      <span className="text-sm text-accent-foreground capitalize">{value.min} - {value.max}</span>
+      <span className="text-sm text-accent-foreground capitalize">
+        {value.min} - {value.max}
+      </span>
     </div>
   );
 }
@@ -284,7 +303,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
   stateUsers,
   setStateUsers,
 }) => {
-  console.log(user, "usermodal")
+  console.log(user, 'usermodal');
   const {
     approvalUpdate,
     requestsUpdate,
@@ -299,12 +318,12 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     const updatedUsers = stateUsers.map((stateUser) =>
       stateUser.id === user.id
         ? {
-          ...stateUser,
-          status: state,
-          ...(state === undefined
-            ? { statusFrom: undefined }
-            : { statusFrom }),
-        }
+            ...stateUser,
+            status: state,
+            ...(state === undefined
+              ? { statusFrom: undefined }
+              : { statusFrom }),
+          }
         : stateUser
     );
     setStateUsers(updatedUsers);
@@ -452,7 +471,6 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
       </Button>
     );
   }
-
 
   if (user.statusFrom === 'myrequests' && !sameGender) {
     if (user.status === 'rejected') {

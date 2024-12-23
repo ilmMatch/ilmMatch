@@ -8,8 +8,13 @@ import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import ProfileCard from '@/components/cards/profileCard';
 import { FilterModal } from '@/components/filterModal';
 export default function FindPage() {
-  const { getProfiles, currentUser, getRequestedMe, getMyRequested, userDataPrivate } =
-    useAuth();
+  const {
+    getProfiles,
+    currentUser,
+    getRequestedMe,
+    getMyRequested,
+    userDataPrivate,
+  } = useAuth();
   const [users, setUsers] = useState<UserProfile[] | undefined>([]);
   const [end, setEnd] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
@@ -28,7 +33,12 @@ export default function FindPage() {
 
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
-    const data = await getProfiles(10, lastVisibleDoc.current, 'approved', filters);
+    const data = await getProfiles(
+      10,
+      lastVisibleDoc.current,
+      'approved',
+      filters
+    );
     if (!data.success) {
       console.log(data.error);
       toast.error('Uh oh! Something went wrong.', {
@@ -78,12 +88,16 @@ export default function FindPage() {
           ? requestedStatus.toString()
           : myRequestStatus
             ? myRequestStatus.toString()
-            : matched ? "matched" : undefined,
+            : matched
+              ? 'matched'
+              : undefined,
         statusFrom: requestedStatus
           ? 'requestedMe'
           : myRequestStatus
             ? 'myrequests'
-            : matched ? "matched" : undefined,
+            : matched
+              ? 'matched'
+              : undefined,
       };
     });
 
@@ -99,9 +113,7 @@ export default function FindPage() {
 
   return (
     <div>
-      <FilterModal
-        filters={filters}
-        setFilters={setFilters} />
+      <FilterModal filters={filters} setFilters={setFilters} />
       {users &&
         users.map((user) => (
           <div key={user.id}>

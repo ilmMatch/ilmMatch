@@ -1,89 +1,93 @@
 import { FilterOptions } from '@/types/firebase';
 import { where, QueryFieldFilterConstraint, and, or } from 'firebase/firestore';
 
-
 export function getFilterConditions(filters: FilterOptions) {
+  const filterConditions = [];
+  const exactMatchFields = [
+    'countryResiding',
+    'countryMoving',
+    'ethnicity',
+    'polygamy',
+    'spouseAge',
+    'hijab',
+    'beard',
+    'born',
+    'sect',
+    'maritalStatus',
+  ];
 
-    const filterConditions = [];
-    const exactMatchFields = [
-        'countryResiding',
-        'countryMoving',
-        'ethnicity',
-        'polygamy',
-        'spouseAge',
-        'hijab',
-        'beard',
-        'born',
-        'sect',
-        'maritalStatus'
-    ];
-
-    exactMatchFields.forEach(field => {
-        if (filters[field as keyof FilterOptions]) {
-            filterConditions.push(where(field, '==', filters[field as keyof FilterOptions]));
-        }
-    });
-
-    if (filters.age) {
-        const now = new Date();
-        if (filters.age.min) {
-            const maxDate = new Date(now.getFullYear() - filters.age.min, now.getMonth(), now.getDate());
-            filterConditions.push(where('dob', '<=', maxDate));
-        }
-        if (filters.age.max) {
-            const minDate = new Date(now.getFullYear() - filters.age.max, now.getMonth(), now.getDate());
-            filterConditions.push(where('dob', '>=', minDate));
-        }
+  exactMatchFields.forEach((field) => {
+    if (filters[field as keyof FilterOptions]) {
+      filterConditions.push(
+        where(field, '==', filters[field as keyof FilterOptions])
+      );
     }
+  });
 
-    if (filters.gender && filters.gender !== 'all') filterConditions.push(where('gender', '==', filters.gender));
-    if (filters.polygamy && filters.polygamy !== 'all') filterConditions.push(where('polygamy', '==', filters.polygamy));
+  if (filters.age) {
+    const now = new Date();
+    if (filters.age.min) {
+      const maxDate = new Date(
+        now.getFullYear() - filters.age.min,
+        now.getMonth(),
+        now.getDate()
+      );
+      filterConditions.push(where('dob', '<=', maxDate));
+    }
+    if (filters.age.max) {
+      const minDate = new Date(
+        now.getFullYear() - filters.age.max,
+        now.getMonth(),
+        now.getDate()
+      );
+      filterConditions.push(where('dob', '>=', minDate));
+    }
+  }
 
-    if (filters.spouseAge?.min !== undefined) {
-        filterConditions.push(where('spouseAge.max', '>=', filters.spouseAge.min));
-    }
-    if (filters.spouseAge?.max !== undefined) {
-        filterConditions.push(where('spouseAge.min', '<=', filters.spouseAge.max));
-    }
+  if (filters.gender && filters.gender !== 'all')
+    filterConditions.push(where('gender', '==', filters.gender));
+  if (filters.polygamy && filters.polygamy !== 'all')
+    filterConditions.push(where('polygamy', '==', filters.polygamy));
 
-    if (filters.height?.max !== undefined) {
-        filterConditions.push(where('height', '<=', filters.height.max));
-    }
-    if (filters.height?.min !== undefined) {
-        filterConditions.push(where('height', '>=', filters.height.min));
-    }
+  if (filters.spouseAge?.min !== undefined) {
+    filterConditions.push(where('spouseAge.max', '>=', filters.spouseAge.min));
+  }
+  if (filters.spouseAge?.max !== undefined) {
+    filterConditions.push(where('spouseAge.min', '<=', filters.spouseAge.max));
+  }
 
-    if (filters.name) {
-        filterConditions.push(where('masjidName', '>=', filters.name));
-        filterConditions.push(where('masjidName', '<=', filters.name + '\uf8ff'));
-    }
+  if (filters.height?.max !== undefined) {
+    filterConditions.push(where('height', '<=', filters.height.max));
+  }
+  if (filters.height?.min !== undefined) {
+    filterConditions.push(where('height', '>=', filters.height.min));
+  }
 
-    if (filters.education) {
-        filterConditions.push(where('education', '>=', filters.education));
-        filterConditions.push(where('education', '<=', filters.education + '\uf8ff'));
-    }
+  if (filters.name) {
+    filterConditions.push(where('masjidName', '>=', filters.name));
+    filterConditions.push(where('masjidName', '<=', filters.name + '\uf8ff'));
+  }
 
+  if (filters.education) {
+    filterConditions.push(where('education', '>=', filters.education));
+    filterConditions.push(
+      where('education', '<=', filters.education + '\uf8ff')
+    );
+  }
 
-    if (filters.scholars && filters.scholars.length > 0) {
-        filterConditions.push(where('scholars', 'array-contains-any', filters.scholars));
-    }
-    if (filters.languages && filters.languages.length > 0) {
-        filterConditions.push(where('languages', 'array-contains-any', filters.languages));
-    }
+  if (filters.scholars && filters.scholars.length > 0) {
+    filterConditions.push(
+      where('scholars', 'array-contains-any', filters.scholars)
+    );
+  }
+  if (filters.languages && filters.languages.length > 0) {
+    filterConditions.push(
+      where('languages', 'array-contains-any', filters.languages)
+    );
+  }
 
-    return filterConditions
+  return filterConditions;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 // const handleCommaField = (fieldValue: string | undefined, fieldName: string) => {
 //     if (fieldValue) {
@@ -107,9 +111,6 @@ export function getFilterConditions(filters: FilterOptions) {
 // // Apply the comma-separated field handling to both languages and scholars
 // handleCommaField(filters.languages, 'languages');
 // handleCommaField(filters.scholars, 'scholars');
-
-
-
 
 // export function getFilterConditions(filters: FilterOptions): QueryFieldFilterConstraint[] {
 //     const conditions: QueryFieldFilterConstraint[] = [];
@@ -138,4 +139,3 @@ export function getFilterConditions(filters: FilterOptions) {
 
 //     return conditions;
 // }
-

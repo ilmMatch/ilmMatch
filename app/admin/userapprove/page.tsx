@@ -20,11 +20,15 @@ export default function UserApprovePage() {
     null
   );
 
-
   const [end, setEnd] = useState(false);
 
   async function getUsers() {
-    const data = await getProfiles(10, lastVisibleDoc.current, 'requested', filters);
+    const data = await getProfiles(
+      10,
+      lastVisibleDoc.current,
+      'requested',
+      filters
+    );
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,
@@ -68,9 +72,7 @@ export default function UserApprovePage() {
   return (
     <div>
       UserApprovePage
-      <FilterModal
-        filters={filters}
-        setFilters={setFilters} />
+      <FilterModal filters={filters} setFilters={setFilters} />
       {unApprovedProfiles &&
         unApprovedProfiles.map((user) => {
           const userPrivateInfo = privateInfo.find(

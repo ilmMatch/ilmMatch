@@ -63,13 +63,14 @@ export function CountryCodeSelector({
               disabled={false}
             >
               <>
-
                 {/* {selectedCountry
                   ? '+ ' + selectedCountry.code
                   : defaultCode
                     ? '+ ' + defaultCode
                     : ''} */}
-                {(defaultCode != undefined || defaultCode != null) ? '+ ' + defaultCode : ""}
+                {defaultCode != undefined || defaultCode != null
+                  ? '+ ' + defaultCode
+                  : ''}
               </>
 
               <ChevronsUpDown

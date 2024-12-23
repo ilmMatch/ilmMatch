@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React from 'react';
 import { PrivateForm } from '@/components/forms/userPrivate';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,12 +8,11 @@ import { useAuth } from '@/context/AuthProvider';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
-
   const { approvalUpdate, currentUser } = useAuth();
   const [submiting, setSubmiting] = React.useState(false);
 
   async function requestReview() {
-    setSubmiting(true)
+    setSubmiting(true);
     if (!currentUser) throw 'you must be logged in';
     const result = await approvalUpdate('requested', currentUser.uid);
     if (!result.success) {
@@ -21,13 +20,12 @@ export default function ProfilePage() {
         description: result.error,
       });
       setSubmiting(false);
-      return
+      return;
     }
     toast.success('Success', {
       description: 'Approval request sent',
-    })
+    });
     setSubmiting(false);
-
   }
   return (
     <>
@@ -42,8 +40,11 @@ export default function ProfilePage() {
         <TabsContent value="public">
           <UserProfileForm />
         </TabsContent>
-        <div className='w-full mt-2 flex justify-end'>
-          <Button onClick={requestReview} disabled={submiting}> Request review</Button>
+        <div className="w-full mt-2 flex justify-end">
+          <Button onClick={requestReview} disabled={submiting}>
+            {' '}
+            Request review
+          </Button>
         </div>
       </Tabs>
     </>

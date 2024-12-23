@@ -25,8 +25,8 @@ export interface UserProfile {
   briefAboutYou: string;
   sect: string;
   spouseAge: {
-    min: number,
-    max: number
+    min: number;
+    max: number;
   };
   countryMoving: string;
   hijab: string;
@@ -58,10 +58,10 @@ export interface UserPrivate {
 
 export type FetchUserProfilesResult =
   | {
-    success: true;
-    data: UserProfile[];
-    lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
-  }
+      success: true;
+      data: UserProfile[];
+      lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
+    }
   | { success: false; error: string };
 
 export type FetchUserPrivatesResult =
@@ -142,7 +142,7 @@ export interface AuthContextType {
     limitx: number,
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null,
     aprroved: string,
-    filters: FilterOptions,
+    filters: FilterOptions
   ) => Promise<FetchUserProfilesResult>;
   allProfiles: UserProfile[];
   bookmarkUpdate: (
@@ -169,9 +169,6 @@ export interface AuthContextType {
   setMatchAdmin: (profile1: string, profile2: string) => Promise<VoidResult>;
   loading: boolean;
 }
-
-
-
 
 export interface FilterOptions extends Record<string, any> {
   name?: string;
@@ -203,12 +200,10 @@ export interface FilterOptions extends Record<string, any> {
   limit?: number;
 }
 
-
-
 export interface UserDataProfileType {
-  born: "born" | "revert";
+  born: 'born' | 'revert';
   briefAboutYou: string;
-  beard: "yes" | "no" | "not applicable";
+  beard: 'yes' | 'no' | 'not applicable';
   build: string;
   childern: number;
   countryResiding: string;
@@ -225,12 +220,12 @@ export interface UserDataProfileType {
   nationality: string;
   occupation: string;
   pray: string;
-  polygamy: "yes" | "no" | "under certain circumstance";
+  polygamy: 'yes' | 'no' | 'under certain circumstance';
   spouseBrief: string;
   scholars: string[];
   sect: string;
   spouseAge: {
-    min: number,
-    max: number
+    min: number;
+    max: number;
   };
 }

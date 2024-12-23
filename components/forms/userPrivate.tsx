@@ -34,13 +34,16 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthProvider';
 import { use, useEffect, useState } from 'react';
 import { CountryCodeSelector } from './fields/CountryCode';
-import { userPrivateSchema, UserPrivateFormValues } from '@/lib/schemas/userPrivateSchema';
+import {
+  userPrivateSchema,
+  UserPrivateFormValues,
+} from '@/lib/schemas/userPrivateSchema';
 import { toast } from 'sonner';
 import { badgeVariants } from '../ui/badge';
 
-
 export function PrivateForm() {
-  const { userPrivateUpdate, userDataPrivate, loading, userDataProfile } = useAuth();
+  const { userPrivateUpdate, userDataPrivate, loading, userDataProfile } =
+    useAuth();
   const [editing, setEditing] = useState(false);
 
   const form = useForm<UserPrivateFormValues>({
@@ -51,20 +54,28 @@ export function PrivateForm() {
         ? new Date(userDataPrivate.dob.seconds * 1000)
         : undefined,
       gender: userDataPrivate?.gender || 'sister',
-      ...(userDataPrivate?.gender === 'brother' ? {
-        countryCode: userDataPrivate?.countryCode || undefined,
-        mobileNumber: userDataPrivate?.mobileNumber?.toString() || 'Not Provided',
-        femaleMehramName: userDataPrivate?.femaleMehramName || '',
-        femaleMehramNumber: userDataPrivate?.femaleMehramNumber?.toString() || '',
-        femaleMehramCountryCode: userDataPrivate?.femaleMehramCountryCode || undefined,
-      } : {
-        waliName: userDataPrivate?.waliName || 'Not Provided',
-        waliCountryCode: userDataPrivate?.waliCountryCode || undefined,
-        waliMobileNumber: userDataPrivate?.waliMobileNumber?.toString() || 'Not Provided',
-        maleMehramName: userDataPrivate?.maleMehramName || 'Not Provided',
-        maleMehramNumber: userDataPrivate?.maleMehramNumber?.toString() || '',
-        maleMehramCountryCode: userDataPrivate?.maleMehramCountryCode || undefined,
-      }),
+      ...(userDataPrivate?.gender === 'brother'
+        ? {
+            countryCode: userDataPrivate?.countryCode || undefined,
+            mobileNumber:
+              userDataPrivate?.mobileNumber?.toString() || 'Not Provided',
+            femaleMehramName: userDataPrivate?.femaleMehramName || '',
+            femaleMehramNumber:
+              userDataPrivate?.femaleMehramNumber?.toString() || '',
+            femaleMehramCountryCode:
+              userDataPrivate?.femaleMehramCountryCode || undefined,
+          }
+        : {
+            waliName: userDataPrivate?.waliName || 'Not Provided',
+            waliCountryCode: userDataPrivate?.waliCountryCode || undefined,
+            waliMobileNumber:
+              userDataPrivate?.waliMobileNumber?.toString() || 'Not Provided',
+            maleMehramName: userDataPrivate?.maleMehramName || 'Not Provided',
+            maleMehramNumber:
+              userDataPrivate?.maleMehramNumber?.toString() || '',
+            maleMehramCountryCode:
+              userDataPrivate?.maleMehramCountryCode || undefined,
+          }),
     },
   });
   const { reset } = form;
@@ -77,27 +88,35 @@ export function PrivateForm() {
           ? new Date(userDataPrivate.dob.seconds * 1000)
           : undefined,
         gender: userDataPrivate?.gender || 'sister',
-        ...(userDataPrivate?.gender === 'brother' ? {
-          countryCode: userDataPrivate?.countryCode || undefined,
-          mobileNumber: userDataPrivate?.mobileNumber?.toString() || 'Not Provided',
-          femaleMehramName: userDataPrivate?.femaleMehramName || '',
-          femaleMehramNumber: userDataPrivate?.femaleMehramNumber?.toString() || '',
-          femaleMehramCountryCode: userDataPrivate?.femaleMehramCountryCode || undefined,
-        } : {
-          waliName: userDataPrivate?.waliName || 'Not Provided',
-          waliCountryCode: userDataPrivate?.waliCountryCode || undefined,
-          waliMobileNumber: userDataPrivate?.waliMobileNumber?.toString() || 'Not Provided',
-          maleMehramName: userDataPrivate?.maleMehramName || 'Not Provided',
-          maleMehramNumber: userDataPrivate?.maleMehramNumber?.toString() || '',
-          maleMehramCountryCode: userDataPrivate?.maleMehramCountryCode || undefined,
-        }),
-      },);
+        ...(userDataPrivate?.gender === 'brother'
+          ? {
+              countryCode: userDataPrivate?.countryCode || undefined,
+              mobileNumber:
+                userDataPrivate?.mobileNumber?.toString() || 'Not Provided',
+              femaleMehramName: userDataPrivate?.femaleMehramName || '',
+              femaleMehramNumber:
+                userDataPrivate?.femaleMehramNumber?.toString() || '',
+              femaleMehramCountryCode:
+                userDataPrivate?.femaleMehramCountryCode || undefined,
+            }
+          : {
+              waliName: userDataPrivate?.waliName || 'Not Provided',
+              waliCountryCode: userDataPrivate?.waliCountryCode || undefined,
+              waliMobileNumber:
+                userDataPrivate?.waliMobileNumber?.toString() || 'Not Provided',
+              maleMehramName: userDataPrivate?.maleMehramName || 'Not Provided',
+              maleMehramNumber:
+                userDataPrivate?.maleMehramNumber?.toString() || '',
+              maleMehramCountryCode:
+                userDataPrivate?.maleMehramCountryCode || undefined,
+            }),
+      });
     }
   }, [userDataPrivate, reset]);
 
   async function onSubmit(values: UserPrivateFormValues) {
     const sanitizedValues = Object.fromEntries(
-      Object.entries(values).map(([key, value]) => [key, value ?? ""])
+      Object.entries(values).map(([key, value]) => [key, value ?? ''])
     ) as UserPrivateFormValues;
 
     const result = await userPrivateUpdate(sanitizedValues);
@@ -106,12 +125,12 @@ export function PrivateForm() {
         description: result.error,
       });
       setEditing(false);
-      return
+      return;
     }
 
     toast.success('Success', {
       description: 'Your profile has been updated',
-    })
+    });
     setEditing(false);
   }
 
@@ -120,7 +139,7 @@ export function PrivateForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
-            <CardHeader className='relative'>
+            <CardHeader className="relative">
               <CardTitle>Contact Info</CardTitle>
               <CardDescription>
                 This information is private and not shown to anyone. Click save
@@ -130,18 +149,18 @@ export function PrivateForm() {
                 className={cn(
                   'absolute top-2 right-2 capitalize',
                   userDataProfile?.approved === 'requested' &&
-                  badgeVariants({ variant: 'requested' }),
+                    badgeVariants({ variant: 'requested' }),
                   userDataProfile?.approved === 'approved' &&
-                  badgeVariants({ variant: 'approved' }),
+                    badgeVariants({ variant: 'approved' }),
                   userDataProfile?.approved === 'notApproved' &&
-                  badgeVariants({ variant: 'notApproved' })
+                    badgeVariants({ variant: 'notApproved' })
                 )}
               >
                 {userDataProfile?.approved}
               </span>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="userName"
@@ -156,7 +175,7 @@ export function PrivateForm() {
                             className={cn(
                               'flex-grow w-full',
                               !editing &&
-                              'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                             )}
                             disabled={!editing}
                           />
@@ -167,7 +186,6 @@ export function PrivateForm() {
                   )}
                 />
                 {userDataPrivate?.gender === 'brother' && (
-
                   <div className="flex">
                     <FormField
                       control={form.control}
@@ -175,7 +193,9 @@ export function PrivateForm() {
                       render={({ field }) => (
                         <FormItem className="">
                           <div className="flex items-center">
-                            <FormLabel className="min-w-32 ">Contact:</FormLabel>
+                            <FormLabel className="min-w-32 ">
+                              Contact:
+                            </FormLabel>
                             <FormControl>
                               <CountryCodeSelector
                                 // onChange={handleUserPhoneChange}
@@ -184,7 +204,7 @@ export function PrivateForm() {
                                 editing={editing}
                                 className={cn(
                                   !editing &&
-                                  'pointer-events-none opacity-50 cursor-default'
+                                    'pointer-events-none opacity-50 cursor-default'
                                 )}
                               />
                             </FormControl>
@@ -209,7 +229,7 @@ export function PrivateForm() {
                                 className={cn(
                                   'flex-grow',
                                   !editing &&
-                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                    'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                                 )}
                                 disabled={!editing}
                               />
@@ -222,7 +242,6 @@ export function PrivateForm() {
                   </div>
                 )}
                 {userDataPrivate?.gender === 'sister' && (
-
                   <FormField
                     control={form.control}
                     name="waliName"
@@ -237,7 +256,7 @@ export function PrivateForm() {
                               className={cn(
                                 'flex-grow w-full',
                                 !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                               )}
                               disabled={!editing}
                             />
@@ -249,7 +268,6 @@ export function PrivateForm() {
                   />
                 )}
                 {userDataPrivate?.gender === 'sister' && (
-
                   <div className="flex">
                     <FormField
                       control={form.control}
@@ -257,7 +275,10 @@ export function PrivateForm() {
                       render={({ field }) => (
                         <FormItem className="">
                           <div className="flex items-center">
-                            <FormLabel className="min-w-32 "> Wali Contact:</FormLabel>
+                            <FormLabel className="min-w-32 ">
+                              {' '}
+                              Wali Contact:
+                            </FormLabel>
                             <FormControl>
                               <CountryCodeSelector
                                 // onChange={handleUserPhoneChange}
@@ -266,7 +287,7 @@ export function PrivateForm() {
                                 editing={editing}
                                 className={cn(
                                   !editing &&
-                                  'pointer-events-none opacity-50 cursor-default'
+                                    'pointer-events-none opacity-50 cursor-default'
                                 )}
                               />
                             </FormControl>
@@ -291,7 +312,7 @@ export function PrivateForm() {
                                 className={cn(
                                   'flex-grow',
                                   !editing &&
-                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                    'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                                 )}
                                 disabled={!editing}
                               />
@@ -318,14 +339,16 @@ export function PrivateForm() {
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-4 flex-1">
                         <div className="flex items-center flex-grow">
-                          <FormLabel className="min-w-32 ">Female Mehram</FormLabel>
+                          <FormLabel className="min-w-32 ">
+                            Female Mehram
+                          </FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               className={cn(
                                 'flex-grow w-full',
                                 !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                               )}
                               disabled={!editing}
                             />
@@ -334,7 +357,8 @@ export function PrivateForm() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />)}
+                  />
+                )}
                 {userDataPrivate?.gender === 'brother' && (
                   <div className="flex">
                     <FormField
@@ -343,7 +367,9 @@ export function PrivateForm() {
                       render={({ field }) => (
                         <FormItem className="">
                           <div className="flex items-center">
-                            <FormLabel className="min-w-32 ">Mehram Contact:</FormLabel>
+                            <FormLabel className="min-w-32 ">
+                              Mehram Contact:
+                            </FormLabel>
                             <FormControl>
                               <CountryCodeSelector
                                 // onChange={handleUserPhoneChange}
@@ -352,7 +378,7 @@ export function PrivateForm() {
                                 editing={editing}
                                 className={cn(
                                   !editing &&
-                                  'pointer-events-none opacity-50 cursor-default'
+                                    'pointer-events-none opacity-50 cursor-default'
                                 )}
                               />
                             </FormControl>
@@ -377,7 +403,7 @@ export function PrivateForm() {
                                 className={cn(
                                   'flex-grow',
                                   !editing &&
-                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                    'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                                 )}
                                 disabled={!editing}
                               />
@@ -397,14 +423,16 @@ export function PrivateForm() {
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-4 flex-1">
                         <div className="flex items-center flex-grow">
-                          <FormLabel className="min-w-32 ">Male Mehram</FormLabel>
+                          <FormLabel className="min-w-32 ">
+                            Male Mehram
+                          </FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               className={cn(
                                 'flex-grow w-full',
                                 !editing &&
-                                'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                               )}
                               disabled={!editing}
                             />
@@ -413,7 +441,8 @@ export function PrivateForm() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />)}
+                  />
+                )}
                 {userDataPrivate?.gender === 'sister' && (
                   <div className="flex">
                     <FormField
@@ -422,7 +451,9 @@ export function PrivateForm() {
                       render={({ field }) => (
                         <FormItem className="">
                           <div className="flex items-center">
-                            <FormLabel className="min-w-32 ">Mehram Contact:</FormLabel>
+                            <FormLabel className="min-w-32 ">
+                              Mehram Contact:
+                            </FormLabel>
                             <FormControl>
                               <CountryCodeSelector
                                 // onChange={handleUserPhoneChange}
@@ -431,7 +462,7 @@ export function PrivateForm() {
                                 editing={editing}
                                 className={cn(
                                   !editing &&
-                                  'pointer-events-none opacity-50 cursor-default'
+                                    'pointer-events-none opacity-50 cursor-default'
                                 )}
                               />
                             </FormControl>
@@ -456,7 +487,7 @@ export function PrivateForm() {
                                 className={cn(
                                   'flex-grow',
                                   !editing &&
-                                  'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
+                                    'inline outline-none border-none disabled:text-foreground disabled:cursor-default'
                                 )}
                                 disabled={!editing}
                               />
@@ -468,8 +499,6 @@ export function PrivateForm() {
                     />
                   </div>
                 )}
-
-
 
                 <FormField
                   control={form.control}

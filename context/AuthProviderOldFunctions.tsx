@@ -79,24 +79,6 @@
 //     await updateDoc(docRef, { [key]: deleteField() });
 //   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //  async function signup(
 //     email: string,
 //     password: string,

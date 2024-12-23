@@ -137,7 +137,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
     }
   }
 
-
   async function login(email: string, password: string): Promise<VoidResult> {
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -208,7 +207,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       };
     }
   };
-
 
   async function userPrivateUpdate(
     UserProfileNew: UserDataPrivateType
@@ -290,7 +288,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         { ...UserProfileNew, approved: 'notApproved' },
         { merge: true }
       );
-
 
       return { success: true };
     } catch (error: any) {
@@ -400,7 +397,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         orderBy('approved'),
         limit(limitx)
       );
-
 
       if (lastVisibleDoc) {
         // If we have a last visible document, start after it

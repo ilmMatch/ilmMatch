@@ -21,7 +21,12 @@ export default function RoleManager() {
 
   const [end, setEnd] = useState(false);
   async function getUsers() {
-    const data = await getProfiles(10, lastVisibleDoc.current, 'requested', filters);
+    const data = await getProfiles(
+      10,
+      lastVisibleDoc.current,
+      'requested',
+      filters
+    );
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,
@@ -52,10 +57,10 @@ export default function RoleManager() {
         );
         return matchingProfile
           ? {
-            ...profile,
-            status: matchingProfile.role,
-            statusFrom: 'adminAssign',
-          }
+              ...profile,
+              status: matchingProfile.role,
+              statusFrom: 'adminAssign',
+            }
           : profile;
       }
     );
@@ -71,12 +76,9 @@ export default function RoleManager() {
     getUsers();
   }, []);
 
-
   return (
     <div>
-      <FilterModal
-        filters={filters}
-        setFilters={setFilters} />
+      <FilterModal filters={filters} setFilters={setFilters} />
       {profiles &&
         profiles.map((user) => {
           const userPrivateInfo = privateInfo.find(

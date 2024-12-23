@@ -92,7 +92,6 @@ export default function BookmarkPage() {
     filterBookmark();
   }, [userDataPrivate?.bookmarks]);
 
-
   return (
     <>
       {bookmarkedProfiles &&
