@@ -1,3 +1,4 @@
+'use client'
 
 import {
   DropdownMenu,
@@ -12,12 +13,15 @@ import AvatarButton from "./avatar"
 import { siteConfig } from "@/config/site"
 import Link from "next/link"
 import { LogoutMobile } from "../Logout"
+import { useAuth } from "@/context/AuthProvider"
 
-export function DropdownMenuComponent() {
+export function DropdownMenuComp({ isAdmin }: { isAdmin?: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <AvatarButton />
+        <div className="cursor-pointer">
+          <AvatarButton />
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" loop side="bottom">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -32,20 +36,26 @@ export function DropdownMenuComponent() {
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Admin</DropdownMenuLabel>
-        <DropdownMenuGroup>
-          {siteConfig.sideMenuAdminItems.map((item) => (
-            <DropdownMenuItem key={item.label}>
-              <Link href={item.href} className="flex items-center gap-2">
-                <item.icon />
-                <span>{item.label}</span>
-              </Link>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
 
+        {isAdmin &&
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Admin</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              {siteConfig.sideMenuAdminItems.map((item) => (
+                <DropdownMenuItem key={item.label}>
+                  <Link href={item.href} className="flex items-center gap-2">
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          </>
+        }
+
+
+        <DropdownMenuSeparator />
         {siteConfig.supportMenuItems.map((item) => (
           <DropdownMenuItem key={item.label}>
             <Link href={item.href} className="flex items-center gap-2">
@@ -60,5 +70,13 @@ export function DropdownMenuComponent() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+
+export function DropdownMenuComponent({ isAdmin }: { isAdmin?: boolean }) {
+  const { userDataPrivate } = useAuth()
+  return (
+    <DropdownMenuComp isAdmin={userDataPrivate?.role === 'admin'} />
   )
 }

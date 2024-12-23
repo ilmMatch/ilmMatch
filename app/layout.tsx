@@ -7,7 +7,7 @@ import { Providers } from '@/context/providers';
 
 import { siteConfig } from '@/config/site';
 import { fontSans } from '@/config/fonts';
-import { Navbar } from '@/components/navbar';
+import { Navbar } from '@/components/navbar/navbar';
 import { AuthProvider } from '@/context/AuthProvider';
 import { SidebarComponent } from '@/components/sidebar/app-sidebar';
 import { Toaster } from 'sonner';

@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
-  const { approvalUpdate, currentUser } = useAuth();
+  const { approvalUpdate, currentUser, userDataProfile } = useAuth();
   const [submiting, setSubmiting] = React.useState(false);
 
   async function requestReview() {
@@ -41,10 +41,10 @@ export default function ProfilePage() {
           <UserProfileForm />
         </TabsContent>
         <div className="w-full mt-2 flex justify-end">
-          <Button onClick={requestReview} disabled={submiting}>
+          {userDataProfile?.approvalStatus === 'notApproved' && <Button onClick={requestReview} disabled={submiting}>
             {' '}
             Request review
-          </Button>
+          </Button>}
         </div>
       </Tabs>
     </>
