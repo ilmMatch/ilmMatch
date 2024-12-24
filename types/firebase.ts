@@ -61,6 +61,7 @@ export type FetchUserProfilesResult =
     success: true;
     data: UserProfile[];
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
+    count: number;
   }
   | { success: false; error: string };
 

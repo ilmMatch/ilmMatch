@@ -33,13 +33,8 @@ export default function FindPage() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
     const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
-      console.log(data.error);
       toast.error('Uh oh! Something went wrong.', {
         description: data.error,
-        action: {
-          label: 'close',
-          onClick: () => console.log('close'),
-        },
       });
       return;
     }
@@ -47,10 +42,6 @@ export default function FindPage() {
     if (!myrequests.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: myrequests.error,
-        action: {
-          label: 'close',
-          onClick: () => console.log('close'),
-        },
       });
       return;
     }
@@ -59,10 +50,6 @@ export default function FindPage() {
     if (!requestedMe.success) {
       toast.error('Uh oh! Something went wrong.', {
         description: requestedMe.error,
-        action: {
-          label: 'close',
-          onClick: () => console.log('close'),
-        },
       });
       return;
     }
@@ -93,9 +80,8 @@ export default function FindPage() {
       };
     });
 
-    data.data.length > 0
-      ? (lastVisibleDoc.current = data.lastVisibleDoc)
-      : setEnd(profilesWithStatus?.length === 0);
+    data.data.length > 0 && (lastVisibleDoc.current = data.lastVisibleDoc)
+    setEnd(profilesWithStatus?.length === 0);
     setUsers((prevData) => [...(prevData ?? []), ...profilesWithStatus]);
   }
 

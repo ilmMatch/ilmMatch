@@ -5,7 +5,7 @@ import {
   NavbarBrand,
 } from '@nextui-org/navbar';
 import { ThemeSwitch } from '@/components/theme-switch';
-import { NavLinks, NavLoginItem, NavUserMobileItem } from './navItemClient';
+import { NavLinks, NavLoginItem, NavLogo, NavUserMobileItem } from './navItemClient';
 import Link from 'next/link';
 import { Logo } from '../icons';
 
@@ -23,12 +23,13 @@ export const Navbar = () => {
           </Link>
         </NavbarBrand>
       </NavbarContent>
-      <NavLinks />
+      <NavLogo />
 
       <NavbarContent
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
+        <NavLinks />
         <NavbarItem className="hidden lg:flex">
           <ThemeSwitch />
         </NavbarItem>

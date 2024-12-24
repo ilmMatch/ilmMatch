@@ -20,54 +20,34 @@ export const siteConfig = {
       href: '/',
     },
     {
-      label: 'Profile',
-      href: '/profile',
+      label: 'About',
+      href: '/about',
     },
     {
-      label: 'Role',
-      href: '/rolemanage',
+      label: 'Rules',
+      href: '/rules',
     },
     {
-      label: 'Blog',
-      href: '/find',
+      label: 'Contact',
+      href: '/contact',
+    },
+  ],
+  navMenuItems: [
+    {
+      label: 'Home',
+      href: '/',
     },
     {
       label: 'About',
       href: '/about',
     },
-  ],
-  navMenuItems: [
     {
-      label: 'Profile',
-      href: '/profile',
+      label: 'Rules',
+      href: '/rules',
     },
     {
-      label: 'Find',
-      href: '/find',
-    },
-    {
-      label: 'Projects',
-      href: '/projects',
-    },
-    {
-      label: 'Team',
-      href: '/team',
-    },
-    {
-      label: 'Calendar',
-      href: '/calendar',
-    },
-    {
-      label: 'Settings',
-      href: '/settings',
-    },
-    {
-      label: 'Help & Feedback',
-      href: '/help-feedback',
-    },
-    {
-      label: 'Logout',
-      href: '/logout',
+      label: 'Contact',
+      href: '/contact',
     },
   ],
   sideMenuItems: [

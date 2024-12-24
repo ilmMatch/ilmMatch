@@ -37,6 +37,7 @@ import {
   doc,
   DocumentData,
   DocumentReference,
+  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -387,7 +388,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       // Create the query to fetch only approved profiles
       const baseConditions = [where('__name__', '!=', currentUser.uid)];
       const filterConditions = getFilterConditions(filters);
-      console.log(filterConditions);
       let q = query(
         usersProfileRef,
         ...baseConditions,
@@ -395,7 +395,6 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         orderBy('approved'),
         limit(limitx)
       );
-      console.log('query', q);
       if (lastVisibleDoc) {
         // If we have a last visible document, start after it
         q = query(q, startAfter(lastVisibleDoc));
@@ -412,10 +411,12 @@ export function AuthProvider(props: { children: React.ReactNode }) {
 
       const newLastVisibleDoc =
         querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+      const count = await getCountFromServer(query(usersProfileRef, ...baseConditions, ...filterConditions))
       return {
         success: true,
         data: userProfiles,
         lastVisibleDoc: newLastVisibleDoc,
+        count: count.data().count
       };
     } catch (error: any) {
       console.error('Error fetching user profiles:', error);
@@ -561,11 +562,12 @@ export function AuthProvider(props: { children: React.ReactNode }) {
         id: doc.id,
         ...(doc.data() as Omit<UserProfile, 'id'>), // Spread the document data without the 'id'
       }));
-
+      const count = await getCountFromServer(q)
       return {
         success: true,
         data: profiles,
         lastVisibleDoc: null,
+        count: count.data().count
       };
     } catch (error: unknown) {
       console.error('Error fetching profiles:', error);
