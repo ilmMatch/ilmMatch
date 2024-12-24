@@ -21,6 +21,9 @@ export default function RoleManager() {
   const [limit, setLimit] = useState<number>(10);
 
   const [end, setEnd] = useState(false);
+
+  async function applyFilterClick() { lastVisibleDoc.current = null; setProfiles([]); setPrivateInfo([]); getUsers(); }
+
   async function getUsers() {
     const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
@@ -53,10 +56,10 @@ export default function RoleManager() {
         );
         return matchingProfile
           ? {
-              ...profile,
-              status: matchingProfile.role,
-              statusFrom: 'adminAssign',
-            }
+            ...profile,
+            status: matchingProfile.role,
+            statusFrom: 'adminAssign',
+          }
           : profile;
       }
     );
@@ -74,7 +77,7 @@ export default function RoleManager() {
 
   return (
     <div>
-      <FilterModal filters={filters} setFilters={setFilters} />
+      <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
       {profiles &&
         profiles.map((user) => {
           const userPrivateInfo = privateInfo.find(

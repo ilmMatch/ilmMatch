@@ -7,13 +7,7 @@ export function getFilterConditions(filters: FilterOptions) {
     'countryResiding',
     'countryMoving',
     'ethnicity',
-    'hijab',
-    'beard',
-    'born',
     'sect',
-    'maritalStatus',
-    'approved',
-    'matched',
   ];
 
   exactMatchFields.forEach((field) => {
@@ -48,6 +42,25 @@ export function getFilterConditions(filters: FilterOptions) {
     filterConditions.push(where('gender', '==', filters.gender));
   if (filters.polygamy && filters.polygamy !== 'all')
     filterConditions.push(where('polygamy', '==', filters.polygamy));
+  if (filters.maritialStatus && filters.maritialStatus !== 'all')
+    filterConditions.push(where('maritialStatus', '==', filters.maritialStatus));
+  if (filters.born && filters.born !== 'all')
+    filterConditions.push(where('born', '==', filters.born));
+  if (filters.hijab && filters.hijab !== 'all')
+    filterConditions.push(where('hijab', '==', filters.hijab));
+
+  if (filters.beard && filters.beard !== 'all') {
+    filterConditions.push(where('beard', '==', filters.beard));
+  }
+
+  if (filters.matched && filters.matched !== 'all') {
+    if (filters.matched === 'matched') filterConditions.push(where('matched', '!=', []));
+    if (filters.matched === 'notmatched') filterConditions.push(where('matched', '==', []));
+  }
+
+  if (filters.approved && filters.approved !== 'all') {
+    filterConditions.push(where('approved', '==', filters.approved));
+  }
 
   if (filters.spouseAge?.min !== undefined) {
     filterConditions.push(where('spouseAge.max', '>=', filters.spouseAge.min));
@@ -83,54 +96,3 @@ export function getFilterConditions(filters: FilterOptions) {
 
   return filterConditions;
 }
-
-// const handleCommaField = (fieldValue: string | undefined, fieldName: string) => {
-//     if (fieldValue) {
-//         // Convert search terms to lowercase for case-insensitive comparison
-//         const searchTerms = fieldValue.toLowerCase().split(',').map(term => term.trim());
-
-//         // Create conditions for each term
-//         const termConditions = searchTerms.map(term =>
-//             and(
-//                 where(fieldName, '>=', term),
-//                 where(fieldName, '<=', term + '\uf8ff')
-//             )
-//         );
-
-//         if (termConditions.length > 0) {
-//             filterConditions.push(or(...termConditions));
-//         }
-//     }
-// };
-
-// // Apply the comma-separated field handling to both languages and scholars
-// handleCommaField(filters.languages, 'languages');
-// handleCommaField(filters.scholars, 'scholars');
-
-// export function getFilterConditions(filters: FilterOptions): QueryFieldFilterConstraint[] {
-//     const conditions: QueryFieldFilterConstraint[] = [];
-
-//     if (filters.gender) conditions.push(where('gender', '==', filters.gender));
-//     if (filters.education) conditions.push(where('education', '==', filters.education));
-//     if (filters.ethnicity) conditions.push(where('ethnicity', '==', filters.ethnicity));
-//     if (filters.polygamy) conditions.push(where('polygamy', '==', filters.polygamy));
-//     if (filters.country) conditions.push(where('countryResiding', '==', filters.country));
-
-//     if (filters.spouseAgeMin && filters.spouseAgeMax) {
-//         conditions.push(where('spouseAge', '>=', filters.spouseAgeMin.toString()));
-//         conditions.push(where('spouseAge', '<=', filters.spouseAgeMax.toString()));
-//     }
-//     if (filters.heightMin && filters.heightMax) {
-//         conditions.push(where('height', '>=', filters.heightMin));
-//         conditions.push(where('height', '<=', filters.heightMax));
-//     }
-
-//     if (filters.scholars && filters.scholars.length > 0) {
-//         conditions.push(where('scholars', 'array-contains-any', filters.scholars));
-//     }
-//     if (filters.languages && filters.languages.length > 0) {
-//         conditions.push(where('languages', 'array-contains-any', filters.languages));
-//     }
-
-//     return conditions;
-// }

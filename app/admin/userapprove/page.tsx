@@ -25,6 +25,7 @@ export default function UserApprovePage() {
 
   const [end, setEnd] = useState(false);
 
+  async function applyFilterClick() { lastVisibleDoc.current = null; setUnApprovedProfiles([]); setPrivateInfo([]); getUsers(); }
   async function getUsers() {
     const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
@@ -70,7 +71,7 @@ export default function UserApprovePage() {
   return (
     <div>
       UserApprovePage
-      <FilterModal filters={filters} setFilters={setFilters} />
+      <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
       {unApprovedProfiles &&
         unApprovedProfiles.map((user) => {
           const userPrivateInfo = privateInfo.find(

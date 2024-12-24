@@ -20,11 +20,14 @@ export default function FindPage() {
   const [limit, setLimit] = useState<number>(10);
   const [filters, setFilters] = useState<FilterOptions>({
     approved: 'approved',
-    matched: [],
+    matched: 'notmatched',
+    gender: userDataPrivate?.gender === 'brother' ? 'sister' : 'brother',
   });
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
   );
+
+  async function applyFilterClick() { lastVisibleDoc.current = null; setUsers([]); getUsers(); }
 
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
@@ -40,7 +43,6 @@ export default function FindPage() {
       });
       return;
     }
-    console.log(data.data);
     const myrequests = await getMyRequested(currentUser?.uid);
     if (!myrequests.success) {
       toast.error('Uh oh! Something went wrong.', {
@@ -103,7 +105,7 @@ export default function FindPage() {
 
   return (
     <div>
-      <FilterModal filters={filters} setFilters={setFilters} />
+      <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
       {users &&
         users.map((user) => (
           <div key={user.id}>
