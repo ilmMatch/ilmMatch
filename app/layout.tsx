@@ -6,7 +6,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Providers } from '@/context/providers';
 
 import { siteConfig } from '@/config/site';
-import { fontSans } from '@/config/fonts';
+import { fontSans, fontComfortaa } from '@/config/fonts';
 import { Navbar } from '@/components/navbar/navbar';
 import { AuthProvider } from '@/context/AuthProvider';
 import { SidebarComponent } from '@/components/sidebar/app-sidebar';
@@ -41,7 +41,8 @@ export default function RootLayout({
       <body
         className={clsx(
           'min-h-screen bg-background font-sans antialiased',
-          fontSans.variable
+          fontSans.variable,
+          fontComfortaa.variable
         )}
       >
         <AuthProvider>

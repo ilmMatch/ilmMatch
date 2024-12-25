@@ -11,15 +11,15 @@ import { Logo } from '../icons';
 
 export const Navbar = () => {
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" shouldHideOnScroll>
+    <NextUINavbar maxWidth="xl" position="sticky" shouldHideOnScroll className="font-comfortaa">
       <NavbarContent
         className="basis-1/5 sm:basis-full sm:hidden"
         justify="start"
       >
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <Link className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <Logo color='#ca8a04' />
+            {/* <p className="font-bold text-inherit text-yellow-600">Match</p> */}
           </Link>
         </NavbarBrand>
       </NavbarContent>
