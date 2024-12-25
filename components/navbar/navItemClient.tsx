@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React from 'react';
 import { Button } from '../ui/button';
 import { Mail } from 'lucide-react';
-import { NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
+import { NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from '@nextui-org/navbar';
 import { ThemeSwitch } from '../theme-switch';
 import { link as linkStyles } from '@nextui-org/theme';
 import { DropdownMenuComponent } from './dropdown';
@@ -37,13 +37,37 @@ export function NavUserMobileItem() {
           <DropdownMenuComponent />
         </NavbarItem>
       ) : (
-        <NavbarItem>
-          <Link href="/login">
-            <Button>
-              <Mail /> Login
-            </Button>
-          </Link>
-        </NavbarItem>
+        <>
+          <NavbarItem>
+            <Link href="/login">
+              <Button variant={'outline'} size={'sm'}>
+                <Mail /> Login
+              </Button>
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <NavbarMenuToggle />
+          </NavbarItem>
+          <NavbarMenu className='flex items-center p-16'>
+
+            {siteConfig.navItems.map((item) => (
+              <NavbarMenuItem key={item.href}>
+                <Link
+                  className={clsx(
+                    linkStyles({ color: 'foreground' }),
+                    'data-[active=true]:text-primary data-[active=true]:font-medium'
+                  )}
+                  color="foreground"
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              </NavbarMenuItem>
+            ))}
+          </NavbarMenu>
+
+        </>
+
       )}
     </NavbarContent>
   );
