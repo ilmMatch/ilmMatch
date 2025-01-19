@@ -1,5 +1,5 @@
 'use client';
-import AdminApprovalCard from '@/components/cards/adminApprovalCard';
+import AdminApprovalCard from '@/components/cards/volunteerApprovalCard';
 import { FilterModal } from '@/components/modals/filterModal';
 import { Button } from '@/components/ui/button';
 import UserModal from '@/components/modals/userModal';

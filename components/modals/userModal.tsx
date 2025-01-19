@@ -112,9 +112,9 @@ export default function UserModal({
                     className={cn(
                       'absolute top-5 right-8 capitalize',
                       matched === 'Matched' &&
-                        badgeVariants({ variant: 'approved' }),
+                      badgeVariants({ variant: 'approved' }),
                       matched === 'Matched before' &&
-                        badgeVariants({ variant: 'notApproved' })
+                      badgeVariants({ variant: 'notApproved' })
                     )}
                   >
                     {matched}
@@ -134,7 +134,7 @@ export default function UserModal({
                   user={user}
                   setStateUsers={setStateUsers}
                   stateUsers={stateUsers}
-                  // handleAction={handleProfileMatchRequest}
+                // handleAction={handleProfileMatchRequest}
                 />
               </ModalFooter>
             </>
@@ -320,12 +320,12 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
     const updatedUsers = stateUsers.map((stateUser) =>
       stateUser.id === user.id
         ? {
-            ...stateUser,
-            status: state,
-            ...(state === undefined
-              ? { statusFrom: undefined }
-              : { statusFrom }),
-          }
+          ...stateUser,
+          status: state,
+          ...(state === undefined
+            ? { statusFrom: undefined }
+            : { statusFrom }),
+        }
         : stateUser
     );
     setStateUsers(updatedUsers);
@@ -659,16 +659,16 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
         <>
           <Button
             disabled={submitting}
-            onClick={() => handleRole('admin')}
+            onClick={() => handleRole('volunteer')}
             variant="default"
           >
             {submitting && <Loader2 className="animate-spin" />}
-            Make Admin
+            Make Volunteer
           </Button>
         </>
       );
     }
-    if (user.status === 'admin') {
+    if (user.status === 'volunteer') {
       return (
         <>
           <Button
@@ -677,7 +677,7 @@ const UserActionButtons: React.FC<UserButtonStatusProps> = ({
             variant="destructive"
           >
             {submitting && <Loader2 className="animate-spin" />}
-            Remove Admin
+            Remove Volunteer
           </Button>
         </>
       );

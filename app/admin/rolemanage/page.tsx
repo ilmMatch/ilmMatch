@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import UserModal from '@/components/modals/userModal';
 import { toast } from 'sonner';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
-import AdminApprovalCard from '@/components/cards/adminApprovalCard';
+import VolunteerApprovalCard from '@/components/cards/volunteerApprovalCard';
 import { FilterModal } from '@/components/modals/filterModal';
 
 export default function RoleManager() {
@@ -78,24 +78,21 @@ export default function RoleManager() {
   return (
     <div>
       <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
-      {profiles &&
-        profiles.map((user) => {
-          const userPrivateInfo = privateInfo.find(
-            (info) => info.id === user.id
-          );
-          return (
-            <div key={user.id}>
-              {userPrivateInfo && (
-                <AdminApprovalCard
-                  user={user}
-                  setStateUsers={setProfiles}
-                  stateUsers={profiles}
-                  privateInfo={userPrivateInfo}
-                />
-              )}
-            </div>
-          );
-        })}
+      {profiles?.map((user) => {
+        const userPrivateInfo = privateInfo.find((info) => info.id === user.id);
+
+        return userPrivateInfo ? (
+          <VolunteerApprovalCard
+            key={user.id}
+            user={user}
+            setStateUsers={setProfiles}
+            stateUsers={profiles}
+            privateInfo={userPrivateInfo}
+          />
+        ) : null;
+      })}
+
+
       {end ? (
         'You have reached the end'
       ) : (

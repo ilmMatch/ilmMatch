@@ -30,7 +30,7 @@ interface UserCardProps {
   privateInfo: UserPrivate;
 }
 
-export default function AdminApprovalCard({
+export default function VolunteerApprovalCard({
   user,
   setStateUsers,
   stateUsers,
@@ -47,12 +47,12 @@ export default function AdminApprovalCard({
     const updatedUsers = stateUsers.map((stateUser) =>
       stateUser.id === user.id
         ? {
-            ...stateUser,
-            status: state,
-            ...(state === undefined
-              ? { statusFrom: undefined }
-              : { statusFrom }),
-          }
+          ...stateUser,
+          status: state,
+          ...(state === undefined
+            ? { statusFrom: undefined }
+            : { statusFrom }),
+        }
         : stateUser
     );
     setStateUsers(updatedUsers);
@@ -209,15 +209,15 @@ export default function AdminApprovalCard({
               <>
                 <Button
                   disabled={submitting}
-                  onClick={() => handleRole('admin')}
+                  onClick={() => handleRole('volunteer')}
                   variant="default"
                 >
                   {submitting && <Loader2 className="animate-spin" />}
-                  Make Admin
+                  Make Volunteer
                 </Button>
               </>
             ) : (
-              user.status === 'admin' && (
+              user.status === 'volunteer' && (
                 <>
                   <Button
                     disabled={submitting}
@@ -225,7 +225,7 @@ export default function AdminApprovalCard({
                     variant="destructive"
                   >
                     {submitting && <Loader2 className="animate-spin" />}
-                    Remove Admin
+                    Remove Volunteer
                   </Button>
                 </>
               )

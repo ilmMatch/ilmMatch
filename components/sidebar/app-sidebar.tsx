@@ -51,7 +51,7 @@ const navSecondary = [
   },
 ];
 
-export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
+export function AppSidebar({ isAdminorVolunteer }: { isAdminorVolunteer: boolean }) {
   const { state, isMobile } = useSidebar();
 
   return (
@@ -101,12 +101,12 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
         </SidebarGroup>
         <SidebarSeparator />
 
-        {isAdmin && (
+        {isAdminorVolunteer && (
           <Collapsible defaultOpen className="group/collapsible">
             <SidebarGroup>
               <SidebarGroupLabel asChild>
                 <CollapsibleTrigger className="text-popover-foreground">
-                  Admin
+                  Admin/ Volunteer
                   <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
@@ -158,7 +158,7 @@ export function SidebarComponent() {
   const { currentUser, userDataPrivate } = useAuth();
   return currentUser && userDataPrivate ? (
     <>
-      <AppSidebar isAdmin={userDataPrivate?.role === 'admin'} />
+      <AppSidebar isAdminorVolunteer={userDataPrivate?.role === 'admin' || userDataPrivate?.role === 'volunteer'} />
     </>
   ) : (
     ''

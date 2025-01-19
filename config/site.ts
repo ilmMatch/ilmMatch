@@ -1,12 +1,14 @@
 import {
   BadgeCheck,
   Bookmark,
+  Handshake,
   Heart,
   LifeBuoy,
   Send,
   User,
   UserPlus,
   UserRoundCheck,
+  UserRoundPlus,
 } from 'lucide-react';
 
 export type SiteConfig = typeof siteConfig;
@@ -87,19 +89,24 @@ export const siteConfig = {
   ],
   sideMenuAdminItems: [
     {
-      label: 'Assign Admin',
-      href: '/admin/rolemanage',
-      icon: UserPlus,
-    },
-    {
-      label: 'User Approval',
+      label: 'Approve User',
       href: '/admin/userapprove',
       icon: UserRoundCheck,
+    },
+    {
+      label: 'Add User',
+      href: '/admin/adduser',
+      icon: UserRoundPlus,
     },
     {
       label: 'Request Approval',
       href: '/admin/requests',
       icon: Heart,
+    },
+    {
+      label: 'Volunteers Management',
+      href: '/admin/rolemanage',
+      icon: Handshake,
     },
   ],
   supportMenuItems: [

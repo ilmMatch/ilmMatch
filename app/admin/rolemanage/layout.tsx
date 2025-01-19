@@ -12,11 +12,11 @@ export default function RootLayout({
 
   if (!currentUser) return <LoginModal />;
   if (!userDataPrivate || !userDataProfile) return <>Loading</>;
+
   return <>
-    {(userDataPrivate.role === "admin" || userDataPrivate.role === "volunteer") ? children : <>
+    {userDataPrivate.role === "admin" ? children : <>
       <div className='w-full h-full flex items-center justify-center text-center'>
-        Only for Admin and Volunteers
-        <p>would you like to be a volunteer? email us.</p>
+        Only for Admin
       </div>
     </>}
   </>

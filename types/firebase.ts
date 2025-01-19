@@ -54,6 +54,7 @@ export interface UserPrivate {
   bookmark?: string[];
 }
 
+export type UserProfileAndPrivate = UserProfile & UserPrivate;
 // Define the return type of the function
 
 export type FetchUserProfilesResult =
