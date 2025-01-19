@@ -1,9 +1,11 @@
 export function parseMessages(messages: string[]) {
     const labels = [
-        'Gender', 'Height', 'Age', 'Build', 'Beard', 'Hijab/Niqab', 'Born Muslim or Revert',
-        'Nationality', 'Ethnicity', 'Occupation', 'Education', 'Languages spoken', 'Would you consider Polygamy',
-        'Do you pray 5xs a day?', 'Marital status', 'Do you have children from previous marriage?',
+        'Marital status', 'Do you have children from previous marriage?', 'Nationality',
         'Which country are you currently residing in?', 'Which countries you would consider moving to?',
+        'Languages spoken', 'Beard', 'Hijab/Niqab', 'Ethnicity', 'Gender', 'Height', 'Build',
+        'Age', 'Do you pray 5xs a day?', 'Born Muslim or Revert', 'Sect', 'Name of Masjid', 'Scholars/speakers you listen to',
+        'Education', 'Islamic Education', 'Occupation',
+        'Would you consider Polygamy',
         'Brief description about you', 'Your preference'
     ];
 

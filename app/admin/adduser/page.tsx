@@ -23,7 +23,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
     Dialog,
     DialogContent,
@@ -33,8 +32,6 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { parseMessages } from '@/lib/parseMessages';
-// import { CommaSeparatedInput } from './fields/comma-separated-input';
-// import { CountryCodeSelector } from './fields/CountryCode';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -54,35 +51,36 @@ import {
 import { cn } from '@/lib/utils';
 import { CommaSeparatedInput } from '@/components/forms/fields/comma-separated-input';
 import { CountryCodeSelector } from '@/components/forms/fields/CountryCode';
+import { parse } from 'path';
 
 const formSchema = z.object({
     // Public Info
-    gender: z.enum(['male', 'female']),
-    maritalStatus: z.enum(['single', 'married', 'divorced', 'widowed']),
-    height: z.number().optional(),
-    build: z.string().optional(),
-    ethnicity: z.string().optional(),
+    maritalStatus: z.string(),
+    children: z.string(),
     nationality: z.string().optional(),
     countryResiding: z.string().optional(),
     countryMoving: z.string().optional(),
-    born: z.enum(['born', 'revert']).optional(),
-    childern: z.number().optional(),
-    beard: z.enum(['yes', 'no', 'not applicable']).optional(),
+    languages: z.array(z.string()).optional(),
+    beard: z.string().optional(),
     hijab: z.string().optional(),
-    pray: z.enum(['yes', 'no', 'yes including tahajjud']).optional(),
+    ethnicity: z.string().optional(),
+    gender: z.enum(['male', 'female']),
+    height: z.string().optional(),
+    build: z.string().optional(),
+    pray: z.string().optional(),
+    born: z.string().optional(),
     sect: z.string().optional(),
     masjidName: z.string().optional(),
-    polygamy: z.enum(['yes', 'no', 'under certain circumstance']).optional(),
+    scholars: z.array(z.string()).optional(),
     education: z.string().optional(),
     islamicEducation: z.string().optional(),
     islamicEducationProof: z.string().url().optional(),
     occupation: z.string().optional(),
-    languages: z.array(z.string()).optional(),
-    scholars: z.array(z.string()).optional(),
     spouseAge: z.object({
         min: z.number().optional(),
         max: z.number().optional(),
     }),
+    polygamy: z.string().optional(),
     briefAboutYou: z.string().optional(),
     spouseBrief: z.string().optional(),
 
@@ -121,22 +119,34 @@ export default function AddProfile() {
 
     function onSubmit(values: FormValues) {
         console.log(values);
-        // Here you would typically send the data to your backend
-        setEditing(false);
+        // send the data to firestore
     }
 
     function handleMessageConvert() {
         const parsedData = parseMessages([message])[0];
         form.reset({
             ...form.getValues(),
-            gender: parsedData['Gender'].toLowerCase() as 'male' | 'female',
-            height: parseInt(parsedData['Height'].replace('"', '')),
+            maritalStatus: parsedData['Marital status'],
+            children: parsedData['Do you have children from previous marriage?'],
             nationality: parsedData['Nationality'],
+            countryResiding: parsedData['Which country are you currently residing in?'],
+            countryMoving: parsedData['Which countries you would consider moving to?'],
             languages: parsedData['Languages spoken'].split(/\s*(?:and|,|\s)\s*/),
+            beard: parsedData['Beard'],
+            hijab: parsedData['Hijab/Niqab'],
             ethnicity: parsedData['Ethnicity'],
-            occupation: parsedData['Occupation'],
+            gender: parsedData['Gender'].toLowerCase() as 'male' | 'female',
+            height: parsedData['Height'],
+            build: parsedData['Build'],
+            pray: parsedData['Do you pray 5xs a day?'],
+            born: parsedData['Born Muslim or Revert'],
+            sect: parsedData['Sect'],
+            masjidName: parsedData['Name of Masjid'],
+            scholars: parsedData['Scholars/speakers you listen to'].split(/\s*(?:and|,|\s)\s*/),
             education: parsedData['Education'],
-            maritalStatus: parsedData['Marital status'].toLowerCase() as 'single' | 'married' | 'divorced' | 'widowed',
+            islamicEducation: parsedData['Islamic Education'],
+            occupation: parsedData['Occupation'],
+            polygamy: parsedData['Would you consider Polygamy'],
             briefAboutYou: parsedData['Brief description about you'],
             spouseBrief: parsedData['Your preference'],
         });
@@ -149,7 +159,7 @@ export default function AddProfile() {
                 <DialogTrigger asChild>
                     <Button variant="outline">Convert Message to Profile</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[650px] h-fit">
                     <DialogHeader>
                         <DialogTitle>Convert Message to Profile</DialogTitle>
                     </DialogHeader>
@@ -157,6 +167,7 @@ export default function AddProfile() {
                         <Textarea
                             placeholder="Paste your message here"
                             value={message}
+                            rows={20}
                             onChange={(e) => setMessage(e.target.value)}
                         />
                         <Button onClick={handleMessageConvert}>Convert</Button>
@@ -189,51 +200,27 @@ export default function AddProfile() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Marital Status</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                            disabled={!editing}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger
-                                                                    className={cn(
-                                                                        !editing && 'disabled:cursor-default'
-                                                                    )}
-                                                                >
-                                                                    <SelectValue placeholder="Select marital status" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="single">Single</SelectItem>
-                                                                <SelectItem value="married">Married</SelectItem>
-                                                                <SelectItem value="divorced">Divorced</SelectItem>
-                                                                <SelectItem value="widowed">Widowed</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
                                             />
                                             <FormField
                                                 control={form.control}
-                                                name="childern"
+                                                name="children"
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Number of Children</FormLabel>
                                                         <FormControl>
                                                             <Input
-                                                                type="number"
                                                                 {...field}
-                                                                onChange={(e) =>
-                                                                    field.onChange(
-                                                                        e.target.value === ''
-                                                                            ? undefined
-                                                                            : +e.target.value
-                                                                    )
-                                                                }
-                                                                className={cn(
-                                                                    !editing && 'disabled:cursor-default'
-                                                                )}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
                                                                 disabled={!editing}
                                                             />
                                                         </FormControl>
@@ -334,28 +321,13 @@ export default function AddProfile() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Beard</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                            disabled={!editing}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger
-                                                                    className={cn(
-                                                                        !editing && 'disabled:cursor-default'
-                                                                    )}
-                                                                >
-                                                                    <SelectValue placeholder="Select option" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="yes">Yes</SelectItem>
-                                                                <SelectItem value="no">No</SelectItem>
-                                                                <SelectItem value="not applicable">
-                                                                    Not Applicable
-                                                                </SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
@@ -406,25 +378,14 @@ export default function AddProfile() {
                                                     <FormItem className="space-y-3">
                                                         <FormLabel>Gender</FormLabel>
 
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                            disabled={!editing}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger
-                                                                    className={cn(
-                                                                        !editing && 'disabled:cursor-default'
-                                                                    )}
-                                                                >
-                                                                    <SelectValue placeholder="Select Gender" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="brother">Brother</SelectItem>
-                                                                <SelectItem value="sister">Sister</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
@@ -439,18 +400,8 @@ export default function AddProfile() {
                                                         <FormLabel>Height (cm)</FormLabel>
                                                         <FormControl>
                                                             <Input
-                                                                type="number"
                                                                 {...field}
-                                                                onChange={(e) =>
-                                                                    field.onChange(
-                                                                        e.target.value === ''
-                                                                            ? undefined
-                                                                            : +e.target.value
-                                                                    )
-                                                                }
-                                                                className={cn(
-                                                                    !editing && 'disabled:cursor-default'
-                                                                )}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
                                                                 disabled={!editing}
                                                             />
                                                         </FormControl>
@@ -467,9 +418,7 @@ export default function AddProfile() {
                                                         <FormControl>
                                                             <Input
                                                                 {...field}
-                                                                className={cn(
-                                                                    !editing && 'disabled:cursor-default'
-                                                                )}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
                                                                 disabled={!editing}
                                                             />
                                                         </FormControl>
@@ -490,29 +439,14 @@ export default function AddProfile() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Prayer Habits</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                            disabled={!editing}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger
-                                                                    className={cn(
-                                                                        !editing && 'disabled:cursor-default'
-                                                                    )}
-                                                                >
-                                                                    <SelectValue placeholder="Select option" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="yes">Yes</SelectItem>
-                                                                <SelectItem value="no">No</SelectItem>
-                                                                <SelectItem value="yes including tahajjud">
-                                                                    Yes, including Tahajjud
-                                                                </SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
+
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
                                                     </FormItem>
                                                 )}
                                             />
@@ -521,26 +455,14 @@ export default function AddProfile() {
                                                 name="born"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Born Muslim or Revert</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                            disabled={!editing}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger
-                                                                    className={cn(
-                                                                        !editing && 'disabled:cursor-default'
-                                                                    )}
-                                                                >
-                                                                    <SelectValue placeholder="Select option" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="born">Born Muslim</SelectItem>
-                                                                <SelectItem value="revert">Revert</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <FormLabel>Born or Revert</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
@@ -699,28 +621,13 @@ export default function AddProfile() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Will you consider Polygamy</FormLabel>
-                                                    <Select
-                                                        onValueChange={field.onChange}
-                                                        value={field.value}
-                                                        disabled={!editing}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger
-                                                                className={cn(
-                                                                    !editing && 'disabled:cursor-default'
-                                                                )}
-                                                            >
-                                                                <SelectValue placeholder="Select option" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="yes">Yes</SelectItem>
-                                                            <SelectItem value="no">No</SelectItem>
-                                                            <SelectItem value="under certain circumstance">
-                                                                Under Certain Circumstances
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
+                                                    </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
