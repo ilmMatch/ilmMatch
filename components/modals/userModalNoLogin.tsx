@@ -9,7 +9,7 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { Button } from '@/components/ui/button';
-import { UserPrivate, UserProfile } from '@/types/firebase';
+import { UserProfile } from '@/types/firebase';
 import {
   BookmarkIcon,
   ChevronRight,
@@ -30,6 +30,20 @@ export default function UserModal({ user }: UserModalProps) {
       },
     });
     return;
+  }
+
+  function handleInterestedClick() {
+    const recipient = "inbox.ilmmatch@gmail.com";
+    const subject = "Interested";
+    const body = `
+myprofile Id: ...
+interested in: ${user.id}
+  `;
+
+    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    // Open Gmail in a new tab
+    window.open(mailtoLink, '_blank');
   }
 
   return (
@@ -73,7 +87,7 @@ export default function UserModal({ user }: UserModalProps) {
                   Close
                 </Button>
 
-                <Button>
+                <Button onClick={handleInterestedClick}>
                   Interested
                 </Button>
               </ModalFooter>

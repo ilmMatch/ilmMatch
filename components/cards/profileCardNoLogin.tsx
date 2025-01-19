@@ -25,7 +25,7 @@ export default function ProfileCard({
 
   return (
     <div className="w-full">
-      <Card className="w-full max-md:max-w-3xl md:w-4/5  overflow-hidden my-2 mx-auto">
+      <Card className="w-full max-md:max-w-3xl md:w-3/5  overflow-hidden my-2 mx-auto border-gray-400">
         <CardContent className="p-0">
           <div className="flex items-center max-sm:flex-col">
             <div className="p-6 sm:flex-shrink-0 flex items-center justify-between max-sm:w-11/12">

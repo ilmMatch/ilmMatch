@@ -79,7 +79,7 @@ export function FilterModal({ filters, setFilters, applyFilterClick }: FilterMod
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="secondary" className="flex items-center gap-2">
           <Filter className="w-4 h-4" />
           Filters
         </Button>

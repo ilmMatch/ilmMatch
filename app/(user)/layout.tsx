@@ -12,5 +12,10 @@ export default function RootLayout({
 
   if (!currentUser) return <LoginModal />;
   if (!userDataPrivate && !userDataProfile) return <>Loading</>;
-  return children;
+  return <>
+    <div className='w-full h-full flex items-center justify-center text-center'>
+      We&apos;re Implementing this Sections, Thank you
+    </div>
+    {/* {children} */}
+  </>
 }

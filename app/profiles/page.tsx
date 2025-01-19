@@ -46,7 +46,9 @@ export default function ProfilesPage() {
 
     return (
         <div>
-            <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
+            <div className='flex justify-end w-full max-md:max-w-3xl md:w-4/5'>
+                <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
+            </div>
             {users &&
                 users.map((user) => (
                     <div key={user.id}>
@@ -55,11 +57,13 @@ export default function ProfilesPage() {
                         />
                     </div>
                 ))}
-            {end ? (
-                "You've reached the end"
-            ) : (
-                <Button onClick={() => getUsers()} disabled={loading}>{loading ? <span><LoaderCircle className='animate-spin' /> Loading...</span> : "Load More"}</Button>
-            )}
+            <div className='w-full text-center'>
+                {end ? (
+                    "You've reached the end"
+                ) : (
+                    <Button onClick={() => getUsers()} disabled={loading}>{loading ? <span className='flex gap-2 mx-auto'><LoaderCircle className='animate-spin' /> Loading...</span> : "Load More"}</Button>
+                )}
+            </div>
         </div>
     );
 }
