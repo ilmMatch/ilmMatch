@@ -8,6 +8,7 @@ import { FilterOptions, UserPrivate, UserProfile } from '@/types/firebase';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { LoaderCircle } from 'lucide-react';
 
 export default function UserApprovePage() {
   const { getProfiles, getPrivatebyUIDs } = useAuth();
@@ -22,11 +23,14 @@ export default function UserApprovePage() {
   const lastVisibleDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(
     null
   );
+  const [loading, setLoading] = useState(false);
+
 
   const [end, setEnd] = useState(false);
 
   async function applyFilterClick() { lastVisibleDoc.current = null; setUnApprovedProfiles([]); setPrivateInfo([]); getUsers(); }
   async function getUsers() {
+    setLoading(true)
     const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
@@ -63,6 +67,7 @@ export default function UserApprovePage() {
       ...profilesWithStatus,
     ]);
     setPrivateInfo((prevPrivateInfo) => [...prevPrivateInfo, ...result.data]);
+    setLoading(false)
   }
   useEffect(() => {
     getUsers();
@@ -91,11 +96,13 @@ export default function UserApprovePage() {
             </div>
           );
         })}
-      {end ? (
-        'You have reached the end'
-      ) : (
-        <Button onClick={() => getUsers()}>Load More</Button>
-      )}
+      <div className='w-full text-center'>
+        {end ? (
+          "You've reached the end"
+        ) : (
+          <Button onClick={() => getUsers()} disabled={loading}>{loading ? <span className='flex gap-2 mx-auto'><LoaderCircle className='animate-spin' /> Loading...</span> : "Load More"}</Button>
+        )}
+      </div>
     </div>
   );
 }

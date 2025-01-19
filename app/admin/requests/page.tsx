@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import MatchProfilesComponent from '@/components/cards/requestMatchCard';
 import { UserPrivate } from '@/types/firebase';
 import { sendEmail } from './sendEmail';
+import { LoaderCircle } from 'lucide-react';
 
 export default function AdminRequestPage() {
   const [matchedData, setMatchedData] = useState<[string, string][]>([]);
@@ -175,13 +176,15 @@ export default function AdminRequestPage() {
           );
         })}
       </div>
-      {loading && <div>Loading profiles...</div>}
-      {hasMore && (
-        <Button onClick={loadMorePairs} disabled={loading}>
-          {loading ? 'Loading...' : 'Load More'}
-        </Button>
-      )}
-      {!hasMore && <div>You reached the end.</div>}
+
+
+      <div className='w-full text-center'>
+        {hasMore ? (
+          <Button onClick={loadMorePairs} disabled={loading}>{loading ? <span className='flex gap-2 mx-auto'><LoaderCircle className='animate-spin' /> Loading...</span> : "Load More"}</Button>
+        ) : (
+          "You've reached the end"
+        )}
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { DocumentData, limit, QueryDocumentSnapshot } from 'firebase/firestore';
 import ProfileCard from '@/components/cards/profileCard';
 import { FilterModal } from '@/components/modals/filterModal';
+import { LoaderCircle } from 'lucide-react';
 export default function FindPage() {
   const {
     getProfiles,
@@ -18,6 +19,8 @@ export default function FindPage() {
   const [users, setUsers] = useState<UserProfile[] | undefined>([]);
   const [end, setEnd] = useState(false);
   const [limit, setLimit] = useState<number>(10);
+  const [loading, setLoading] = useState(false);
+
   const [filters, setFilters] = useState<FilterOptions>({
     approved: 'approved',
     matched: 'notmatched',
@@ -31,6 +34,7 @@ export default function FindPage() {
 
   async function getUsers() {
     if (!currentUser || !userDataPrivate) return 'you must be logged in';
+    setLoading(true);
     const data = await getProfiles(limit, lastVisibleDoc.current, filters);
     if (!data.success) {
       toast.error('Uh oh! Something went wrong.', {
@@ -83,6 +87,7 @@ export default function FindPage() {
     data.data.length > 0 && (lastVisibleDoc.current = data.lastVisibleDoc)
     setEnd(profilesWithStatus?.length === 0);
     setUsers((prevData) => [...(prevData ?? []), ...profilesWithStatus]);
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -91,7 +96,9 @@ export default function FindPage() {
 
   return (
     <div>
-      <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
+      <div className='flex justify-end w-full max-md:max-w-3xl md:w-4/5'>
+        <FilterModal filters={filters} setFilters={setFilters} applyFilterClick={applyFilterClick} />
+      </div>
       {users &&
         users.map((user) => (
           <div key={user.id}>
@@ -103,11 +110,13 @@ export default function FindPage() {
             {/* <UserModal user={user} setStateUsers={setUsers} stateUsers={users} /> */}
           </div>
         ))}
-      {end ? (
-        "You've reached the end"
-      ) : (
-        <Button onClick={() => getUsers()}>Load More</Button>
-      )}
+      <div className='w-full text-center'>
+        {end ? (
+          "You've reached the end"
+        ) : (
+          <Button onClick={() => getUsers()} disabled={loading}>{loading ? <span className='flex gap-2 mx-auto'><LoaderCircle className='animate-spin' /> Loading...</span> : "Load More"}</Button>
+        )}
+      </div>
     </div>
   );
 }
