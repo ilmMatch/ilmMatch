@@ -45,6 +45,7 @@ import {
   orderBy,
   query,
   QueryDocumentSnapshot,
+  QueryFieldFilterConstraint,
   serverTimestamp,
   setDoc,
   startAfter,
@@ -382,11 +383,13 @@ export function AuthProvider(props: { children: React.ReactNode }) {
   ): Promise<FetchUserProfilesResult> {
     try {
       // Create a reference to the usersprofile collection
-      if (!currentUser) throw new Error('you must be logged in');
+      let baseConditions: QueryFieldFilterConstraint[] = [];
+      if (currentUser)
+        baseConditions = [where('__name__', '!=', currentUser.uid)];
+
       const usersProfileRef = collection(db, 'usersprofile');
 
       // Create the query to fetch only approved profiles
-      const baseConditions = [where('__name__', '!=', currentUser.uid)];
       const filterConditions = getFilterConditions(filters);
       let q = query(
         usersProfileRef,

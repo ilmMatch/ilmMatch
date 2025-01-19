@@ -41,7 +41,7 @@ export default function AdminRequestPage() {
 
     const newProfiles = new Map(profiles);
     const newPrivateProfiles = new Map(privateProfiles);
-    for (let [uid1, uid2] of pairs) {
+    for (const [uid1, uid2] of pairs) {
       if (!newProfiles.has(uid1)) {
         const data = await getProfilebyUID(uid1);
         if (!data.success) {

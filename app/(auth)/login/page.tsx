@@ -108,7 +108,7 @@ export default function LoginPage() {
               </Button>
             </div>
             <p className="text-sm !mt-8 text-center">
-              Don&apos;t have an account?{' '}
+              Interested to be a Volunteer?{' '}
               <Link
                 href="/register"
                 className="text-primary hover:underline ml-1 whitespace-nowrap font-semibold"

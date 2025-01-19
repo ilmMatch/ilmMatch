@@ -19,7 +19,7 @@ export function NavLoginItem() {
       <NavbarItem className="hidden lg:flex">
         <Link href="/login">
           <Button>
-            <Mail /> Login
+            <Mail /> Volunteer
           </Button>
         </Link>
       </NavbarItem>
@@ -41,7 +41,7 @@ export function NavUserMobileItem() {
           <NavbarItem>
             <Link href="/login">
               <Button variant={'outline'} size={'sm'}>
-                <Mail /> Login
+                <Mail /> Volunteer
               </Button>
             </Link>
           </NavbarItem>

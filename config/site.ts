@@ -31,6 +31,10 @@ export const siteConfig = {
       label: 'Contact',
       href: '/contact',
     },
+    {
+      label: 'Profiles',
+      href: '/profiles',
+    },
   ],
   navMenuItems: [
     {
@@ -48,6 +52,10 @@ export const siteConfig = {
     {
       label: 'Contact',
       href: '/contact',
+    },
+    {
+      label: 'Profiles',
+      href: '/profiles',
     },
   ],
   sideMenuItems: [

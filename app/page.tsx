@@ -21,7 +21,7 @@ export default function LandingPage() {
               <Link href="/about">Learn More</Link>
             </Button>
             <Button size="lg" variant="outline">
-              <Link href="/register">Get Started</Link>
+              <Link href="/profiles">Get Started</Link>
             </Button>
           </div>
         </section>
@@ -76,7 +76,7 @@ export default function LandingPage() {
             Let your shared love for Islamic learning be the foundation of your future together.
           </p>
           <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            <Link href="/register">Get Started</Link>
+            <Link href="/profiles">Get Started</Link>
           </Button>
         </section>
       </main>
