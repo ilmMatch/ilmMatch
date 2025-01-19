@@ -113,8 +113,6 @@ export default function AddProfile() {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            gender: 'male',
-            maritalStatus: 'single',
             languages: [],
             scholars: [],
             spouseAge: { min: undefined, max: undefined },
@@ -134,11 +132,12 @@ export default function AddProfile() {
             gender: parsedData['Gender'].toLowerCase() as 'male' | 'female',
             height: parseInt(parsedData['Height'].replace('"', '')),
             nationality: parsedData['Nationality'],
+            languages: parsedData['Languages spoken'].split(/\s*(?:and|,|\s)\s*/),
             ethnicity: parsedData['Ethnicity'],
             occupation: parsedData['Occupation'],
             education: parsedData['Education'],
             maritalStatus: parsedData['Marital status'].toLowerCase() as 'single' | 'married' | 'divorced' | 'widowed',
-            briefAboutYou: parsedData['Brief description about you (maximum 150 words)*'],
+            briefAboutYou: parsedData['Brief description about you'],
             spouseBrief: parsedData['Your preference'],
         });
         setOpenDialog(false);
@@ -176,555 +175,633 @@ export default function AddProfile() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-8">
-                                <FormField
-                                    control={form.control}
-                                    name="gender"
-                                    render={({ field }) => (
-                                        <FormItem className="space-y-3">
-                                            <FormLabel>Gender</FormLabel>
-                                            <FormControl>
-                                                <RadioGroup
-                                                    onValueChange={field.onChange}
-                                                    defaultValue={field.value}
-                                                    className="flex flex-col space-y-1"
-                                                    disabled={!editing}
-                                                >
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                                        <FormControl>
-                                                            <RadioGroupItem value="male" />
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal">
-                                                            Male
-                                                        </FormLabel>
+                                <div className="grid gap-8 md:grid-cols-2">
+
+                                    {/* Personal Information */}
+                                    <div className="space-y-4 bg-card md:p-6 rounded-lg shadow-none">
+                                        <h2 className="text-2xl font-bold text-primary">
+                                            Personal Information
+                                        </h2>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="maritalStatus"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Marital Status</FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                            disabled={!editing}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                >
+                                                                    <SelectValue placeholder="Select marital status" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="single">Single</SelectItem>
+                                                                <SelectItem value="married">Married</SelectItem>
+                                                                <SelectItem value="divorced">Divorced</SelectItem>
+                                                                <SelectItem value="widowed">Widowed</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
                                                     </FormItem>
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="childern"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Number of Children</FormLabel>
                                                         <FormControl>
-                                                            <RadioGroupItem value="female" />
+                                                            <Input
+                                                                type="number"
+                                                                {...field}
+                                                                onChange={(e) =>
+                                                                    field.onChange(
+                                                                        e.target.value === ''
+                                                                            ? undefined
+                                                                            : +e.target.value
+                                                                    )
+                                                                }
+                                                                className={cn(
+                                                                    !editing && 'disabled:cursor-default'
+                                                                )}
+                                                                disabled={!editing}
+                                                            />
                                                         </FormControl>
-                                                        <FormLabel className="font-normal">
-                                                            Female
-                                                        </FormLabel>
+                                                        <FormMessage />
                                                     </FormItem>
-                                                </RadioGroup>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                )}
+                                            />
+                                        </div>
 
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="maritalStatus"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Marital Status</FormLabel>
-                                                <Select
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                    disabled={!editing}
-                                                >
+                                        <FormField
+                                            control={form.control}
+                                            name="nationality"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Nationality</FormLabel>
                                                     <FormControl>
-                                                        <SelectTrigger
-                                                            className={cn(
-                                                                !editing && 'disabled:cursor-default'
-                                                            )}
-                                                        >
-                                                            <SelectValue placeholder="Select marital status" />
-                                                        </SelectTrigger>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
                                                     </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="single">Single</SelectItem>
-                                                        <SelectItem value="married">Married</SelectItem>
-                                                        <SelectItem value="divorced">Divorced</SelectItem>
-                                                        <SelectItem value="widowed">Widowed</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="childern"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Number of Children</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        {...field}
-                                                        onChange={(e) =>
-                                                            field.onChange(
-                                                                e.target.value === ''
-                                                                    ? undefined
-                                                                    : +e.target.value
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            !editing && 'disabled:cursor-default'
-                                                        )}
-                                                        disabled={!editing}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                <FormField
-                                    control={form.control}
-                                    name="nationality"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Nationality</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="countryResiding"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Country of Residence</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(
+                                                                    !editing && 'disabled:cursor-default'
+                                                                )}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="countryResiding"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Country of Residence</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        className={cn(
-                                                            !editing && 'disabled:cursor-default'
-                                                        )}
-                                                        disabled={!editing}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                            <FormField
+                                                control={form.control}
+                                                name="countryMoving"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Country To Marry/Move in</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(
+                                                                    !editing && 'disabled:cursor-default'
+                                                                )}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
 
-                                    <FormField
-                                        control={form.control}
-                                        name="countryMoving"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Country To Marry/Move in</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        className={cn(
-                                                            !editing && 'disabled:cursor-default'
-                                                        )}
-                                                        disabled={!editing}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <FormField
-                                    control={form.control}
-                                    name="languages"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Languages</FormLabel>
-                                            <FormControl>
-                                                <CommaSeparatedInput
-                                                    value={field.value || []}
-                                                    onChange={field.onChange}
-                                                    placeholder="Enter languages (comma-separated)"
-                                                    editing={editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="beard"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Beard</FormLabel>
-                                                <Select
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                    disabled={!editing}
-                                                >
+                                        <FormField
+                                            control={form.control}
+                                            name="languages"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Languages</FormLabel>
                                                     <FormControl>
-                                                        <SelectTrigger
-                                                            className={cn(
-                                                                !editing && 'disabled:cursor-default'
-                                                            )}
-                                                        >
-                                                            <SelectValue placeholder="Select option" />
-                                                        </SelectTrigger>
+                                                        <CommaSeparatedInput
+                                                            value={field.value || []}
+                                                            onChange={field.onChange}
+                                                            placeholder="Enter languages (comma-separated)"
+                                                            editing={editing}
+                                                        />
                                                     </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="yes">Yes</SelectItem>
-                                                        <SelectItem value="no">No</SelectItem>
-                                                        <SelectItem value="not applicable">
-                                                            Not Applicable
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
 
-                                    <FormField
-                                        control={form.control}
-                                        name="hijab"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Hijab</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        className={cn(!editing && 'disabled:cursor-default')}
-                                                        disabled={!editing}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                    {/* Appearance  */}
+                                    <div className="space-y-4 bg-card md:p-6 rounded-lg shadow-none">
+                                        <h2 className="text-2xl font-bold text-primary">Appearance</h2>
 
-                                <FormField
-                                    control={form.control}
-                                    name="ethnicity"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Ethnicity</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="beard"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Beard</FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                            disabled={!editing}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                >
+                                                                    <SelectValue placeholder="Select option" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="yes">Yes</SelectItem>
+                                                                <SelectItem value="no">No</SelectItem>
+                                                                <SelectItem value="not applicable">
+                                                                    Not Applicable
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="height"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Height (cm)</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        {...field}
-                                                        onChange={(e) =>
-                                                            field.onChange(
-                                                                e.target.value === ''
-                                                                    ? undefined
-                                                                    : +e.target.value
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            !editing && 'disabled:cursor-default'
-                                                        )}
-                                                        disabled={!editing}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="build"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Build</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        className={cn(
-                                                            !editing && 'disabled:cursor-default'
-                                                        )}
-                                                        disabled={!editing}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                            <FormField
+                                                control={form.control}
+                                                name="hijab"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Hijab</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
 
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <FormField
-                                        control={form.control}
-                                        name="pray"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Prayer Habits</FormLabel>
-                                                <Select
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                    disabled={!editing}
-                                                >
+                                        <div className="grid gap-4 sm:grid-cols-2">
+
+                                            <FormField
+                                                control={form.control}
+                                                name="ethnicity"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Ethnicity</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(!editing && 'disabled:cursor-default')}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="gender"
+                                                render={({ field }) => (
+                                                    <FormItem className="space-y-3">
+                                                        <FormLabel>Gender</FormLabel>
+
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                            disabled={!editing}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                >
+                                                                    <SelectValue placeholder="Select Gender" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="brother">Brother</SelectItem>
+                                                                <SelectItem value="sister">Sister</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="height"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Height (cm)</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                {...field}
+                                                                onChange={(e) =>
+                                                                    field.onChange(
+                                                                        e.target.value === ''
+                                                                            ? undefined
+                                                                            : +e.target.value
+                                                                    )
+                                                                }
+                                                                className={cn(
+                                                                    !editing && 'disabled:cursor-default'
+                                                                )}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="build"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Build</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                className={cn(
+                                                                    !editing && 'disabled:cursor-default'
+                                                                )}
+                                                                disabled={!editing}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Religious */}
+                                    <div className="space-y-4 bg-card md:p-6 rounded-lg">
+                                        <h2 className="text-2xl font-bold text-primary">Religious</h2>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <FormField
+                                                control={form.control}
+                                                name="pray"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Prayer Habits</FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                            disabled={!editing}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                >
+                                                                    <SelectValue placeholder="Select option" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="yes">Yes</SelectItem>
+                                                                <SelectItem value="no">No</SelectItem>
+                                                                <SelectItem value="yes including tahajjud">
+                                                                    Yes, including Tahajjud
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="born"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Born Muslim or Revert</FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                            disabled={!editing}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                >
+                                                                    <SelectValue placeholder="Select option" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="born">Born Muslim</SelectItem>
+                                                                <SelectItem value="revert">Revert</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name="sect"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Sect</FormLabel>
                                                     <FormControl>
-                                                        <SelectTrigger
-                                                            className={cn(
-                                                                !editing && 'disabled:cursor-default'
-                                                            )}
-                                                        >
-                                                            <SelectValue placeholder="Select option" />
-                                                        </SelectTrigger>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
                                                     </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="yes">Yes</SelectItem>
-                                                        <SelectItem value="no">No</SelectItem>
-                                                        <SelectItem value="yes including tahajjud">
-                                                            Yes, including Tahajjud
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="born"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Born Muslim or Revert</FormLabel>
-                                                <Select
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                    disabled={!editing}
-                                                >
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="masjidName"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Masjid Name You Go To</FormLabel>
                                                     <FormControl>
-                                                        <SelectTrigger
-                                                            className={cn(
-                                                                !editing && 'disabled:cursor-default'
-                                                            )}
-                                                        >
-                                                            <SelectValue placeholder="Select option" />
-                                                        </SelectTrigger>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
                                                     </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="born">Born Muslim</SelectItem>
-                                                        <SelectItem value="revert">Revert</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="scholars"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Scholars</FormLabel>
+                                                    <FormControl>
+                                                        <CommaSeparatedInput
+                                                            value={field.value || []}
+                                                            onChange={field.onChange}
+                                                            placeholder="Enter scholars (comma-separated)"
+                                                            editing={editing}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                    </div>
+                                    {/* Educational */}
+                                    <div className="space-y-4 bg-card md:p-6 rounded-lg">
+                                        <h2 className="text-2xl font-bold text-primary">
+                                            Education and Occupation
+                                        </h2>
+                                        <FormField
+                                            control={form.control}
+                                            name="education"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Education</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="islamicEducation"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Islamic Education</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="islamicEducationProof"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Islamic Education Proof</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            type="url"
+                                                            placeholder="https://example.com/proof"
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        Provide a link to your Islamic education certificate or
+                                                        proof
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="occupation"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Occupation</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            className={cn(!editing && 'disabled:cursor-default')}
+                                                            disabled={!editing}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                    </div>
                                 </div>
 
-                                <FormField
-                                    control={form.control}
-                                    name="sect"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Sect</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="masjidName"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Masjid Name You Go To</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="scholars"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Scholars</FormLabel>
-                                            <FormControl>
-                                                <CommaSeparatedInput
-                                                    value={field.value || []}
-                                                    onChange={field.onChange}
-                                                    placeholder="Enter scholars (comma-separated)"
-                                                    editing={editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="education"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Education</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="islamicEducation"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Islamic Education</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="islamicEducationProof"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Islamic Education Proof</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    type="url"
-                                                    placeholder="https://example.com/proof"
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Provide a link to your Islamic education certificate or
-                                                proof
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="occupation"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Occupation</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    className={cn(!editing && 'disabled:cursor-default')}
-                                                    disabled={!editing}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="polygamy"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Will you consider Polygamy</FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value}
-                                                disabled={!editing}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger
-                                                        className={cn(
-                                                            !editing && 'disabled:cursor-default'
-                                                        )}
+                                <div className="space-y-4 bg-card md:p-6 rounded-lg md:col-span-2">
+                                    <h2 className="text-2xl font-bold text-primary">
+                                        Spouse Preferences & About
+                                    </h2>
+                                    <div className='grid gap-8 md:grid-cols-2'>
+                                        <FormField
+                                            control={form.control}
+                                            name="polygamy"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Will you consider Polygamy</FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        value={field.value}
+                                                        disabled={!editing}
                                                     >
-                                                        <SelectValue placeholder="Select option" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="yes">Yes</SelectItem>
-                                                    <SelectItem value="no">No</SelectItem>
-                                                    <SelectItem value="under certain circumstance">
-                                                        Under Certain Circumstances
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                        <FormControl>
+                                                            <SelectTrigger
+                                                                className={cn(
+                                                                    !editing && 'disabled:cursor-default'
+                                                                )}
+                                                            >
+                                                                <SelectValue placeholder="Select option" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="yes">Yes</SelectItem>
+                                                            <SelectItem value="no">No</SelectItem>
+                                                            <SelectItem value="under certain circumstance">
+                                                                Under Certain Circumstances
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                <div className="flex gap-2 justify-center items-center">
-                                    <Label className="min-w-fit">Spouse Age:</Label>
+                                        <div className="space-y-2">
+                                            <Label className="min-w-fit">Spouse Age:</Label>
+                                            <div className='flex gap-2 justify-center items-center'>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="spouseAge.min"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    {...field}
+                                                                    placeholder="Min"
+                                                                    onChange={(e) =>
+                                                                        field.onChange(
+                                                                            e.target.value === ''
+                                                                                ? undefined
+                                                                                : +e.target.value
+                                                                        )
+                                                                    }
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                    disabled={!editing}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+
+                                                <FormField
+                                                    control={form.control}
+                                                    name="spouseAge.max"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    {...field}
+                                                                    placeholder="Max"
+                                                                    onChange={(e) =>
+                                                                        field.onChange(
+                                                                            e.target.value === ''
+                                                                                ? undefined
+                                                                                : +e.target.value
+                                                                        )
+                                                                    }
+                                                                    className={cn(
+                                                                        !editing && 'disabled:cursor-default'
+                                                                    )}
+                                                                    disabled={!editing}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <FormField
                                         control={form.control}
-                                        name="spouseAge.min"
+                                        name="briefAboutYou"
                                         render={({ field }) => (
                                             <FormItem>
+                                                <FormLabel>Brief About You</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        {...field}
-                                                        placeholder="Min"
-                                                        onChange={(e) =>
-                                                            field.onChange(
-                                                                e.target.value === ''
-                                                                    ? undefined
-                                                                    : +e.target.value
-                                                            )
-                                                        }
+                                                    <Textarea
+                                                        placeholder="Tell us about yourself"
                                                         className={cn(
-                                                            !editing && 'disabled:cursor-default'
+                                                            !editing && 'disabled:cursor-default resize-none'
                                                         )}
                                                         disabled={!editing}
+                                                        {...field}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -734,25 +811,18 @@ export default function AddProfile() {
 
                                     <FormField
                                         control={form.control}
-                                        name="spouseAge.max"
+                                        name="spouseBrief"
                                         render={({ field }) => (
                                             <FormItem>
+                                                <FormLabel>Brief About Desired Spouse</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        {...field}
-                                                        placeholder="Max"
-                                                        onChange={(e) =>
-                                                            field.onChange(
-                                                                e.target.value === ''
-                                                                    ? undefined
-                                                                    : +e.target.value
-                                                            )
-                                                        }
+                                                    <Textarea
+                                                        placeholder="Describe your ideal spouse"
                                                         className={cn(
-                                                            !editing && 'disabled:cursor-default'
+                                                            !editing && 'disabled:cursor-default resize-none'
                                                         )}
                                                         disabled={!editing}
+                                                        {...field}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -760,48 +830,6 @@ export default function AddProfile() {
                                         )}
                                     />
                                 </div>
-
-                                <FormField
-                                    control={form.control}
-                                    name="briefAboutYou"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Brief About You</FormLabel>
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="Tell us about yourself"
-                                                    className={cn(
-                                                        !editing && 'disabled:cursor-default resize-none'
-                                                    )}
-                                                    disabled={!editing}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="spouseBrief"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Brief About Desired Spouse</FormLabel>
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="Describe your ideal spouse"
-                                                    className={cn(
-                                                        !editing && 'disabled:cursor-default resize-none'
-                                                    )}
-                                                    disabled={!editing}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                             </div>
                         </CardContent>
                     </Card>
@@ -1187,7 +1215,7 @@ export default function AddProfile() {
                     </Button>
                 </form>
             </Form>
-        </div>
+        </div >
     );
 }
 

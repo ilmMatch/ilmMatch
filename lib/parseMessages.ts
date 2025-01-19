@@ -4,7 +4,7 @@ export function parseMessages(messages: string[]) {
         'Nationality', 'Ethnicity', 'Occupation', 'Education', 'Languages spoken', 'Would you consider Polygamy',
         'Do you pray 5xs a day?', 'Marital status', 'Do you have children from previous marriage?',
         'Which country are you currently residing in?', 'Which countries you would consider moving to?',
-        'Brief description about you \\(maximum 150 words\\)\\*', 'Your preference'
+        'Brief description about you', 'Your preference'
     ];
 
     const extractField = (text: string, start: string, end: string) => {
@@ -14,6 +14,9 @@ export function parseMessages(messages: string[]) {
     };
 
     const sanitize = (value: string | null) => {
+        if (value?.includes("\\(maximum 150 words\\) \\*)")) {
+            return value.replace("\\(maximum 150 words\\)\\*", '').trim() || '';
+        }
         return value?.replace(/^[:\-\?\s]+|[:\-\?\s]+$/g, '').trim() || '';
     };
 
